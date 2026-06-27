@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@llp/types": ["./types/index.ts"]
     }
   },
   "include": [

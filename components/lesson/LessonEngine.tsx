@@ -120,6 +120,11 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       ? exercises[state.exerciseIndex]
       : null;
 
+  const goToDashboard = () => {
+    router.push("/dashboard");
+    router.refresh();
+  };
+
   const handleSubmit = (correct: boolean) => {
     if (correct) {
       setShowXpPop(true);
@@ -134,7 +139,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     const nextIndex = state.exerciseIndex + 1;
     if (nextIndex >= exercises.length) {
       const perfect = state.mistakes === 0;
-      let totalXp = state.xp + (perfect ? 20 : 0);
+      const totalXp = state.xp + (perfect ? 20 : 0);
 
       try {
         const result = await fetchApi<{ xpEarned: number; newStreak: number; totalXp: number }>(
@@ -146,7 +151,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
         );
         dispatch({
           type: "COMPLETE",
-          totalXp: result.xpEarned,
+          totalXp,
           streak: result.newStreak,
           perfect,
         });
@@ -229,7 +234,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       <div className="flex flex-col items-center justify-center gap-6 py-20">
         <h2 className="text-2xl font-black text-destructive">Out of hearts!</h2>
         <p className="text-muted-foreground">Try again when you&apos;re ready.</p>
-        <Button onClick={() => router.push("/dashboard")}>Back to map</Button>
+        <Button onClick={goToDashboard}>Back to map</Button>
       </div>
     );
   }
@@ -240,7 +245,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
         totalXp={state.totalXp}
         streak={state.streak}
         perfect={state.perfect}
-        onContinue={() => router.push("/dashboard")}
+        onContinue={goToDashboard}
       />
     );
   }
@@ -277,6 +282,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
       {currentExercise?.type === "match" && state.phase === "active" && (
         <MatchExercise
+          key={currentExercise.id}
           answer={currentExercise.answer}
           onComplete={handleMatchComplete}
         />

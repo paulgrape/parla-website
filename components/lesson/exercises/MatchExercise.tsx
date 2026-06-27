@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,22 +14,33 @@ interface Pair {
   english: string;
 }
 
+function parsePairs(answer: string): Pair[] {
+  const parsed = JSON.parse(answer) as unknown;
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed.map((item) => {
+    if (Array.isArray(item) && item.length >= 2) {
+      return { italian: String(item[0]), english: String(item[1]) };
+    }
+    if (item && typeof item === "object" && "italian" in item && "english" in item) {
+      const pair = item as { italian: string; english: string };
+      return { italian: pair.italian, english: pair.english };
+    }
+    return { italian: "", english: "" };
+  }).filter((p) => p.italian && p.english);
+}
+
 function shuffle<T>(items: T[]): T[] {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
 export function MatchExercise({ answer, onComplete }: MatchExerciseProps) {
-  const pairs: Pair[] = useMemo(() => JSON.parse(answer), [answer]);
+  const pairs: Pair[] = useMemo(() => parsePairs(answer), [answer]);
   const [selectedItalian, setSelectedItalian] = useState<string | null>(null);
   const [matched, setMatched] = useState<Set<string>>(new Set());
   const [wrongPair, setWrongPair] = useState<string | null>(null);
-  const [italianWords, setItalianWords] = useState<string[]>([]);
-  const [englishWords, setEnglishWords] = useState<string[]>([]);
-
-  useEffect(() => {
-    setItalianWords(shuffle(pairs.map((p) => p.italian)));
-    setEnglishWords(shuffle(pairs.map((p) => p.english)));
-  }, [pairs]);
+  const [italianWords] = useState<string[]>(() => shuffle(pairs.map((p) => p.italian)));
+  const [englishWords] = useState<string[]>(() => shuffle(pairs.map((p) => p.english)));
 
   const handleSelectItalian = (word: string) => {
     if (matched.has(word)) return;

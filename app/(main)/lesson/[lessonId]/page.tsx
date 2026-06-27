@@ -1,8 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { LessonEngine } from "@/components/lesson/LessonEngine";
-import { fetchApiServer } from "@/lib/api";
-import type { Exercise } from "@llp/types";
+import { LessonContent } from "@/components/lesson/LessonContent";
 
 export default async function LessonPage({
   params,
@@ -10,21 +8,8 @@ export default async function LessonPage({
   params: Promise<{ lessonId: string }>;
 }) {
   const { lessonId } = await params;
-  const { getToken } = await auth();
-  const token = await getToken();
-  if (!token) redirect("/sign-in");
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
 
-  let exercises: Exercise[] = [];
-
-  try {
-    exercises = await fetchApiServer<Exercise[]>(`/lessons/${lessonId}/exercises`, token);
-  } catch {
-    redirect("/dashboard");
-  }
-
-  return (
-    <div>
-      <LessonEngine lessonId={lessonId} exercises={exercises} />
-    </div>
-  );
+  return <LessonContent lessonId={lessonId} />;
 }

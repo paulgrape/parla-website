@@ -2,16 +2,33 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Flame, Home, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useApi } from "@/lib/api";
+import type { UserStats } from "@llp/types";
 
 interface SidebarProps {
-  streak: number;
-  xp: number;
+  streak?: number;
+  xp?: number;
 }
 
-export function Sidebar({ streak, xp }: SidebarProps) {
+export function Sidebar({ streak: initialStreak = 0, xp: initialXp = 0 }: SidebarProps) {
   const pathname = usePathname();
+  const { fetchApi } = useApi();
+  const [streak, setStreak] = useState(initialStreak);
+  const [xp, setXp] = useState(initialXp);
+
+  useEffect(() => {
+    fetchApi<UserStats>("/me")
+      .then((stats) => {
+        setStreak(stats.streak);
+        setXp(stats.xp);
+      })
+      .catch(() => {
+        // Keep initial values if API is unavailable
+      });
+  }, [fetchApi]);
 
   const links = [
     { href: "/dashboard", label: "Learn", icon: Home },

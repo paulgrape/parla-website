@@ -26,7 +26,7 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
       {units.map((unit) => (
         <section key={unit.id}>
           <div className="mb-6">
-            <h2 className="text-2xl font-black">{unit.title}</h2>
+            <h2 className="text-xl font-black md:text-2xl">{unit.title}</h2>
             {unit.description && (
               <p className="text-muted-foreground">{unit.description}</p>
             )}
@@ -54,7 +54,7 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                   <Link
                     href={unlocked ? `/lesson/${lesson.id}` : "#"}
                     className={cn(
-                      "relative flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-transform",
+                      "relative flex h-14 w-14 items-center justify-center rounded-full border-4 font-bold transition-transform md:h-16 md:w-16",
                       completed
                         ? "border-primary bg-primary text-white shadow-[0_4px_0_0_#46a302]"
                         : unlocked

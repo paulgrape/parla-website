@@ -42,14 +42,14 @@ export function CompletionScreen({
           )}
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex gap-6 md:gap-8">
           <div>
             <p className="text-sm font-bold uppercase text-muted-foreground">XP Earned</p>
-            <p className="text-4xl font-black text-primary">{totalXp}</p>
+            <p className="text-3xl font-black text-primary md:text-4xl">{totalXp}</p>
           </div>
           <div>
             <p className="text-sm font-bold uppercase text-muted-foreground">Streak</p>
-            <p className="flex items-center justify-center gap-1 text-4xl font-black text-orange-500">
+            <p className="flex items-center justify-center gap-1 text-3xl font-black text-orange-500 md:text-4xl">
               <Flame className="h-8 w-8" />
               {streak}
             </p>
