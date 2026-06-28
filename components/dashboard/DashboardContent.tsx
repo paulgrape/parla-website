@@ -50,7 +50,7 @@ export function DashboardContent() {
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
         <h1 className="text-2xl font-black md:text-3xl">Your learning path</h1>
-        <p className="text-muted-foreground">Complete lessons to unlock new ones</p>
+        <p className="text-muted-foreground">Complete levels to unlock new topics</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -68,7 +68,7 @@ export function DashboardContent() {
 
       {units.length === 0 ? (
         <div className="rounded-2xl border-2 border-border bg-muted p-6 text-center">
-          <p className="font-bold">No lessons found</p>
+          <p className="font-bold">No levels found</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Run <code className="rounded bg-white px-1">npm run db:seed</code> to populate the curriculum.
           </p>

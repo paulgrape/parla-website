@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 interface MatchExerciseProps {
   answer: string;
-  onComplete: (correct: boolean) => void;
+  onMistake: () => void;
+  onComplete: () => void;
 }
 
 interface Pair {
@@ -34,7 +35,7 @@ function shuffle<T>(items: T[]): T[] {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
-export function MatchExercise({ answer, onComplete }: MatchExerciseProps) {
+export function MatchExercise({ answer, onMistake, onComplete }: MatchExerciseProps) {
   const pairs: Pair[] = useMemo(() => parsePairs(answer), [answer]);
   const [selectedItalian, setSelectedItalian] = useState<string | null>(null);
   const [matched, setMatched] = useState<Set<string>>(new Set());
@@ -59,9 +60,10 @@ export function MatchExercise({ answer, onComplete }: MatchExerciseProps) {
       setSelectedItalian(null);
 
       if (newMatched.size === pairs.length) {
-        onComplete(true);
+        onComplete();
       }
     } else {
+      onMistake();
       setWrongPair(selectedItalian);
       setSelectedItalian(null);
       setTimeout(() => setWrongPair(null), 500);

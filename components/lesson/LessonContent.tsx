@@ -21,7 +21,7 @@ export function LessonContent({ lessonId }: LessonContentProps) {
     fetchApi<Exercise[]>(`/lessons/${lessonId}/exercises`)
       .then(setExercises)
       .catch(() => {
-        setError("Could not load this lesson. Make sure the API is running (npm run dev:api).");
+        setError("Could not load this level. Make sure the API is running (npm run dev:api).");
       });
   }, [fetchApi, lessonId]);
 
@@ -35,13 +35,13 @@ export function LessonContent({ lessonId }: LessonContentProps) {
   }
 
   if (!exercises) {
-    return <p className="text-center text-muted-foreground py-20">Loading lesson...</p>;
+    return <p className="text-center text-muted-foreground py-20">Loading level...</p>;
   }
 
   if (exercises.length === 0) {
     return (
       <div className="mx-auto max-w-md py-20 text-center space-y-4">
-        <p className="font-bold">This lesson has no exercises yet.</p>
+        <p className="font-bold">This level has no exercises yet.</p>
         <Button onClick={() => router.push("/dashboard")}>Back to map</Button>
       </div>
     );

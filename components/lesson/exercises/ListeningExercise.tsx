@@ -12,6 +12,7 @@ interface ListeningExerciseProps {
   revealed: boolean;
   onSubmit: (correct: boolean) => void;
   onContinue: () => void;
+  onSkipListening: () => void;
 }
 
 export function ListeningExercise({
@@ -20,6 +21,7 @@ export function ListeningExercise({
   revealed,
   onSubmit,
   onContinue,
+  onSkipListening,
 }: ListeningExerciseProps) {
   const [input, setInput] = useState("");
 
@@ -63,9 +65,14 @@ export function ListeningExercise({
           </Button>
         </div>
       ) : (
-        <Button onClick={handleSubmit} disabled={!input.trim()} className="w-full" size="lg">
-          Check
-        </Button>
+        <div className="space-y-3">
+          <Button onClick={handleSubmit} disabled={!input.trim()} className="w-full" size="lg">
+            Check
+          </Button>
+          <Button onClick={onSkipListening} className="w-full" variant="outline" size="lg">
+            I cannot listen now
+          </Button>
+        </div>
       )}
     </div>
   );
