@@ -8,6 +8,7 @@ interface CompletionScreenProps {
   totalXp: number;
   streak: number;
   perfect: boolean;
+  mistakes: number;
   onContinue: () => void;
 }
 
@@ -15,6 +16,7 @@ export function CompletionScreen({
   totalXp,
   streak,
   perfect,
+  mistakes,
   onContinue,
 }: CompletionScreenProps) {
   return (
@@ -34,10 +36,15 @@ export function CompletionScreen({
         </motion.div>
 
         <div>
-          <h2 className="text-3xl font-black text-primary">Lesson Complete!</h2>
+          <h2 className="text-3xl font-black text-primary">Level Complete!</h2>
           {perfect && (
             <p className="mt-2 text-sm font-bold text-orange-500">
-              Perfect lesson! +20 bonus XP
+              Perfect level! +20 bonus XP
+            </p>
+          )}
+          {!perfect && mistakes > 0 && (
+            <p className="mt-2 text-sm font-bold text-primary">
+              Nice recovery. You fixed {mistakes} mistake{mistakes === 1 ? "" : "s"}.
             </p>
           )}
         </div>
