@@ -1,10 +1,17 @@
 "use client";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { useClerkAppearance } from "@/hooks/useClerkAppearance";
 
 function hasValidClerkKey() {
   const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   return Boolean(key && key.startsWith("pk_") && !key.includes("placeholder"));
+}
+
+function ClerkWithTheme({ children }: { children: React.ReactNode }) {
+  const appearance = useClerkAppearance();
+
+  return <ClerkProvider appearance={appearance}>{children}</ClerkProvider>;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -12,5 +19,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <ClerkProvider>{children}</ClerkProvider>;
+  return <ClerkWithTheme>{children}</ClerkWithTheme>;
 }

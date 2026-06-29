@@ -50,7 +50,7 @@ export function DashboardContent() {
         <div className="rounded-2xl border-2 border-border bg-muted p-6 text-center">
           <p className="font-bold">No levels found</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Run <code className="rounded bg-white px-1">npm run db:seed</code> to populate the curriculum.
+            Run <code className="rounded bg-card px-1">npm run db:seed</code> to populate the curriculum.
           </p>
         </div>
       ) : (

@@ -23,7 +23,7 @@ export function CompletionScreen({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-6"
     >
       <div className="flex max-w-md flex-col items-center gap-6 text-center">
         <motion.div

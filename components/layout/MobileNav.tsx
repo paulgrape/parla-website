@@ -17,7 +17,7 @@ export function MobileNav() {
   if (pathname.startsWith("/lesson/")) return null;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t-2 border-border bg-white md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t-2 border-border bg-card md:hidden">
       {links.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
