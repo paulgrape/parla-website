@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check } from "lucide-react";
+import { Tick01Icon } from "hugeicons-react";
 import { cn } from "@/lib/utils";
 
 interface MatchExerciseProps {
@@ -96,7 +96,7 @@ export function MatchExercise({ answer, onMistake, onComplete }: MatchExercisePr
             >
               <span className="flex items-center justify-between">
                 {word}
-                {matched.has(word) && <Check className="h-4 w-4" />}
+                {matched.has(word) && <Tick01Icon size={16} strokeWidth={2.5} />}
               </span>
             </button>
           ))}

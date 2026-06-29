@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Volume2 } from "lucide-react";
+import { VolumeHighIcon } from "hugeicons-react";
 import { Button } from "@/components/ui/button";
 import { speakItalian } from "@/lib/speech";
 import { isAnswerCorrect } from "@/lib/utils";
@@ -42,7 +42,7 @@ export function ListeningExercise({
         onClick={() => speakItalian(audioText)}
         className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary text-white shadow-[0_6px_0_0_#46a302] transition-transform hover:scale-105 active:shadow-none active:translate-y-1"
       >
-        <Volume2 className="h-10 w-10" />
+        <VolumeHighIcon size={40} strokeWidth={2} />
       </button>
 
       <input

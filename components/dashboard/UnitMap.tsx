@@ -1,93 +1,124 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { Check, Lock, Star } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Lesson, Unit } from "@llp/types";
+import { cn } from '@/lib/utils'
+import type { Lesson, Unit } from '@llp/types'
+import { LockIcon, StarIcon, Tick01Icon } from 'hugeicons-react'
+import Link from 'next/link'
 
 interface UnitMapProps {
-  units: (Unit & { lessons: Lesson[] })[];
-  completedLessons: string[];
+  units: (Unit & { lessons: Lesson[] })[]
+  completedLessons: string[]
 }
 
-export function UnitMap({ units, completedLessons }: UnitMapProps) {
-  const allLessons = units.flatMap((u) =>
-    u.lessons.map((l) => ({ ...l, unitOrder: u.order }))
-  );
+// Horizontal offsets (px) cycled per node to form a Duolingo-style wave path.
+const WAVE_OFFSETS = [0, -60, -100, -60, 0, 60, 100, 60]
 
-  const isUnlocked = (lesson: Lesson & { unitOrder: number }, index: number) => {
-    if (index === 0) return true;
-    const prev = allLessons[index - 1];
-    return completedLessons.includes(prev.id);
-  };
+// Banner color cycled per unit so consecutive chapters feel distinct.
+const UNIT_THEMES = [
+  { banner: 'bg-primary', shadow: '#46a302' },
+  { banner: 'bg-purple-500', shadow: '#7c3aed' },
+  { banner: 'bg-sky-500', shadow: '#0284c7' },
+  { banner: 'bg-orange-500', shadow: '#c2410c' },
+  { banner: 'bg-pink-500', shadow: '#be185d' },
+]
+
+export function UnitMap({ units, completedLessons }: UnitMapProps) {
+  const allLessons = units.flatMap(u =>
+    u.lessons.map(l => ({ ...l, unitOrder: u.order })),
+  )
+
+  const isUnlocked = (lessonId: string, index: number) => {
+    if (index === 0) return true
+    const prev = allLessons[index - 1]
+    return completedLessons.includes(prev.id)
+  }
 
   return (
-    <div className="space-y-12">
-      {units.map((unit) => (
-        <section key={unit.id}>
-          <div className="mb-6">
-            <p className="text-xs font-black uppercase tracking-wide text-primary">
-              Chapter {unit.order}
-            </p>
-            <h2 className="text-xl font-black md:text-2xl">{unit.title}</h2>
-            {unit.description && (
-              <p className="text-muted-foreground">{unit.description}</p>
-            )}
-          </div>
+    <div className='space-y-8'>
+      {units.map((unit, unitIndex) => {
+        const theme = UNIT_THEMES[unitIndex % UNIT_THEMES.length]
 
-          <div className="flex flex-col items-center gap-4">
-            {unit.lessons.map((lesson, lessonIndex) => {
-              const globalIndex = allLessons.findIndex((l) => l.id === lesson.id);
-              const completed = completedLessons.includes(lesson.id);
-              const unlocked = isUnlocked(
-                { ...lesson, unitOrder: unit.order },
-                globalIndex
-              );
+        return (
+          <section
+            key={unit.id}
+            className='space-y-10'
+          >
+            <div
+              className={cn(
+                'sticky md:top-4 top-18 z-20 flex items-center justify-between gap-4 rounded-2xl px-5 py-4 text-white shadow-[0_4px_0_0_rgba(0,0,0,0.15)]',
+                theme.banner,
+              )}
+            >
+              <div>
+                <p className='text-xs font-black uppercase tracking-wide text-white/80'>
+                  Section 1, Unit {unit.order}
+                </p>
+                <h2 className='text-lg font-black font-display md:text-xl'>
+                  {unit.title}
+                </h2>
+              </div>
+            </div>
 
-              return (
-                <div key={lesson.id} className="flex flex-col items-center">
-                  {lessonIndex > 0 && (
-                    <div
+            <div className='flex flex-col items-center gap-4'>
+              {unit.lessons.map((lesson, lessonIndex) => {
+                const globalIndex = allLessons.findIndex(
+                  l => l.id === lesson.id,
+                )
+                const completed = completedLessons.includes(lesson.id)
+                const unlocked = isUnlocked(lesson.id, globalIndex)
+                const offset = WAVE_OFFSETS[lessonIndex % WAVE_OFFSETS.length]
+
+                return (
+                  <div
+                    key={lesson.id}
+                    className='flex flex-col items-center'
+                    style={{ transform: `translateX(${offset}px)` }}
+                  >
+                    <Link
+                      href={unlocked ? `/lesson/${lesson.id}` : '#'}
+                      aria-disabled={!unlocked}
+                      onClick={e => !unlocked && e.preventDefault()}
                       className={cn(
-                        "h-8 w-1 rounded-full mb-2",
-                        completed || unlocked ? "bg-primary" : "bg-border"
+                        'relative flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-all duration-100 md:h-18 md:w-18',
+                        completed
+                          ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                          : unlocked
+                            ? 'border-primary-dark bg-white text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                            : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_#d1d1d1]',
                       )}
-                    />
-                  )}
-                  <Link
-                    href={unlocked ? `/lesson/${lesson.id}` : "#"}
-                    className={cn(
-                      "relative flex h-14 w-14 items-center justify-center rounded-full border-4 font-bold transition-transform md:h-16 md:w-16",
-                      completed
-                        ? "border-primary bg-primary text-white shadow-[0_4px_0_0_#46a302]"
-                        : unlocked
-                          ? "border-primary bg-white text-primary shadow-[0_4px_0_0_#46a302] hover:scale-105"
-                          : "border-border bg-muted text-muted-foreground cursor-not-allowed"
-                    )}
-                    onClick={(e) => !unlocked && e.preventDefault()}
-                  >
-                    {completed ? (
-                      <Check className="h-7 w-7" />
-                    ) : unlocked ? (
-                      <Star className="h-6 w-6" />
-                    ) : (
-                      <Lock className="h-5 w-5" />
-                    )}
-                  </Link>
-                  <p
-                    className={cn(
-                      "mt-2 text-sm font-bold text-center max-w-30",
-                      !unlocked && "text-muted-foreground"
-                    )}
-                  >
-                    Level {lesson.order}: {lesson.title}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+                    >
+                      {completed ? (
+                        <Tick01Icon
+                          size={30}
+                          strokeWidth={2.5}
+                        />
+                      ) : unlocked ? (
+                        <StarIcon
+                          size={26}
+                          strokeWidth={2}
+                        />
+                      ) : (
+                        <LockIcon
+                          size={22}
+                          strokeWidth={2}
+                        />
+                      )}
+                    </Link>
+                    <p
+                      className={cn(
+                        'mt-3 max-w-32 text-center text-sm font-bold',
+                        !unlocked && 'text-muted-foreground',
+                      )}
+                    >
+                      Level {lesson.order}: {lesson.title}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
     </div>
-  );
+  )
 }

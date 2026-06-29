@@ -2,43 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Flame, Home, RotateCcw } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
+import { Home01Icon, ArrowReloadHorizontalIcon } from "hugeicons-react";
 import { cn } from "@/lib/utils";
-import { useApi } from "@/lib/api";
-import type { UserStats } from "@llp/types";
 
-interface SidebarProps {
-  streak?: number;
-  xp?: number;
-}
+const links = [
+  { href: "/dashboard", label: "Learn", icon: Home01Icon },
+  { href: "/review", label: "Review", icon: ArrowReloadHorizontalIcon },
+];
 
-export function Sidebar({ streak: initialStreak = 0, xp: initialXp = 0 }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
-  const { fetchApi } = useApi();
-  const [streak, setStreak] = useState(initialStreak);
-  const [xp, setXp] = useState(initialXp);
 
-  useEffect(() => {
-    fetchApi<UserStats>("/me")
-      .then((stats) => {
-        setStreak(stats.streak);
-        setXp(stats.xp);
-      })
-      .catch(() => {
-        // Keep initial values if API is unavailable
-      });
-  }, [fetchApi]);
-
-  const links = [
-    { href: "/dashboard", label: "Learn", icon: Home },
-    { href: "/review", label: "Review", icon: RotateCcw },
-  ];
+  // Immersive lesson flow: hide the sidebar while inside a lesson.
+  if (pathname.startsWith("/lesson/")) return null;
 
   return (
-    <aside className="hidden md:flex w-64 flex-col border-r-2 border-border bg-white p-6 gap-8">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r-2 border-border bg-white p-6 md:flex">
       <div>
-        <h1 className="text-2xl font-black text-primary tracking-tight">Parla</h1>
+        <h1 className="text-2xl font-black tracking-tight text-primary font-display">Parla</h1>
         <p className="text-sm text-muted-foreground">Learn Italian</p>
       </div>
 
@@ -54,24 +36,15 @@ export function Sidebar({ streak: initialStreak = 0, xp: initialXp = 0 }: Sideba
                 : "text-foreground hover:bg-muted"
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon size={20} strokeWidth={2} />
             {label}
           </Link>
         ))}
       </nav>
 
-      <div className="mt-auto space-y-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-orange-50 px-4 py-3">
-          <Flame className="h-6 w-6 text-orange-500" />
-          <div>
-            <p className="text-xs font-bold uppercase text-orange-600">Streak</p>
-            <p className="text-xl font-black text-orange-500">{streak} days</p>
-          </div>
-        </div>
-        <div className="rounded-2xl bg-primary/10 px-4 py-3">
-          <p className="text-xs font-bold uppercase text-primary">Total XP</p>
-          <p className="text-xl font-black text-primary">{xp}</p>
-        </div>
+      <div className="mt-auto flex items-center gap-3 rounded-2xl px-2 py-2">
+        <UserButton afterSignOutUrl="/sign-in" />
+        <span className="text-sm font-bold text-muted-foreground">Account</span>
       </div>
     </aside>
   );

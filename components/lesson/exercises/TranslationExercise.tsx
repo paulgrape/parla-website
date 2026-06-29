@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Tick01Icon, Cancel01Icon } from "hugeicons-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ export function TranslationExercise({
         <p className="text-sm font-bold uppercase text-muted-foreground mb-2">
           Translate this word
         </p>
-        <h2 className="text-3xl font-black">{prompt}</h2>
+        <h2 className="text-3xl font-black font-display">{prompt}</h2>
       </div>
 
       <div className="grid gap-3">
@@ -52,8 +52,8 @@ export function TranslationExercise({
             >
               <span className="flex items-center justify-between">
                 {option}
-                {revealed && isCorrect && <Check className="h-5 w-5" />}
-                {revealed && isSelected && !isCorrect && <X className="h-5 w-5" />}
+                {revealed && isCorrect && <Tick01Icon size={20} strokeWidth={2.5} />}
+                {revealed && isSelected && !isCorrect && <Cancel01Icon size={20} strokeWidth={2.5} />}
               </span>
             </button>
           );

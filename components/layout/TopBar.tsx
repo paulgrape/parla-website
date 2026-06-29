@@ -1,17 +1,18 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Flame } from "lucide-react";
+import { FireIcon } from "hugeicons-react";
 import { useApi } from "@/lib/api";
 import type { UserStats } from "@llp/types";
 
 interface TopBarProps {
   streak?: number;
-  title?: string;
 }
 
-export function TopBar({ streak: initialStreak = 0, title }: TopBarProps) {
+export function TopBar({ streak: initialStreak = 0 }: TopBarProps) {
+  const pathname = usePathname();
   const { fetchApi } = useApi();
   const [streak, setStreak] = useState(initialStreak);
 
@@ -22,15 +23,16 @@ export function TopBar({ streak: initialStreak = 0, title }: TopBarProps) {
         // Keep initial value if API is unavailable
       });
   }, [fetchApi]);
+
+  // Desktop has no top navbar; immersive lesson flow hides it on mobile too.
+  if (pathname.startsWith("/lesson/")) return null;
+
   return (
-    <header className="flex items-center justify-between border-b-2 border-border bg-white px-4 py-3 md:px-6">
-      <div className="flex items-center gap-3">
-        <span className="text-lg font-black text-primary md:hidden">Parla</span>
-        {title && <h2 className="hidden md:block text-lg font-bold">{title}</h2>}
-      </div>
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b-2 border-border bg-white px-4 py-3 md:hidden">
+      <span className="text-lg font-black text-primary font-display">Parla</span>
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1 md:hidden">
-          <Flame className="h-5 w-5 text-orange-500" />
+        <div className="flex items-center gap-1">
+          <FireIcon size={20} strokeWidth={2} className="text-orange-500" />
           <span className="font-bold text-orange-500">{streak}</span>
         </div>
         <UserButton afterSignOutUrl="/sign-in" />
