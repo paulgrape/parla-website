@@ -83,8 +83,8 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                         completed
                           ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                           : unlocked
-                            ? 'border-primary-dark bg-white text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
-                            : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_#d1d1d1]',
+                            ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                            : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
                       )}
                     >
                       {completed ? (
@@ -107,7 +107,7 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                     <p
                       className={cn(
                         'mt-3 max-w-32 text-center text-sm font-bold',
-                        !unlocked && 'text-muted-foreground',
+                        unlocked ? 'text-foreground' : 'text-muted-foreground',
                       )}
                     >
                       Level {lesson.order}: {lesson.title}

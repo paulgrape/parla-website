@@ -32,7 +32,7 @@ export function RightAside() {
   const nextReview = stats?.nextReview ?? 0;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-92 shrink-0 flex-col gap-5 overflow-y-auto border-l-2 border-border bg-white p-6 lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-92 shrink-0 flex-col gap-5 overflow-y-auto border-l-2 border-border bg-card p-6 lg:flex">
       <div className="flex items-center justify-between gap-2 rounded-2xl border-2 border-border px-4 py-3">
         <div className="flex items-center gap-1.5 font-black text-orange-500">
           <FireIcon size={22} strokeWidth={2.5} />
