@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, RotateCcw } from "lucide-react";
+import { Home01Icon, ArrowReloadHorizontalIcon } from "hugeicons-react";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/dashboard", label: "Learn", icon: Home },
-  { href: "/review", label: "Review", icon: RotateCcw },
+  { href: "/dashboard", label: "Learn", icon: Home01Icon },
+  { href: "/review", label: "Review", icon: ArrowReloadHorizontalIcon },
 ];
 
 export function MobileNav() {
@@ -29,7 +29,7 @@ export function MobileNav() {
               active ? "text-primary" : "text-muted-foreground"
             )}
           >
-            <Icon className="h-6 w-6" />
+            <Icon size={24} strokeWidth={2} />
             {label}
           </Link>
         );

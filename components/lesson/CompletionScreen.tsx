@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Flame, Star } from "lucide-react";
+import { FireIcon, StarIcon } from "hugeicons-react";
 import { Button } from "@/components/ui/button";
 
 interface CompletionScreenProps {
@@ -32,11 +32,11 @@ export function CompletionScreen({
           transition={{ type: "spring", delay: 0.2 }}
           className="flex h-24 w-24 items-center justify-center rounded-full bg-primary"
         >
-          <Star className="h-12 w-12 text-white fill-white" />
+          <StarIcon size={48} strokeWidth={2} className="text-white" fill="currentColor" />
         </motion.div>
 
         <div>
-          <h2 className="text-3xl font-black text-primary">Level Complete!</h2>
+          <h2 className="text-3xl font-black text-primary font-display">Level Complete!</h2>
           {perfect && (
             <p className="mt-2 text-sm font-bold text-orange-500">
               Perfect level! +20 bonus XP
@@ -57,7 +57,7 @@ export function CompletionScreen({
           <div>
             <p className="text-sm font-bold uppercase text-muted-foreground">Streak</p>
             <p className="flex items-center justify-center gap-1 text-3xl font-black text-orange-500 md:text-4xl">
-              <Flame className="h-8 w-8" />
+              <FireIcon size={32} strokeWidth={2} />
               {streak}
             </p>
           </div>
