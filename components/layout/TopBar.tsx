@@ -1,45 +1,47 @@
-"use client";
+'use client'
 
-import { ThemedUserButton } from "@/components/auth/ThemedUserButton";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FireIcon } from "hugeicons-react";
-import { AppLogo } from "@/components/layout/AppLogo";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { useApi } from "@/lib/api";
-import type { UserStats } from "@llp/types";
+import { ThemedUserButton } from '@/components/auth/ThemedUserButton'
+import { AppLogo } from '@/components/layout/AppLogo'
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { useUserStats } from '@/components/providers/UserStatsProvider'
+import { FavouriteIcon, FireIcon } from 'hugeicons-react'
+import { usePathname } from 'next/navigation'
 
-interface TopBarProps {
-  streak?: number;
-}
-
-export function TopBar({ streak: initialStreak = 0 }: TopBarProps) {
-  const pathname = usePathname();
-  const { fetchApi } = useApi();
-  const [streak, setStreak] = useState(initialStreak);
-
-  useEffect(() => {
-    fetchApi<UserStats>("/me")
-      .then((stats) => setStreak(stats.streak))
-      .catch(() => {
-        // Keep initial value if API is unavailable
-      });
-  }, [fetchApi]);
+export function TopBar() {
+  const pathname = usePathname()
+  const { stats } = useUserStats()
 
   // Desktop has no top navbar; immersive lesson flow hides it on mobile too.
-  if (pathname.startsWith("/lesson/")) return null;
+  if (pathname.startsWith('/lesson/')) return null
+
+  const streak = stats?.streak ?? 0
+  const streakActive = stats?.streakActive ?? false
+  const streakColor = streakActive ? 'text-orange-500' : 'text-muted-foreground'
+  const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b-2 border-border bg-card px-4 py-3 md:hidden">
-      <AppLogo size="sm" />
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1">
-          <FireIcon size={20} strokeWidth={2} className="text-orange-500" />
-          <span className="font-bold text-orange-500">{streak}</span>
+    <header className='sticky top-0 z-30 flex items-center justify-between border-b-2 border-border bg-card px-4 py-3 md:hidden'>
+      <AppLogo size='sm' />
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-1'>
+          <FavouriteIcon
+            size={20}
+            strokeWidth={2}
+            className='text-destructive'
+          />
+          <span className='font-bold text-destructive'>{hearts}</span>
+        </div>
+        <div className='flex items-center gap-1'>
+          <FireIcon
+            size={20}
+            strokeWidth={2}
+            className={streakColor}
+          />
+          <span className={`font-bold ${streakColor}`}>{streak}</span>
         </div>
         <ThemeToggle />
-        <ThemedUserButton afterSignOutUrl="/sign-in" />
+        <ThemedUserButton afterSignOutUrl='/sign-in' />
       </div>
     </header>
-  );
+  )
 }

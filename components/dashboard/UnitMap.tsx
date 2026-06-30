@@ -8,6 +8,7 @@ import Link from 'next/link'
 interface UnitMapProps {
   units: (Unit & { lessons: Lesson[] })[]
   completedLessons: string[]
+  heartsAvailable?: boolean
 }
 
 // Horizontal offsets (px) cycled per node to form a Duolingo-style wave path.
@@ -22,7 +23,11 @@ const UNIT_THEMES = [
   { banner: 'bg-pink-500', shadow: '#be185d' },
 ]
 
-export function UnitMap({ units, completedLessons }: UnitMapProps) {
+export function UnitMap({
+  units,
+  completedLessons,
+  heartsAvailable = true,
+}: UnitMapProps) {
   const allLessons = units.flatMap(u =>
     u.lessons.map(l => ({ ...l, unitOrder: u.order })),
   )
@@ -44,12 +49,12 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
             className='space-y-0'
           >
             <div
-              className='sticky md:top-4 top-18'
+              className='sticky md:top-4 top-20'
               style={{ zIndex: 10 + unitIndex }}
             >
               <div
                 aria-hidden
-                className='pointer-events-none absolute inset-x-0 bottom-full h-18 bg-background md:h-4'
+                className='pointer-events-none absolute inset-x-0 bottom-full h-8 bg-background md:h-4'
               />
               <div
                 className={cn(
@@ -75,6 +80,7 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                 )
                 const completed = completedLessons.includes(lesson.id)
                 const unlocked = isUnlocked(lesson.id, globalIndex)
+                const canOpen = unlocked && heartsAvailable
                 const offset = WAVE_OFFSETS[lessonIndex % WAVE_OFFSETS.length]
 
                 return (
@@ -84,9 +90,9 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                     style={{ marginLeft: offset }}
                   >
                     <Link
-                      href={unlocked ? `/lesson/${lesson.id}` : '#'}
-                      aria-disabled={!unlocked}
-                      onClick={e => !unlocked && e.preventDefault()}
+                      href={canOpen ? `/lesson/${lesson.id}` : '#'}
+                      aria-disabled={!canOpen}
+                      onClick={e => !canOpen && e.preventDefault()}
                       className={cn(
                         'flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-all duration-100 md:h-18 md:w-18',
                         completed
@@ -94,6 +100,9 @@ export function UnitMap({ units, completedLessons }: UnitMapProps) {
                           : unlocked
                             ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                             : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
+                        unlocked &&
+                          !heartsAvailable &&
+                          'cursor-not-allowed opacity-60',
                       )}
                     >
                       {completed ? (

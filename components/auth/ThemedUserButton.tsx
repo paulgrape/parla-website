@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import { UserButton } from "@clerk/nextjs";
-import type { ComponentProps } from "react";
-import { useClerkAppearance } from "@/hooks/useClerkAppearance";
+import { useClerkAppearance } from '@/hooks/useClerkAppearance'
+import { UserButton } from '@clerk/nextjs'
+import type { ComponentProps } from 'react'
 
-type ThemedUserButtonProps = ComponentProps<typeof UserButton>;
+type ThemedUserButtonProps = ComponentProps<typeof UserButton>
 
 export function ThemedUserButton(props: ThemedUserButtonProps) {
-  const appearance = useClerkAppearance();
+  const appearance = useClerkAppearance()
 
   return (
     <UserButton
@@ -15,5 +15,5 @@ export function ThemedUserButton(props: ThemedUserButtonProps) {
       appearance={appearance}
       userProfileProps={{ ...props.userProfileProps, appearance }}
     />
-  );
+  )
 }
