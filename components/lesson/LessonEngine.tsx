@@ -1,8 +1,10 @@
 'use client'
 
+import { useUserStats } from '@/components/providers/UserStatsProvider'
 import { Button } from '@/components/ui/button'
 import { useApi } from '@/lib/api'
 import type { Exercise } from '@llp/types'
+import { Cancel01Icon } from 'hugeicons-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { CompletionScreen } from './CompletionScreen'
@@ -12,6 +14,30 @@ import { MatchExercise } from './exercises/MatchExercise'
 import { TranslationExercise, XpPop } from './exercises/TranslationExercise'
 import { HeartBar } from './HeartBar'
 import { ProgressBar } from './ProgressBar'
+import { QuitDialog } from './QuitDialog'
+import { ResultDialog } from './ResultDialog'
+
+const CORRECT_TITLES = [
+  'Well done!',
+  'Good job!',
+  'Awesome!',
+  'Great!',
+  'Nice!',
+]
+
+function pickCorrectTitle() {
+  return CORRECT_TITLES[Math.floor(Math.random() * CORRECT_TITLES.length)]
+}
+
+function formatHeartCountdown(ms: number) {
+  const totalMinutes = Math.max(0, Math.ceil(ms / 60000))
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    return `${hours}h ${minutes}m`
+  }
+  return `${totalMinutes} min`
+}
 
 type LessonState =
   | { phase: 'idle' }
@@ -52,7 +78,7 @@ interface RevealedLessonState extends Omit<ActiveLessonState, 'phase'> {
 }
 
 type LessonAction =
-  | { type: 'START'; exerciseIds: string[] }
+  | { type: 'START'; exerciseIds: string[]; lives: number }
   | { type: 'SUBMIT'; correct: boolean }
   | { type: 'CONTINUE' }
   | { type: 'MATCH_MISTAKE' }
@@ -71,7 +97,6 @@ type LessonAction =
     }
   | { type: 'FAIL' }
 
-const MAX_LIVES = 5
 const XP_PER_EXERCISE = 10
 const PERFECT_BONUS_XP = 20
 const LISTENING_SKIP_MINUTES = 15
@@ -155,7 +180,7 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         remainingIds,
         mistakeIds: [],
         fixingMistakes: false,
-        lives: MAX_LIVES,
+        lives: action.lives,
         xp: 0,
         mistakes: 0,
         earnedIds: [],
@@ -293,9 +318,13 @@ interface LessonEngineProps {
 export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const router = useRouter()
   const { fetchApi } = useApi()
+  const { stats, loading, loseHeart } = useUserStats()
   const [state, dispatch] = useReducer(lessonReducer, { phase: 'idle' })
   const [selected, setSelected] = useState<string | null>(null)
   const [showXpPop, setShowXpPop] = useState(false)
+  const [showQuitDialog, setShowQuitDialog] = useState(false)
+  const [showSkipDialog, setShowSkipDialog] = useState(false)
+  const [correctTitle, setCorrectTitle] = useState(CORRECT_TITLES[0])
   const [listeningSkipUntil, setListeningSkipUntil] = useState<number | null>(
     () => {
       if (typeof window === 'undefined') return null
@@ -313,11 +342,16 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const [now, setNow] = useState(() => Date.now())
   const completionPostingRef = useRef(false)
 
+  const maxHearts = stats?.maxHearts ?? 5
+  const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
+  const nextHeartAt = stats?.nextHeartAt ?? null
+  const heartRegenLabel =
+    nextHeartAt && nextHeartAt > now
+      ? formatHeartCountdown(nextHeartAt - now)
+      : null
+
   const listeningSkipActive =
     listeningSkipUntil !== null && listeningSkipUntil > now
-  const listeningRemainingMinutes = listeningSkipActive
-    ? Math.max(1, Math.ceil((listeningSkipUntil - now) / 60000))
-    : 0
 
   const levelExercises = useMemo(
     () =>
@@ -338,13 +372,11 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   )
 
   useEffect(() => {
-    if (!listeningSkipUntil) return
-
     const interval = window.setInterval(() => {
       const currentTime = Date.now()
       setNow(currentTime)
 
-      if (listeningSkipUntil <= currentTime) {
+      if (listeningSkipUntil && listeningSkipUntil <= currentTime) {
         setListeningSkipUntil(null)
         window.localStorage.removeItem(LISTENING_SKIP_STORAGE_KEY)
       }
@@ -399,8 +431,17 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     if (correct) {
       setShowXpPop(true)
       setTimeout(() => setShowXpPop(false), 1000)
+    } else {
+      void loseHeart()
     }
     dispatch({ type: 'SUBMIT', correct })
+  }
+
+  const handleTranslationCheck = () => {
+    if (state.phase !== 'active' || !selected || !currentExercise) return
+    const correct = selected === currentExercise.answer
+    if (correct) setCorrectTitle(pickCorrectTitle())
+    handleSubmit(correct)
   }
 
   const handleContinue = () => {
@@ -412,7 +453,29 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
   const handleMatchMistake = () => {
     if (state.phase !== 'active') return
+    void loseHeart()
     dispatch({ type: 'MATCH_MISTAKE' })
+  }
+
+  const handleClose = () => {
+    const hasProgress =
+      (state.phase === 'active' || state.phase === 'answer_revealed') &&
+      state.earnedIds.length > 0
+
+    if (hasProgress) {
+      setShowQuitDialog(true)
+    } else {
+      goToDashboard()
+    }
+  }
+
+  const requestSkipListening = () => {
+    setShowSkipDialog(true)
+  }
+
+  const confirmSkipListening = () => {
+    setShowSkipDialog(false)
+    handleSkipListening()
   }
 
   const handleMatchComplete = () => {
@@ -424,8 +487,9 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   }
 
   const handleStart = () => {
+    if (hearts <= 0) return
     completionPostingRef.current = false
-    dispatch({ type: 'START', exerciseIds: levelExerciseIds })
+    dispatch({ type: 'START', exerciseIds: levelExerciseIds, lives: hearts })
   }
 
   const handleSkipListening = () => {
@@ -452,27 +516,38 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   }
 
   if (state.phase === 'idle') {
+    if (loading && !stats) {
+      return (
+        <p className='py-20 text-center text-muted-foreground'>
+          Loading your hearts...
+        </p>
+      )
+    }
+
+    if (!loading && hearts <= 0) {
+      return (
+        <div className='flex flex-col items-center justify-center gap-6 py-20 text-center'>
+          <h2 className='text-2xl font-black text-destructive'>
+            Out of hearts!
+          </h2>
+          <p className='max-w-md text-muted-foreground'>
+            {heartRegenLabel
+              ? `You need at least one heart to start a level. Your next heart arrives in ${heartRegenLabel}.`
+              : 'You need at least one heart to start a level.'}
+          </p>
+          <Button onClick={goToDashboard}>Back to map</Button>
+        </div>
+      )
+    }
+
     const allExercisesSkipped =
       levelExercises.length === 0 && exercises.length > 0
 
     return (
       <div className='flex flex-col items-center justify-center gap-6 py-20'>
         <h2 className='text-2xl font-black'>Ready for this level?</h2>
-        {/* {listeningSkipActive && (
-          <div className='max-w-md rounded-2xl border-2 border-border bg-muted px-4 py-3 text-center text-sm font-bold text-muted-foreground'>
-            Listening is skipped for {listeningRemainingMinutes} more min.
-            <Button
-              className='mt-3'
-              variant='outline'
-              size='sm'
-              onClick={handleResumeListening}
-            >
-              Resume listening
-            </Button>
-          </div>
-        )} */}
         <p className='text-muted-foreground'>
-          {levelExercises.length} exercises · 5 hearts
+          {levelExercises.length} exercises · {hearts}/{maxHearts} hearts
         </p>
         {allExercisesSkipped ? (
           <div className='max-w-md text-center'>
@@ -495,6 +570,13 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
             Start Level
           </Button>
         )}
+        <Button
+          variant='ghost'
+          size='sm'
+          onClick={goToDashboard}
+        >
+          Back to map
+        </Button>
       </div>
     )
   }
@@ -531,10 +613,12 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
   if (state.phase === 'failed') {
     return (
-      <div className='flex flex-col items-center justify-center gap-6 py-20'>
+      <div className='flex flex-col items-center justify-center gap-6 py-20 text-center'>
         <h2 className='text-2xl font-black text-destructive'>Out of hearts!</h2>
-        <p className='text-muted-foreground'>
-          Try again when you&apos;re ready.
+        <p className='max-w-md text-muted-foreground'>
+          {heartRegenLabel
+            ? `This level wasn't saved. Your next heart arrives in ${heartRegenLabel}.`
+            : "This level wasn't saved. Come back when your hearts refill."}
         </p>
         <Button onClick={goToDashboard}>Back to map</Button>
       </div>
@@ -578,31 +662,34 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const lives = state.lives
   const revealed = state.phase === 'answer_revealed'
 
+  const showTranslationResult =
+    revealed && currentExercise?.type === 'translation'
+
   return (
     <div className='relative mx-auto max-w-lg px-4 py-6'>
-      <div className='mb-6 flex items-center justify-between gap-4'>
+      <div className='mb-6 flex items-center gap-3'>
+        <button
+          type='button'
+          aria-label='Close level'
+          onClick={handleClose}
+          className='-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted'
+        >
+          <Cancel01Icon
+            size={22}
+            strokeWidth={2.5}
+          />
+        </button>
         <ProgressBar
           current={progressIndex}
           total={progressTotal}
         />
-        <HeartBar lives={lives} />
+        <HeartBar
+          lives={lives}
+          maxLives={maxHearts}
+        />
       </div>
 
       <XpPop show={showXpPop} />
-
-      {/* {listeningSkipActive && (
-        <div className="mb-4 rounded-2xl border-2 border-border bg-muted px-4 py-3 text-sm font-bold text-muted-foreground">
-          Listening skipped for {listeningRemainingMinutes} more min.
-          <Button
-            className="ml-0 mt-3 w-full md:ml-3 md:mt-0 md:w-auto"
-            variant="outline"
-            size="sm"
-            onClick={handleResumeListening}
-          >
-            Resume listening
-          </Button>
-        </div>
-      )} */}
 
       {fixingMistakes && (
         <div className='mb-4 rounded-2xl bg-orange-50 px-4 py-3 text-center text-sm font-black text-orange-600'>
@@ -617,12 +704,12 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           selected={selected}
           revealed={revealed}
           correctAnswer={currentExercise.answer}
+          isNew={currentExercise.isNew}
           onSelect={option => {
             if (revealed) return
             setSelected(option)
-            handleSubmit(option === currentExercise.answer)
           }}
-          onContinue={handleContinue}
+          onCheck={handleTranslationCheck}
         />
       )}
 
@@ -652,9 +739,43 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           revealed={revealed}
           onSubmit={handleSubmit}
           onContinue={handleContinue}
-          onSkipListening={handleSkipListening}
+          onSkipListening={requestSkipListening}
         />
       )}
+
+      <ResultDialog
+        open={showTranslationResult}
+        variant={
+          state.phase === 'answer_revealed' && state.correct
+            ? 'correct'
+            : 'wrong'
+        }
+        title={
+          state.phase === 'answer_revealed' && state.correct
+            ? correctTitle
+            : 'Not quite'
+        }
+        correctAnswer={
+          state.phase === 'answer_revealed' && !state.correct
+            ? currentExercise?.answer
+            : undefined
+        }
+        onContinue={handleContinue}
+      />
+
+      <ResultDialog
+        open={showSkipDialog}
+        variant='info'
+        title='Listening paused'
+        message='Listening exercises will be skipped for 15 minutes.'
+        onContinue={confirmSkipListening}
+      />
+
+      <QuitDialog
+        open={showQuitDialog}
+        onCancel={() => setShowQuitDialog(false)}
+        onConfirm={goToDashboard}
+      />
     </div>
   )
 }

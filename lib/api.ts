@@ -1,55 +1,55 @@
-"use client";
+'use client'
 
-import { useAuth } from "@clerk/nextjs";
-import { useCallback } from "react";
+import { useAuth } from '@clerk/nextjs'
+import { useCallback } from 'react'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8787'
 
 export function useApi() {
-  const { getToken } = useAuth();
+  const { getToken } = useAuth()
 
   const fetchApi = useCallback(
     async <T>(path: string, options: RequestInit = {}): Promise<T> => {
-      const token = await getToken();
+      const token = await getToken()
       const res = await fetch(`${API_URL}${path}`, {
         ...options,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
           ...options.headers,
         },
-      });
+      })
 
       if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
+        throw new Error(`API error: ${res.status}`)
       }
 
-      return res.json() as Promise<T>;
+      return res.json() as Promise<T>
     },
-    [getToken]
-  );
+    [getToken],
+  )
 
-  return { fetchApi };
+  return { fetchApi }
 }
 
 export async function fetchApiServer<T>(
   path: string,
   token: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
       ...options.headers,
     },
-    cache: "no-store",
-  });
+    cache: 'no-store',
+  })
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    throw new Error(`API error: ${res.status}`)
   }
 
-  return res.json() as Promise<T>;
+  return res.json() as Promise<T>
 }
