@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home01Icon, ArrowReloadHorizontalIcon } from "hugeicons-react";
 import { ThemedUserButton } from "@/components/auth/ThemedUserButton";
+import { AppLogo } from "@/components/layout/AppLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/utils";
 
@@ -20,10 +21,7 @@ export function Sidebar() {
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r-2 border-border bg-card p-6 md:flex">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight text-primary font-display">Parla</h1>
-        <p className="text-sm text-muted-foreground">Learn Italian</p>
-      </div>
+      <AppLogo size="md" showTagline />
 
       <nav className="flex flex-col gap-2">
         {links.map(({ href, label, icon: Icon }) => (
