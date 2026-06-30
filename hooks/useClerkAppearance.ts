@@ -11,6 +11,14 @@ const brandVariables = {
   borderRadius: "1rem",
 } as const;
 
+const lightVariables = {
+  ...brandVariables,
+  colorBackground: "#ffffff",
+  colorInputBackground: "#ececec",
+  colorText: "#1a1a1a",
+  colorTextSecondary: "#777777",
+} as const;
+
 function buildClerkAppearance(resolvedTheme: string | undefined): Appearance {
   if (resolvedTheme === "dark") {
     return {
@@ -20,7 +28,7 @@ function buildClerkAppearance(resolvedTheme: string | undefined): Appearance {
   }
 
   return {
-    variables: brandVariables,
+    variables: lightVariables,
   };
 }
 
