@@ -49,7 +49,11 @@ export function DashboardContent() {
 
   if (loading) {
     return (
-      <p className='text-center text-muted-foreground py-12'>
+      <p
+        role='status'
+        aria-live='polite'
+        className='text-center text-muted-foreground py-12'
+      >
         Loading your path...
       </p>
     )
@@ -71,6 +75,7 @@ export function DashboardContent() {
 
   return (
     <div className='space-y-8'>
+      <h1 className='sr-only'>Learning path</h1>
       {!heartsAvailable && (
         <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-4 text-center'>
           <p className='font-black text-destructive'>

@@ -8,9 +8,14 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ current, total }: ProgressBarProps) {
+  const percent = (current / total) * 100
+
   return (
     <div className='w-full'>
-      <Progress value={(current / total) * 100} />
+      <Progress
+        value={percent}
+        label={`Lesson progress, ${current} of ${total}`}
+      />
     </div>
   )
 }

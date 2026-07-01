@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { speakItalian } from '@/lib/speech'
 import { isAnswerCorrect } from '@/lib/utils'
 import { VolumeHighIcon } from 'hugeicons-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 interface ListeningExerciseProps {
   audioText: string
@@ -24,6 +24,7 @@ export function ListeningExercise({
   onSkipListening,
 }: ListeningExerciseProps) {
   const [input, setInput] = useState('')
+  const inputId = useId()
 
   const handleSubmit = () => {
     onSubmit(isAnswerCorrect(input, answer))
@@ -39,24 +40,36 @@ export function ListeningExercise({
       </div>
 
       <button
+        type='button'
+        aria-label='Play audio'
         onClick={() => speakItalian(audioText)}
-        className='mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary text-white shadow-[0_6px_0_0_#46a302] transition-transform hover:scale-105 active:shadow-none active:translate-y-1'
+        className='mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary text-white shadow-[0_6px_0_0_#46a302] transition-transform hover:scale-105 active:shadow-none active:translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
       >
         <VolumeHighIcon
           size={40}
           strokeWidth={2}
+          aria-hidden
         />
       </button>
 
-      <input
-        type='text'
-        value={input}
-        disabled={revealed}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && !revealed && handleSubmit()}
-        placeholder='Type what you heard...'
-        className='w-full rounded-2xl border-2 border-border px-6 py-4 text-lg font-bold focus:border-primary focus:outline-none disabled:opacity-60'
-      />
+      <div>
+        <label
+          htmlFor={inputId}
+          className='sr-only'
+        >
+          Type what you heard
+        </label>
+        <input
+          id={inputId}
+          type='text'
+          value={input}
+          disabled={revealed}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !revealed && handleSubmit()}
+          placeholder='Type what you heard...'
+          className='w-full rounded-2xl border-2 border-border px-6 py-4 text-lg font-bold focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60'
+        />
+      </div>
 
       {revealed ? (
         <div className='space-y-4'>

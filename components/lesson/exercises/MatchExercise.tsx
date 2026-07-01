@@ -60,6 +60,7 @@ export function MatchExercise({
   const [matchedItalian, setMatchedItalian] = useState<Set<string>>(new Set())
   const [matchedEnglish, setMatchedEnglish] = useState<Set<string>>(new Set())
   const [wrong, setWrong] = useState<Selection | null>(null)
+  const [wrongAnnouncement, setWrongAnnouncement] = useState('')
   const [italianWords] = useState<string[]>(() =>
     shuffle(pairs.map(p => p.italian)),
   )
@@ -102,8 +103,12 @@ export function MatchExercise({
     } else {
       onMistake()
       setWrong({ side, word })
+      setWrongAnnouncement('Incorrect match. Try again.')
       setSelection(null)
-      setTimeout(() => setWrong(null), 500)
+      setTimeout(() => {
+        setWrong(null)
+        setWrongAnnouncement('')
+      }, 500)
     }
   }
 
@@ -145,6 +150,12 @@ export function MatchExercise({
 
   return (
     <div className='flex flex-col gap-8'>
+      <div
+        aria-live='polite'
+        className='sr-only'
+      >
+        {wrongAnnouncement}
+      </div>
       <div>
         <p className='text-sm font-bold uppercase text-muted-foreground mb-2'>
           Match the pairs

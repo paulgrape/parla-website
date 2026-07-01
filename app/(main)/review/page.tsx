@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { useApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import type { ReviewItem } from '@llp/types'
@@ -45,14 +44,20 @@ export default function ReviewPage() {
 
   if (loading) {
     return (
-      <p className='text-center text-muted-foreground'>Loading reviews...</p>
+      <p
+        role='status'
+        aria-live='polite'
+        className='text-center text-muted-foreground'
+      >
+        Loading reviews...
+      </p>
     )
   }
 
   if (done) {
     return (
       <div className='mx-auto max-w-md text-center space-y-4 py-20'>
-        <h2 className='text-2xl font-black'>All caught up!</h2>
+        <h1 className='text-2xl font-black'>All caught up!</h1>
         <p className='text-muted-foreground'>
           No vocabulary due for review right now.
         </p>
@@ -72,12 +77,19 @@ export default function ReviewPage() {
         </p>
       </div>
 
-      <Card
+      <button
+        type='button'
+        onClick={() => setFlipped(!flipped)}
+        aria-pressed={flipped}
+        aria-label={
+          flipped
+            ? `Showing English: ${current.english}. Press to show Italian.`
+            : `Showing Italian: ${current.italian}. Press to show English.`
+        }
         className={cn(
-          'min-h-[200px] flex flex-col items-center justify-center cursor-pointer transition-all',
+          'w-full min-h-[200px] rounded-3xl border-2 border-border bg-card p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           flipped && 'bg-primary/5 border-primary',
         )}
-        onClick={() => setFlipped(!flipped)}
       >
         <p className='text-sm font-bold uppercase text-muted-foreground mb-2'>
           {flipped ? 'English' : 'Italian'}
@@ -85,11 +97,17 @@ export default function ReviewPage() {
         <p className='text-3xl font-black'>
           {flipped ? current.english : current.italian}
         </p>
-        <p className='mt-4 text-xs text-muted-foreground'>Tap to flip</p>
-      </Card>
+        <p className='mt-4 text-xs text-muted-foreground'>
+          Tap or press to flip
+        </p>
+      </button>
 
       {flipped && (
-        <div className='grid grid-cols-3 gap-2'>
+        <div
+          className='grid grid-cols-3 gap-2'
+          role='group'
+          aria-label='Rate how well you remembered this word'
+        >
           {[
             { label: 'Hard', quality: 1 },
             { label: 'Good', quality: 3 },

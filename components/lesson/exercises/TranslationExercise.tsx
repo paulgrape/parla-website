@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Cancel01Icon, SparklesIcon, Tick01Icon } from 'hugeicons-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 interface TranslationExerciseProps {
   prompt: string
@@ -29,6 +29,8 @@ export function TranslationExercise({
 }: TranslationExerciseProps) {
   const [showTooltip, setShowTooltip] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
+  const promptId = useId()
+  const tooltipId = useId()
 
   useEffect(() => {
     if (!showTooltip) return
@@ -46,11 +48,37 @@ export function TranslationExercise({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showTooltip])
 
+  const handleOptionKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    option: string,
+    index: number,
+  ) => {
+    if (revealed) return
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      event.preventDefault()
+      const nextIndex = (index + 1) % options.length
+      onSelect(options[nextIndex])
+      document.getElementById(`translation-option-${nextIndex}`)?.focus()
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      event.preventDefault()
+      const prevIndex = (index - 1 + options.length) % options.length
+      onSelect(options[prevIndex])
+      document.getElementById(`translation-option-${prevIndex}`)?.focus()
+    } else if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault()
+      onSelect(option)
+    }
+  }
+
   return (
     <div className='flex flex-col gap-8'>
       <div>
         <div className='mb-2 flex items-center gap-2'>
-          <p className='text-sm font-bold uppercase text-muted-foreground'>
+          <p
+            id={promptId}
+            className='text-sm font-bold uppercase text-muted-foreground'
+          >
             Translate this word
           </p>
           {isNew && (
@@ -58,6 +86,7 @@ export function TranslationExercise({
               <SparklesIcon
                 size={12}
                 strokeWidth={2.5}
+                aria-hidden
               />
               New word
             </span>
@@ -72,6 +101,9 @@ export function TranslationExercise({
             <button
               type='button'
               onClick={() => setShowTooltip(open => !open)}
+              aria-expanded={showTooltip}
+              aria-controls={tooltipId}
+              aria-describedby={showTooltip ? tooltipId : undefined}
               className='text-3xl font-black font-display underline decoration-purple-400 decoration-dashed underline-offset-8'
             >
               {prompt}
@@ -79,6 +111,8 @@ export function TranslationExercise({
             <AnimatePresence>
               {showTooltip && (
                 <motion.span
+                  id={tooltipId}
+                  role='tooltip'
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
@@ -99,16 +133,25 @@ export function TranslationExercise({
         )}
       </div>
 
-      <div className='grid gap-3'>
-        {options.map(option => {
+      <div
+        role='radiogroup'
+        aria-labelledby={promptId}
+        className='grid gap-3'
+      >
+        {options.map((option, index) => {
           const isSelected = selected === option
           const isCorrect = option === correctAnswer
 
           return (
             <button
               key={option}
+              id={`translation-option-${index}`}
+              type='button'
+              role='radio'
+              aria-checked={isSelected}
               disabled={revealed}
               onClick={() => onSelect(option)}
+              onKeyDown={event => handleOptionKeyDown(event, option, index)}
               className={cn(
                 'rounded-2xl border-2 border-border px-6 py-4 text-left font-bold transition-all',
                 !revealed && isSelected && 'border-primary bg-primary/10',
@@ -130,12 +173,14 @@ export function TranslationExercise({
                   <Tick01Icon
                     size={20}
                     strokeWidth={2.5}
+                    aria-hidden
                   />
                 )}
                 {revealed && isSelected && !isCorrect && (
                   <Cancel01Icon
                     size={20}
                     strokeWidth={2.5}
+                    aria-hidden
                   />
                 )}
               </span>
@@ -168,6 +213,7 @@ export function XpPop({ show }: { show: boolean }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
           className='pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 text-2xl font-black text-primary'
+          aria-hidden
         >
           +10 XP
         </motion.span>

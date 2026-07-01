@@ -23,19 +23,27 @@ export function TopBar() {
     <header className='sticky top-0 z-30 flex items-center justify-between border-b-2 border-border bg-card px-4 py-3 md:hidden'>
       <AppLogo size='sm' />
       <div className='flex items-center gap-4'>
-        <div className='flex items-center gap-1'>
+        <div
+          className='flex items-center gap-1'
+          aria-label={`${hearts} hearts`}
+        >
           <FavouriteIcon
             size={20}
             strokeWidth={2}
             className='text-destructive'
+            aria-hidden
           />
           <span className='font-bold text-destructive'>{hearts}</span>
         </div>
-        <div className='flex items-center gap-1'>
+        <div
+          className='flex items-center gap-1'
+          aria-label={`${streak} day streak${streakActive ? ', active' : ''}`}
+        >
           <FireIcon
             size={20}
             strokeWidth={2}
             className={streakColor}
+            aria-hidden
           />
           <span className={`font-bold ${streakColor}`}>{streak}</span>
         </div>

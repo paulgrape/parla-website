@@ -82,6 +82,41 @@ export function UnitMap({
                 const unlocked = isUnlocked(lesson.id, globalIndex)
                 const canOpen = unlocked && heartsAvailable
                 const offset = WAVE_OFFSETS[lessonIndex % WAVE_OFFSETS.length]
+                const lessonLabel = `Level ${lesson.order}: ${lesson.title}${
+                  completed ? ', completed' : !unlocked ? ', locked' : !heartsAvailable ? ', no hearts' : ''
+                }`
+
+                const nodeClassName = cn(
+                  'flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-all duration-100 md:h-18 md:w-18',
+                  completed
+                    ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                    : unlocked
+                      ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                      : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
+                  unlocked &&
+                    !heartsAvailable &&
+                    'cursor-not-allowed opacity-60',
+                )
+
+                const nodeIcon = completed ? (
+                  <Tick01Icon
+                    size={30}
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
+                ) : unlocked ? (
+                  <StarIcon
+                    size={26}
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                ) : (
+                  <LockIcon
+                    size={22}
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                )
 
                 return (
                   <div
@@ -89,39 +124,23 @@ export function UnitMap({
                     className='flex flex-col items-center'
                     style={{ marginLeft: offset }}
                   >
-                    <Link
-                      href={canOpen ? `/lesson/${lesson.id}` : '#'}
-                      aria-disabled={!canOpen}
-                      onClick={e => !canOpen && e.preventDefault()}
-                      className={cn(
-                        'flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-all duration-100 md:h-18 md:w-18',
-                        completed
-                          ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
-                          : unlocked
-                            ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
-                            : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
-                        unlocked &&
-                          !heartsAvailable &&
-                          'cursor-not-allowed opacity-60',
-                      )}
-                    >
-                      {completed ? (
-                        <Tick01Icon
-                          size={30}
-                          strokeWidth={2.5}
-                        />
-                      ) : unlocked ? (
-                        <StarIcon
-                          size={26}
-                          strokeWidth={2}
-                        />
-                      ) : (
-                        <LockIcon
-                          size={22}
-                          strokeWidth={2}
-                        />
-                      )}
-                    </Link>
+                    {canOpen ? (
+                      <Link
+                        href={`/lesson/${lesson.id}`}
+                        aria-label={lessonLabel}
+                        className={nodeClassName}
+                      >
+                        {nodeIcon}
+                      </Link>
+                    ) : (
+                      <span
+                        role='img'
+                        aria-label={lessonLabel}
+                        className={nodeClassName}
+                      >
+                        {nodeIcon}
+                      </span>
+                    )}
                     <p
                       className={cn(
                         'mt-3 max-w-32 text-center text-sm font-bold',

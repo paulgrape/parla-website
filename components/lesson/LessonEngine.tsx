@@ -667,16 +667,18 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
   return (
     <div className='relative mx-auto max-w-lg px-4 py-6'>
+      <h1 className='sr-only'>Lesson in progress</h1>
       <div className='mb-6 flex items-center gap-3'>
         <button
           type='button'
           aria-label='Close level'
           onClick={handleClose}
-          className='-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted'
+          className='-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
         >
           <Cancel01Icon
             size={22}
             strokeWidth={2.5}
+            aria-hidden
           />
         </button>
         <ProgressBar
@@ -692,7 +694,10 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       <XpPop show={showXpPop} />
 
       {fixingMistakes && (
-        <div className='mb-4 rounded-2xl bg-orange-50 px-4 py-3 text-center text-sm font-black text-orange-600'>
+        <div
+          role='status'
+          className='mb-4 rounded-2xl bg-orange-50 px-4 py-3 text-center text-sm font-black text-orange-600'
+        >
           Fix your mistakes to finish the level.
         </div>
       )}
