@@ -1,9 +1,13 @@
 'use client'
 
 import { UnitMap } from '@/components/dashboard/UnitMap'
+import { DashboardSkeleton } from '@/components/skeletons/PageSkeletons'
 import { useUserStats } from '@/components/providers/UserStatsProvider'
 import { useApi } from '@/lib/api'
-import type { Lesson, Unit } from '@llp/types'
+import type { Lesson, Section, Unit } from '@llp/types'
+import { ArrowLeft01Icon } from 'hugeicons-react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 function formatCountdown(ms: number) {
@@ -19,20 +23,42 @@ function formatCountdown(ms: number) {
 export function DashboardContent() {
   const { fetchApi } = useApi()
   const { stats } = useUserStats()
+  const searchParams = useSearchParams()
+  const sectionIdParam = searchParams.get('sectionId')
+
   const [units, setUnits] = useState<(Unit & { lessons: Lesson[] })[]>([])
+  const [activeSection, setActiveSection] = useState<Section | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    fetchApi<Unit[]>('/units')
-      .then(allUnits => {
-        setUnits(
-          allUnits.map(unit => ({
-            ...unit,
-            lessons: unit.lessons ?? [],
-          })),
-        )
+    fetchApi<Section[]>('/sections')
+      .then(allSections => {
+        const target =
+          (sectionIdParam
+            ? allSections.find(s => s.id === sectionIdParam)
+            : null) ??
+          allSections.find(
+            s => (s.completedCount ?? 0) < (s.lessonCount ?? 0),
+          ) ??
+          allSections[allSections.length - 1] ??
+          null
+
+        setActiveSection(target)
+
+        if (target) {
+          return fetchApi<Unit[]>(`/units?sectionId=${target.id}`).then(
+            allUnits => {
+              setUnits(
+                allUnits.map(unit => ({
+                  ...unit,
+                  lessons: unit.lessons ?? [],
+                })),
+              )
+            },
+          )
+        }
       })
       .catch(() => {
         setError(
@@ -40,7 +66,7 @@ export function DashboardContent() {
         )
       })
       .finally(() => setLoading(false))
-  }, [fetchApi])
+  }, [fetchApi, sectionIdParam])
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 1000)
@@ -48,15 +74,7 @@ export function DashboardContent() {
   }, [])
 
   if (loading) {
-    return (
-      <p
-        role='status'
-        aria-live='polite'
-        className='text-center text-muted-foreground py-12'
-      >
-        Loading your path...
-      </p>
-    )
+    return <DashboardSkeleton />
   }
 
   if (error) {
@@ -75,7 +93,26 @@ export function DashboardContent() {
 
   return (
     <div className='space-y-8'>
-      <h1 className='sr-only'>Learning path</h1>
+      <div className='flex items-center justify-between gap-4'>
+        <h1 className='sr-only'>Learning path</h1>
+        <Link
+          href='/sections'
+          className='inline-flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
+        >
+          <ArrowLeft01Icon
+            size={18}
+            strokeWidth={2}
+            aria-hidden
+          />
+          Sections
+        </Link>
+        {activeSection && (
+          <p className='text-sm font-bold text-muted-foreground'>
+            {activeSection.title}
+          </p>
+        )}
+      </div>
+
       {!heartsAvailable && (
         <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-4 text-center'>
           <p className='font-black text-destructive'>
@@ -102,6 +139,7 @@ export function DashboardContent() {
           units={units}
           completedLessons={stats?.completedLessons ?? []}
           heartsAvailable={heartsAvailable}
+          sectionOrder={activeSection?.order ?? 1}
         />
       )}
     </div>

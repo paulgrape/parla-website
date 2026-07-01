@@ -2,8 +2,29 @@
 
 export type ExerciseType = 'translation' | 'match' | 'fill_blank' | 'listening'
 
+export interface GrammarConcept {
+  title: string
+  content: string
+}
+
+export interface Section {
+  id: string
+  title: string
+  description: string
+  order: number
+  cefrLevel: string
+  cefrDescription: string
+  exampleSentence: string
+  exampleTranslation: string
+  grammarConcepts: GrammarConcept[]
+  unitCount?: number
+  lessonCount?: number
+  completedCount?: number
+}
+
 export interface Unit {
   id: string
+  sectionId: string
   title: string
   description: string | null
   order: number
@@ -62,4 +83,18 @@ export interface ProgressResult {
   xpEarned: number
   newStreak: number
   totalXp: number
+}
+
+export interface GuidebookPhrase {
+  italian: string
+  english: string
+  audioText: string | null
+  order: number
+}
+
+export interface Guidebook {
+  unitId: string
+  unitTitle: string
+  grammarTips: string
+  phrases: GuidebookPhrase[]
 }

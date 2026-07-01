@@ -1,6 +1,7 @@
 'use client'
 
 import { LessonEngine } from '@/components/lesson/LessonEngine'
+import { LessonSkeleton } from '@/components/skeletons/PageSkeletons'
 import { Button } from '@/components/ui/button'
 import { useApi } from '@/lib/api'
 import type { Exercise } from '@llp/types'
@@ -37,11 +38,7 @@ export function LessonContent({ lessonId }: LessonContentProps) {
   }
 
   if (!exercises) {
-    return (
-      <p className='text-center text-muted-foreground py-20'>
-        Loading level...
-      </p>
-    )
+    return <LessonSkeleton />
   }
 
   if (exercises.length === 0) {
