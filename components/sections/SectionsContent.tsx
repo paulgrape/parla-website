@@ -1,0 +1,155 @@
+'use client'
+
+import { SectionsSkeleton } from '@/components/skeletons/PageSkeletons'
+import { Progress } from '@/components/ui/progress'
+import { useApi } from '@/lib/api'
+import { cn } from '@/lib/utils'
+import type { Section } from '@llp/types'
+import { ArrowLeft01Icon, Tick01Icon } from 'hugeicons-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+const SECTION_THEMES = [
+  { card: 'bg-primary', shadow: '#46a302' },
+  { card: 'bg-sky-500', shadow: '#0284c7' },
+  { card: 'bg-purple-500', shadow: '#7c3aed' },
+  { card: 'bg-orange-500', shadow: '#c2410c' },
+]
+
+export function SectionsContent() {
+  const { fetchApi } = useApi()
+  const [sections, setSections] = useState<Section[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchApi<Section[]>('/sections')
+      .then(setSections)
+      .catch(() => setError('Could not load sections.'))
+      .finally(() => setLoading(false))
+  }, [fetchApi])
+
+  if (loading) {
+    return <SectionsSkeleton />
+  }
+
+  if (error) {
+    return (
+      <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-6 text-center'>
+        <p className='font-bold text-destructive'>{error}</p>
+      </div>
+    )
+  }
+
+  const activeSectionIndex = sections.findIndex(
+    s => (s.completedCount ?? 0) < (s.lessonCount ?? 0),
+  )
+
+  return (
+    <div className='space-y-6'>
+      <div className='flex items-center gap-3'>
+        <Link
+          href='/dashboard'
+          className='flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
+        >
+          <ArrowLeft01Icon
+            size={18}
+            strokeWidth={2}
+            aria-hidden
+          />
+          Back
+        </Link>
+      </div>
+
+      <h1 className='sr-only'>Sections</h1>
+
+      <div className='space-y-4'>
+        {sections.map((section, index) => {
+          const theme = SECTION_THEMES[index % SECTION_THEMES.length]
+          const lessonCount = section.lessonCount ?? 0
+          const completedCount = section.completedCount ?? 0
+          const isComplete =
+            lessonCount > 0 && completedCount >= lessonCount
+          const isActive = index === activeSectionIndex
+          const progressPct =
+            lessonCount > 0
+              ? Math.round((completedCount / lessonCount) * 100)
+              : 0
+
+          return (
+            <article
+              key={section.id}
+              className='overflow-hidden rounded-2xl border-2 border-border bg-card'
+            >
+              <div
+                className={cn(
+                  'relative px-5 py-4 text-white',
+                  theme.card,
+                )}
+                style={{
+                  backgroundImage:
+                    'repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,0.04) 10px, rgba(255,255,255,0.04) 20px)',
+                }}
+              >
+                <Link
+                  href={`/sections/details/${section.id}`}
+                  className='text-xs font-black uppercase tracking-wide text-white/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded'
+                >
+                  {section.cefrLevel} &bull; See details
+                </Link>
+                <h2 className='mt-1 text-xl font-black font-display'>
+                  {section.title}
+                </h2>
+              </div>
+
+              <div className='flex items-center justify-between gap-4 p-5'>
+                <div className='flex-1 space-y-2'>
+                  {isComplete ? (
+                    <p className='flex items-center gap-2 text-sm font-black uppercase text-primary'>
+                      <Tick01Icon
+                        size={18}
+                        strokeWidth={2.5}
+                        aria-hidden
+                      />
+                      Completed!
+                    </p>
+                  ) : isActive ? (
+                    <div className='space-y-1'>
+                      <Progress
+                        value={progressPct}
+                        className='h-3'
+                      />
+                      <p className='text-xs font-bold text-muted-foreground'>
+                        {progressPct}% complete
+                      </p>
+                    </div>
+                  ) : (
+                    <p className='text-sm font-bold text-muted-foreground'>
+                      {completedCount}/{lessonCount} lessons
+                    </p>
+                  )}
+                </div>
+
+                <Link
+                  href={
+                    isComplete
+                      ? `/dashboard?sectionId=${section.id}`
+                      : `/dashboard?sectionId=${section.id}`
+                  }
+                  className={cn(
+                    'shrink-0 rounded-xl px-5 py-2.5 text-sm font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                    isActive && !isComplete
+                      ? 'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]'
+                      : 'border-2 border-border bg-card text-foreground hover:bg-muted',
+                  )}
+                >
+                  {isComplete ? 'Review' : isActive ? 'Continue' : 'Start'}
+                </Link>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

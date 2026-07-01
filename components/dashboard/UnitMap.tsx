@@ -1,20 +1,21 @@
 'use client'
 
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { cn } from '@/lib/utils'
 import type { Lesson, Unit } from '@llp/types'
-import { LockIcon, StarIcon, Tick01Icon } from 'hugeicons-react'
+import { BookOpen01Icon, LockIcon, StarIcon, Tick01Icon } from 'hugeicons-react'
 import Link from 'next/link'
+import { useEffect, useMemo, useRef } from 'react'
 
 interface UnitMapProps {
   units: (Unit & { lessons: Lesson[] })[]
   completedLessons: string[]
   heartsAvailable?: boolean
+  sectionOrder?: number
 }
 
-// Horizontal offsets (px) cycled per node to form a Duolingo-style wave path.
 const WAVE_OFFSETS = [0, -60, -100, -60, 0, 60, 100, 60]
 
-// Banner color cycled per unit so consecutive chapters feel distinct.
 const UNIT_THEMES = [
   { banner: 'bg-primary', shadow: '#46a302' },
   { banner: 'bg-purple-500', shadow: '#7c3aed' },
@@ -27,9 +28,15 @@ export function UnitMap({
   units,
   completedLessons,
   heartsAvailable = true,
+  sectionOrder = 1,
 }: UnitMapProps) {
-  const allLessons = units.flatMap(u =>
-    u.lessons.map(l => ({ ...l, unitOrder: u.order })),
+  const reducedMotion = useReducedMotion()
+  const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  const allLessons = useMemo(
+    () =>
+      units.flatMap(u => u.lessons.map(l => ({ ...l, unitOrder: u.order }))),
+    [units],
   )
 
   const isUnlocked = (lessonId: string, index: number) => {
@@ -37,6 +44,36 @@ export function UnitMap({
     const prev = allLessons[index - 1]
     return completedLessons.includes(prev.id)
   }
+
+  const nextLessonId = useMemo(() => {
+    for (let i = 0; i < allLessons.length; i++) {
+      const lesson = allLessons[i]
+      const unlocked =
+        i === 0 || completedLessons.includes(allLessons[i - 1].id)
+      if (!completedLessons.includes(lesson.id) && unlocked) {
+        return lesson.id
+      }
+    }
+    return null
+  }, [allLessons, completedLessons])
+
+  useEffect(() => {
+    if (!nextLessonId) return
+    const el = nodeRefs.current.get(nextLessonId)
+    if (!el) return
+
+    const rect = el.getBoundingClientRect()
+    const viewportMid = window.innerHeight / 2
+    const elMid = rect.top + rect.height / 2
+    const alreadyCentered = Math.abs(elMid - viewportMid) < 80
+
+    if (!alreadyCentered) {
+      el.scrollIntoView({
+        block: 'center',
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      })
+    }
+  }, [nextLessonId, reducedMotion])
 
   return (
     <div className='space-y-8'>
@@ -64,12 +101,23 @@ export function UnitMap({
               >
                 <div>
                   <p className='text-xs font-black uppercase tracking-wide text-white/80'>
-                    Section 1, Unit {unit.order}
+                    Section {sectionOrder}, Unit {unit.order}
                   </p>
                   <h2 className='text-lg font-black font-display md:text-xl'>
                     {unit.title}
                   </h2>
                 </div>
+                <Link
+                  href={`/guidebook/${unit.id}`}
+                  className='flex shrink-0 items-center gap-1.5 rounded-xl bg-white/20 px-3 py-2 text-xs font-black uppercase tracking-wide text-white transition-colors hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+                >
+                  <BookOpen01Icon
+                    size={16}
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  Guidebook
+                </Link>
               </div>
             </div>
 
@@ -81,9 +129,18 @@ export function UnitMap({
                 const completed = completedLessons.includes(lesson.id)
                 const unlocked = isUnlocked(lesson.id, globalIndex)
                 const canOpen = unlocked && heartsAvailable
+                const isNext = lesson.id === nextLessonId
                 const offset = WAVE_OFFSETS[lessonIndex % WAVE_OFFSETS.length]
                 const lessonLabel = `Level ${lesson.order}: ${lesson.title}${
-                  completed ? ', completed' : !unlocked ? ', locked' : !heartsAvailable ? ', no hearts' : ''
+                  completed
+                    ? ', completed'
+                    : !unlocked
+                      ? ', locked'
+                      : !heartsAvailable
+                        ? ', no hearts'
+                        : isNext
+                          ? ', current'
+                          : ''
                 }`
 
                 const nodeClassName = cn(
@@ -121,6 +178,9 @@ export function UnitMap({
                 return (
                   <div
                     key={lesson.id}
+                    ref={el => {
+                      if (el) nodeRefs.current.set(lesson.id, el)
+                    }}
                     className='flex flex-col items-center'
                     style={{ marginLeft: offset }}
                   >
@@ -128,6 +188,7 @@ export function UnitMap({
                       <Link
                         href={`/lesson/${lesson.id}`}
                         aria-label={lessonLabel}
+                        aria-current={isNext ? 'step' : undefined}
                         className={nodeClassName}
                       >
                         {nodeIcon}

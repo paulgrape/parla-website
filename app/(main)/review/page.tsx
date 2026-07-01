@@ -1,5 +1,6 @@
 'use client'
 
+import { ReviewSkeleton } from '@/components/skeletons/PageSkeletons'
 import { Button } from '@/components/ui/button'
 import { useApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -43,15 +44,7 @@ export default function ReviewPage() {
   }
 
   if (loading) {
-    return (
-      <p
-        role='status'
-        aria-live='polite'
-        className='text-center text-muted-foreground'
-      >
-        Loading reviews...
-      </p>
-    )
+    return <ReviewSkeleton />
   }
 
   if (done) {
