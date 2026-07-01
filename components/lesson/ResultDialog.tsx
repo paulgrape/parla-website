@@ -1,9 +1,12 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Alert02Icon, Tick01Icon } from 'hugeicons-react'
+import { useId } from 'react'
 
 export type ResultDialogVariant = 'correct' | 'wrong' | 'info'
 
@@ -53,20 +56,32 @@ export function ResultDialog({
   onContinue,
 }: ResultDialogProps) {
   const styles = VARIANT_STYLES[variant]
+  const titleId = useId()
+  const descriptionId = useId()
+  const reducedMotion = useReducedMotion()
 
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          className='fixed inset-x-0 bottom-0 z-50 flex justify-center'
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        <Dialog
+          open={open}
+          titleId={titleId}
+          descriptionId={descriptionId}
+          onClose={onContinue}
+          variant='bottom'
+          ariaLive='assertive'
         >
-          <div
+          <motion.div
+            initial={reducedMotion ? false : { y: '100%' }}
+            animate={{ y: 0 }}
+            exit={reducedMotion ? undefined : { y: '100%' }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { type: 'spring', stiffness: 320, damping: 32 }
+            }
             className={cn(
-              'w-full max-w-lg rounded-t-3xl border-t-2 px-5 pb-8 pt-6 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]',
+              'w-full rounded-t-3xl border-t-2 px-5 pb-8 pt-6 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]',
               styles.sheet,
             )}
           >
@@ -76,6 +91,7 @@ export function ResultDialog({
                   'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
                   styles.iconBg,
                 )}
+                aria-hidden
               >
                 {variant === 'correct' ? (
                   <Tick01Icon
@@ -93,6 +109,7 @@ export function ResultDialog({
               </div>
               <div>
                 <h3
+                  id={titleId}
                   className={cn(
                     'text-2xl font-black font-display',
                     styles.icon,
@@ -101,12 +118,23 @@ export function ResultDialog({
                   {title}
                 </h3>
                 {correctAnswer && (
-                  <p className='text-sm font-bold text-muted-foreground'>
+                  <p
+                    id={descriptionId}
+                    className='text-sm font-bold text-muted-foreground'
+                  >
                     Correct answer:{' '}
                     <span className={styles.icon}>{correctAnswer}</span>
                   </p>
                 )}
-                {message && (
+                {message && !correctAnswer && (
+                  <p
+                    id={descriptionId}
+                    className='text-sm font-bold text-muted-foreground'
+                  >
+                    {message}
+                  </p>
+                )}
+                {message && correctAnswer && (
                   <p className='text-sm font-bold text-muted-foreground'>
                     {message}
                   </p>
@@ -121,8 +149,8 @@ export function ResultDialog({
             >
               {buttonLabel}
             </Button>
-          </div>
-        </motion.div>
+          </motion.div>
+        </Dialog>
       )}
     </AnimatePresence>
   )

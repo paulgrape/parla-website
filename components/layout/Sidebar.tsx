@@ -26,25 +26,35 @@ export function Sidebar() {
         showTagline
       />
 
-      <nav className='flex flex-col gap-2'>
-        {links.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              'flex items-center gap-3 rounded-2xl px-4 py-3 font-bold transition-colors',
-              pathname === href || pathname.startsWith(href + '/')
-                ? 'bg-primary/10 text-primary'
-                : 'text-foreground hover:bg-muted',
-            )}
-          >
-            <Icon
-              size={20}
-              strokeWidth={2}
-            />
-            {label}
-          </Link>
-        ))}
+      <nav
+        aria-label='Main navigation'
+        className='flex flex-col gap-2'
+      >
+        {links.map(({ href, label, icon: Icon }) => {
+          const active =
+            pathname === href || pathname.startsWith(href + '/')
+
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? 'page' : undefined}
+              className={cn(
+                'flex items-center gap-3 rounded-2xl px-4 py-3 font-bold transition-colors',
+                active
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-foreground hover:bg-muted',
+              )}
+            >
+              <Icon
+                size={20}
+                strokeWidth={2}
+                aria-hidden
+              />
+              {label}
+            </Link>
+          )
+        })}
       </nav>
 
       <div className='mt-auto flex items-center justify-between rounded-2xl px-2 py-2'>

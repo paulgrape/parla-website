@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { isAnswerCorrect } from '@/lib/utils'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 interface FillBlankExerciseProps {
   prompt: string
@@ -20,6 +20,7 @@ export function FillBlankExercise({
   onContinue,
 }: FillBlankExerciseProps) {
   const [input, setInput] = useState('')
+  const inputId = useId()
 
   const handleSubmit = () => {
     onSubmit(isAnswerCorrect(input, answer))
@@ -34,15 +35,24 @@ export function FillBlankExercise({
         <h2 className='text-2xl font-black'>{prompt}</h2>
       </div>
 
-      <input
-        type='text'
-        value={input}
-        disabled={revealed}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && !revealed && handleSubmit()}
-        placeholder='Type your answer...'
-        className='w-full rounded-2xl border-2 border-border px-6 py-4 text-lg font-bold focus:border-primary focus:outline-none disabled:opacity-60'
-      />
+      <div>
+        <label
+          htmlFor={inputId}
+          className='sr-only'
+        >
+          Your answer
+        </label>
+        <input
+          id={inputId}
+          type='text'
+          value={input}
+          disabled={revealed}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !revealed && handleSubmit()}
+          placeholder='Type your answer...'
+          className='w-full rounded-2xl border-2 border-border px-6 py-4 text-lg font-bold focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60'
+        />
+      </div>
 
       {revealed ? (
         <div className='space-y-4'>

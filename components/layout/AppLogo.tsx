@@ -27,7 +27,7 @@ export function AppLogo({
     >
       <Image
         src='/icon0.svg'
-        alt='Parla'
+        alt=''
         width={icon}
         height={icon}
         className='shrink-0'

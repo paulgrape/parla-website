@@ -28,8 +28,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       type='button'
       onClick={toggleTheme}
       aria-label='Toggle theme'
+      aria-pressed={mounted ? isDark : undefined}
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-300 hover:bg-muted hover:text-foreground cursor-pointer',
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-300 hover:bg-muted hover:text-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         className,
       )}
     >
@@ -44,16 +45,19 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
             size={18}
             strokeWidth={2}
             className='opacity-50'
+            aria-hidden
           />
         ) : isDark ? (
           <Sun01Icon
             size={18}
             strokeWidth={2}
+            aria-hidden
           />
         ) : (
           <Moon01Icon
             size={18}
             strokeWidth={2}
+            aria-hidden
           />
         )}
       </span>
