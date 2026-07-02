@@ -2,6 +2,7 @@ import { MobileNav } from '@/components/layout/MobileNav'
 import { RightAside } from '@/components/layout/RightAside'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
+import { SoundPreloader } from '@/components/providers/SoundPreloader'
 import { UserStatsProvider } from '@/components/providers/UserStatsProvider'
 
 export default function MainLayout({
@@ -11,6 +12,7 @@ export default function MainLayout({
 }) {
   return (
     <UserStatsProvider>
+      <SoundPreloader />
       <a
         href='#main-content'
         className='sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:font-bold focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'

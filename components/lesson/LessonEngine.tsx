@@ -3,6 +3,7 @@
 import { useUserStats } from '@/components/providers/UserStatsProvider'
 import { Button } from '@/components/ui/button'
 import { useApi } from '@/lib/api'
+import { playSound } from '@/lib/sound'
 import type { Exercise } from '@llp/types'
 import { Cancel01Icon } from 'hugeicons-react'
 import { useRouter } from 'next/navigation'
@@ -428,6 +429,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   }
 
   const handleSubmit = (correct: boolean) => {
+    playSound(correct ? 'correct' : 'wrong')
     if (correct) {
       setShowXpPop(true)
       setTimeout(() => setShowXpPop(false), 1000)
@@ -453,6 +455,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
   const handleMatchMistake = () => {
     if (state.phase !== 'active') return
+    playSound('wrong')
     void loseHeart()
     dispatch({ type: 'MATCH_MISTAKE' })
   }
@@ -481,6 +484,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const handleMatchComplete = () => {
     if (state.phase !== 'active') return
 
+    playSound('correct')
     setShowXpPop(true)
     setTimeout(() => setShowXpPop(false), 1000)
     dispatch({ type: 'MATCH_COMPLETE' })
