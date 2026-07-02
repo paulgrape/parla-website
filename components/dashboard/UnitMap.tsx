@@ -4,7 +4,13 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { playSound } from '@/lib/sound'
 import { cn } from '@/lib/utils'
 import type { Lesson, Unit } from '@llp/types'
-import { BookOpen01Icon, LockIcon, StarIcon, Tick01Icon } from 'hugeicons-react'
+import {
+  ArrowLeft01Icon,
+  BookOpen01Icon,
+  LockIcon,
+  StarIcon,
+  Tick01Icon,
+} from 'hugeicons-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef } from 'react'
 
@@ -101,9 +107,20 @@ export function UnitMap({
                 )}
               >
                 <div>
-                  <p className='text-xs font-black uppercase tracking-wide text-white/80'>
-                    Section {sectionOrder}, Unit {unit.order}
-                  </p>
+                  <Link
+                    href='/sections'
+                    className='inline-flex items-center gap-1 text-sm font-bold group text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg -ml-1 pr-2 py-1 my-auto'
+                  >
+                    <ArrowLeft01Icon
+                      size={18}
+                      strokeWidth={2}
+                      aria-hidden
+                    />
+
+                    <p className='text-xs font-black uppercase tracking-wide text-foreground/80 group-hover:text-foreground transition-colors my-auto'>
+                      Section {sectionOrder}, Unit {unit.order}
+                    </p>
+                  </Link>
                   <h2 className='text-lg font-black font-display md:text-xl'>
                     {unit.title}
                   </h2>
