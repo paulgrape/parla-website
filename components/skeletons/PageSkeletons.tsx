@@ -27,11 +27,6 @@ export function DashboardSkeleton() {
       label='Loading your path...'
       className='space-y-8'
     >
-      <div className='flex items-center justify-between gap-4'>
-        <Skeleton className='h-8 w-24 rounded-lg' />
-        <Skeleton className='h-5 w-32' />
-      </div>
-
       {[0, 1, 2].map(unitIndex => (
         <div
           key={unitIndex}

@@ -3,9 +3,10 @@
 import { SectionsSkeleton } from '@/components/skeletons/PageSkeletons'
 import { Progress } from '@/components/ui/progress'
 import { useApi } from '@/lib/api'
+import { isSectionComplete, isSectionUnlocked } from '@/lib/sections'
 import { cn } from '@/lib/utils'
 import type { Section } from '@llp/types'
-import { ArrowLeft01Icon, Tick01Icon } from 'hugeicons-react'
+import { ArrowLeft01Icon, LockIcon, Tick01Icon } from 'hugeicons-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -41,9 +42,7 @@ export function SectionsContent() {
     )
   }
 
-  const activeSectionIndex = sections.findIndex(
-    s => (s.completedCount ?? 0) < (s.lessonCount ?? 0),
-  )
+  const activeSectionIndex = sections.findIndex(s => !isSectionComplete(s))
 
   return (
     <div className='space-y-6'>
@@ -68,8 +67,9 @@ export function SectionsContent() {
           const theme = SECTION_THEMES[index % SECTION_THEMES.length]
           const lessonCount = section.lessonCount ?? 0
           const completedCount = section.completedCount ?? 0
-          const isComplete =
-            lessonCount > 0 && completedCount >= lessonCount
+          const isComplete = isSectionComplete(section)
+          const isUnlocked = isSectionUnlocked(sections, index)
+          const isLocked = !isComplete && !isUnlocked
           const isActive = index === activeSectionIndex
           const progressPct =
             lessonCount > 0
@@ -79,13 +79,13 @@ export function SectionsContent() {
           return (
             <article
               key={section.id}
-              className='overflow-hidden rounded-2xl border-2 border-border bg-card'
+              className={cn(
+                'overflow-hidden rounded-2xl border-2 border-border bg-card',
+                isLocked && 'opacity-60',
+              )}
             >
               <div
-                className={cn(
-                  'relative px-5 py-4 text-white',
-                  theme.card,
-                )}
+                className={cn('relative px-5 py-4 text-white', theme.card)}
                 style={{
                   backgroundImage:
                     'repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,0.04) 10px, rgba(255,255,255,0.04) 20px)',
@@ -113,6 +113,15 @@ export function SectionsContent() {
                       />
                       Completed!
                     </p>
+                  ) : isLocked ? (
+                    <p className='flex items-center gap-2 text-sm font-bold text-muted-foreground'>
+                      <LockIcon
+                        size={16}
+                        strokeWidth={2}
+                        aria-hidden
+                      />
+                      Complete previous sections
+                    </p>
                   ) : isActive ? (
                     <div className='space-y-1'>
                       <Progress
@@ -130,21 +139,26 @@ export function SectionsContent() {
                   )}
                 </div>
 
-                <Link
-                  href={
-                    isComplete
-                      ? `/dashboard?sectionId=${section.id}`
-                      : `/dashboard?sectionId=${section.id}`
-                  }
-                  className={cn(
-                    'shrink-0 rounded-xl px-5 py-2.5 text-sm font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                    isActive && !isComplete
-                      ? 'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]'
-                      : 'border-2 border-border bg-card text-foreground hover:bg-muted',
-                  )}
-                >
-                  {isComplete ? 'Review' : isActive ? 'Continue' : 'Start'}
-                </Link>
+                {isLocked ? (
+                  <span
+                    aria-disabled
+                    className='shrink-0 cursor-not-allowed rounded-xl border-2 border-border bg-muted px-5 py-2.5 text-sm font-black uppercase tracking-wide text-muted-foreground'
+                  >
+                    Locked
+                  </span>
+                ) : (
+                  <Link
+                    href={`/dashboard?sectionId=${section.id}`}
+                    className={cn(
+                      'shrink-0 rounded-xl px-5 py-2.5 text-sm font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      isActive && !isComplete
+                        ? 'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]'
+                        : 'border-2 border-border bg-card text-foreground',
+                    )}
+                  >
+                    {isComplete ? 'Review' : isActive ? 'Continue' : 'Start'}
+                  </Link>
+                )}
               </div>
             </article>
           )

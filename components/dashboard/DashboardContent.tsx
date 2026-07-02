@@ -1,11 +1,13 @@
 'use client'
 
 import { UnitMap } from '@/components/dashboard/UnitMap'
-import { DashboardSkeleton } from '@/components/skeletons/PageSkeletons'
 import { useUserStats } from '@/components/providers/UserStatsProvider'
+import { DashboardSkeleton } from '@/components/skeletons/PageSkeletons'
 import { useApi } from '@/lib/api'
+import { resolveActiveSection } from '@/lib/sections'
+import { cn } from '@/lib/utils'
 import type { Lesson, Section, Unit } from '@llp/types'
-import { ArrowLeft01Icon } from 'hugeicons-react'
+import { Tick01Icon } from 'hugeicons-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -35,15 +37,7 @@ export function DashboardContent() {
   useEffect(() => {
     fetchApi<Section[]>('/sections')
       .then(allSections => {
-        const target =
-          (sectionIdParam
-            ? allSections.find(s => s.id === sectionIdParam)
-            : null) ??
-          allSections.find(
-            s => (s.completedCount ?? 0) < (s.lessonCount ?? 0),
-          ) ??
-          allSections[allSections.length - 1] ??
-          null
+        const target = resolveActiveSection(allSections, sectionIdParam)
 
         setActiveSection(target)
 
@@ -91,28 +85,14 @@ export function DashboardContent() {
   const regenLabel =
     nextHeartAt && nextHeartAt > now ? formatCountdown(nextHeartAt - now) : null
 
+  const completedLessons = stats?.completedLessons ?? []
+  const allLessonIds = units.flatMap(u => u.lessons.map(l => l.id))
+  const isSectionComplete =
+    allLessonIds.length > 0 &&
+    allLessonIds.every(id => completedLessons.includes(id))
+
   return (
     <div className='space-y-8'>
-      <div className='flex items-center justify-between gap-4'>
-        <h1 className='sr-only'>Learning path</h1>
-        <Link
-          href='/sections'
-          className='inline-flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
-        >
-          <ArrowLeft01Icon
-            size={18}
-            strokeWidth={2}
-            aria-hidden
-          />
-          Sections
-        </Link>
-        {activeSection && (
-          <p className='text-sm font-bold text-muted-foreground'>
-            {activeSection.title}
-          </p>
-        )}
-      </div>
-
       {!heartsAvailable && (
         <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-4 text-center'>
           <p className='font-black text-destructive'>
@@ -135,12 +115,39 @@ export function DashboardContent() {
           </p>
         </div>
       ) : (
-        <UnitMap
-          units={units}
-          completedLessons={stats?.completedLessons ?? []}
-          heartsAvailable={heartsAvailable}
-          sectionOrder={activeSection?.order ?? 1}
-        />
+        <>
+          <UnitMap
+            units={units}
+            completedLessons={completedLessons}
+            heartsAvailable={heartsAvailable}
+            sectionOrder={activeSection?.order ?? 1}
+          />
+
+          {isSectionComplete && (
+            <div className='rounded-2xl border-2 border-border bg-card p-6 text-center space-y-4'>
+              <p className='flex items-center justify-center gap-2 text-sm font-black uppercase text-primary'>
+                <Tick01Icon
+                  size={18}
+                  strokeWidth={2.5}
+                  aria-hidden
+                />
+                Section complete!
+              </p>
+              <p className='text-sm text-muted-foreground'>
+                You finished all lessons in {activeSection?.title}.
+              </p>
+              <Link
+                href='/sections'
+                className={cn(
+                  'inline-block rounded-xl px-5 py-2.5 text-sm font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]',
+                )}
+              >
+                View sections
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
