@@ -1,6 +1,7 @@
 'use client'
 
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { playSound } from '@/lib/sound'
 import { cn } from '@/lib/utils'
 import type { Lesson, Unit } from '@llp/types'
 import { BookOpen01Icon, LockIcon, StarIcon, Tick01Icon } from 'hugeicons-react'
@@ -187,6 +188,7 @@ export function UnitMap({
                     {canOpen ? (
                       <Link
                         href={`/lesson/${lesson.id}`}
+                        onClick={() => playSound('click')}
                         aria-label={lessonLabel}
                         aria-current={isNext ? 'step' : undefined}
                         className={nodeClassName}

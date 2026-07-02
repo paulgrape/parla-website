@@ -4,7 +4,7 @@ import { ThemedUserButton } from '@/components/auth/ThemedUserButton'
 import { AppLogo } from '@/components/layout/AppLogo'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { cn } from '@/lib/utils'
-import { BookOpen01Icon, Home01Icon, ArrowReloadHorizontalIcon } from 'hugeicons-react'
+import { BookOpen01Icon, Home01Icon, ArrowReloadHorizontalIcon, Settings01Icon } from 'hugeicons-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -12,6 +12,7 @@ const links = [
   { href: '/dashboard', label: 'Learn', icon: Home01Icon },
   { href: '/sections', label: 'Sections', icon: BookOpen01Icon },
   { href: '/review', label: 'Review', icon: ArrowReloadHorizontalIcon },
+  { href: '/settings', label: 'Settings', icon: Settings01Icon },
 ]
 
 export function Sidebar() {
