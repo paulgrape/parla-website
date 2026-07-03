@@ -15,8 +15,8 @@ export function TopBar() {
   if (pathname.startsWith('/lesson/')) return null
 
   const streak = stats?.streak ?? 0
-  const streakActive = stats?.streakActive ?? false
-  const streakColor = streakActive ? 'text-orange-500' : 'text-muted-foreground'
+  const extendedToday = stats?.extendedToday ?? false
+  const streakColor = extendedToday ? 'text-orange-500' : 'text-muted-foreground'
   const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
 
   return (
@@ -37,7 +37,7 @@ export function TopBar() {
         </div>
         <div
           className='flex items-center gap-1'
-          aria-label={`${streak} day streak${streakActive ? ', active' : ''}`}
+          aria-label={`${streak} day streak${extendedToday ? ', extended today' : ''}`}
         >
           <FireIcon
             size={20}

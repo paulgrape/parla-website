@@ -32,7 +32,7 @@ export function RightAside() {
   if (pathname.startsWith('/lesson/')) return null
 
   const streak = stats?.streak ?? 0
-  const streakActive = stats?.streakActive ?? false
+  const extendedToday = stats?.extendedToday ?? false
   const longestStreak = stats?.longestStreak ?? 0
   const xp = stats?.xp ?? 0
   const nextReview = stats?.nextReview ?? 0
@@ -49,7 +49,7 @@ export function RightAside() {
       <div className='flex items-center justify-between gap-2 rounded-2xl border-2 border-border px-4 py-3'>
         <div
           className={`flex items-center gap-1.5 font-black ${
-            streakActive ? 'text-orange-500' : 'text-muted-foreground'
+            extendedToday ? 'text-orange-500' : 'text-muted-foreground'
           }`}
         >
           <FireIcon
@@ -83,7 +83,7 @@ export function RightAside() {
       <StreakCard
         streak={streak}
         longestStreak={longestStreak}
-        active={streakActive}
+        active={extendedToday}
       />
       <XpBar xp={xp} />
 

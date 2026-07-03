@@ -55,6 +55,7 @@ export interface UserStats {
   xp: number
   streak: number
   streakActive: boolean
+  extendedToday: boolean
   longestStreak: number
   completedLessons: string[]
   nextReview: number
@@ -83,6 +84,7 @@ export interface ProgressResult {
   xpEarned: number
   newStreak: number
   totalXp: number
+  streakExtended: boolean
 }
 
 export interface GuidebookPhrase {
