@@ -11,11 +11,17 @@ export function useApi() {
   const fetchApi = useCallback(
     async <T>(path: string, options: RequestInit = {}): Promise<T> => {
       const token = await getToken()
+      const timeZone =
+        typeof Intl !== 'undefined'
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone
+          : undefined
+
       const res = await fetch(`${API_URL}${path}`, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          ...(timeZone ? { 'X-Time-Zone': timeZone } : {}),
           ...options.headers,
         },
       })

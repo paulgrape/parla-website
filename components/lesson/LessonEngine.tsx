@@ -9,6 +9,7 @@ import { Cancel01Icon } from 'hugeicons-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { CompletionScreen } from './CompletionScreen'
+import { StreakExtendScreen } from './StreakExtendScreen'
 import { FillBlankExercise } from './exercises/FillBlankExercise'
 import { ListeningExercise } from './exercises/ListeningExercise'
 import { MatchExercise } from './exercises/MatchExercise'
@@ -54,6 +55,7 @@ type LessonState =
       phase: 'completed'
       totalXp: number
       streak: number
+      streakExtended: boolean
       perfect: boolean
       mistakes: number
     }
@@ -93,6 +95,7 @@ type LessonAction =
       type: 'COMPLETE'
       totalXp: number
       streak: number
+      streakExtended: boolean
       perfect: boolean
       mistakes: number
     }
@@ -299,6 +302,7 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         phase: 'completed',
         totalXp: action.totalXp,
         streak: action.streak,
+        streakExtended: action.streakExtended,
         perfect: action.perfect,
         mistakes: action.mistakes,
       }
@@ -341,6 +345,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     },
   )
   const [now, setNow] = useState(() => Date.now())
+  const [streakScreenDone, setStreakScreenDone] = useState(false)
   const completionPostingRef = useRef(false)
 
   const maxHearts = stats?.maxHearts ?? 5
@@ -396,7 +401,12 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       return
 
     completionPostingRef.current = true
-    fetchApi<{ xpEarned: number; newStreak: number; totalXp: number }>(
+    fetchApi<{
+      xpEarned: number
+      newStreak: number
+      totalXp: number
+      streakExtended: boolean
+    }>(
       '/progress',
       {
         method: 'POST',
@@ -408,6 +418,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           type: 'COMPLETE',
           totalXp: state.totalXp,
           streak: result.newStreak,
+          streakExtended: result.streakExtended,
           perfect: state.perfect,
           mistakes: state.mistakes,
         })
@@ -417,6 +428,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           type: 'COMPLETE',
           totalXp: state.totalXp,
           streak: 0,
+          streakExtended: false,
           perfect: state.perfect,
           mistakes: state.mistakes,
         })
@@ -493,6 +505,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const handleStart = () => {
     if (hearts <= 0) return
     completionPostingRef.current = false
+    setStreakScreenDone(false)
     dispatch({ type: 'START', exerciseIds: levelExerciseIds, lives: hearts })
   }
 
@@ -630,6 +643,15 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   }
 
   if (state.phase === 'completed') {
+    if (state.streakExtended && !streakScreenDone) {
+      return (
+        <StreakExtendScreen
+          streak={state.streak}
+          onContinue={() => setStreakScreenDone(true)}
+        />
+      )
+    }
+
     return (
       <CompletionScreen
         totalXp={state.totalXp}
