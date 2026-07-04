@@ -2,6 +2,7 @@
 
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { XpBar } from '@/components/dashboard/XpBar'
+import { LegalLinks } from '@/components/layout/LegalLinks'
 import { useUserStats } from '@/components/providers/UserStatsProvider'
 import { FavouriteIcon, FireIcon, StarIcon } from 'hugeicons-react'
 import Link from 'next/link'
@@ -100,6 +101,8 @@ export function RightAside() {
           </p>
         </Link>
       )}
+
+      <LegalLinks variant='aside' className='px-2' />
     </aside>
   )
 }
