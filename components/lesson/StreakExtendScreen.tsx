@@ -61,7 +61,7 @@ export function StreakExtendScreen({
         initial={reducedMotion ? false : { opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 22 }}
-        className='flex flex-col items-center gap-6 p-6 text-center'
+        className='relative flex flex-col items-center gap-6 px-6 pt-6 pb-24 text-center'
       >
         <motion.div
           initial={reducedMotion ? false : { scale: 0.85 }}
@@ -147,7 +147,7 @@ export function StreakExtendScreen({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
               transition={reducedMotion ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
-              className='w-full'
+              className='absolute inset-x-6 bottom-6'
             >
               <Button
                 onClick={onContinue}

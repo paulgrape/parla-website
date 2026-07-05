@@ -1,3 +1,4 @@
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -28,7 +29,7 @@ export function AppLogo({
   className,
 }: AppLogoProps) {
   const { icon, title } = sizeConfig[size]
-  const resolvedTagline = tagline ?? (showTagline ? 'Learn Italian' : undefined)
+  const resolvedTagline = tagline ?? (showTagline ? APP_TAGLINE : undefined)
   const TitleTag = titleAs
   const hasTagline = Boolean(resolvedTagline)
 
@@ -39,7 +40,7 @@ export function AppLogo({
         title,
       )}
     >
-      Parla
+      {APP_NAME}
     </TitleTag>
   )
 

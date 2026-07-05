@@ -1,5 +1,9 @@
+'use client'
+
+import { legalHrefWithFrom } from '@/lib/parlaReturnNav'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const links = [
   { href: '/about', label: 'About', asideLabel: 'ABOUT' },
@@ -19,6 +23,8 @@ interface LegalLinksProps {
 }
 
 export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
+  const pathname = usePathname()
+
   if (variant === 'aside') {
     return (
       <nav
@@ -29,7 +35,11 @@ export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
         )}
       >
         {links.map(({ href, asideLabel }) => (
-          <Link key={href} href={href} className={asideLinkClassName}>
+          <Link
+            key={href}
+            href={legalHrefWithFrom(href, pathname)}
+            className={asideLinkClassName}
+          >
             {asideLabel}
           </Link>
         ))}
@@ -48,7 +58,10 @@ export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
       {links.map(({ href, label }, index) => (
         <span key={href}>
           {index > 0 && <span aria-hidden='true'> · </span>}
-          <Link href={href} className={footerLinkClassName}>
+          <Link
+            href={legalHrefWithFrom(href, pathname)}
+            className={footerLinkClassName}
+          >
             {label}
           </Link>
         </span>
