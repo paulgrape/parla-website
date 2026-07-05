@@ -1,6 +1,30 @@
-import { WebhookEvent } from '@clerk/nextjs/server'
+import { getNameViolations } from '@/lib/nameModeration'
+import { clerkClient, WebhookEvent } from '@clerk/nextjs/server'
 import { headers } from 'next/headers'
 import { Webhook } from 'svix'
+
+async function moderateUserNames(data: {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  username: string | null
+  public_metadata: Record<string, unknown>
+}) {
+  const { violations, revert } = getNameViolations(data)
+  if (violations.length === 0) return
+
+  const client = await clerkClient()
+  await client.users.updateUser(data.id, {
+    ...revert,
+    publicMetadata: {
+      ...data.public_metadata,
+      nameFlagged: true,
+      nameFlaggedAt: new Date().toISOString(),
+    },
+  })
+
+  console.warn('Reverted disallowed profile name(s):', data.id, violations)
+}
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
@@ -33,18 +57,17 @@ export async function POST(req: Request) {
     return new Response('Invalid signature', { status: 400 })
   }
 
-  if (evt.type === 'user.created') {
-    const { id, username, first_name, email_addresses } = evt.data
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-    if (apiUrl) {
-      // User will be created on first API call via getOrCreateUser
-      console.log(
-        'New user registered:',
-        id,
-        username ?? first_name,
-        email_addresses?.[0]?.email_address,
-      )
+  if (evt.type === 'user.created' || evt.type === 'user.updated') {
+    try {
+      await moderateUserNames({
+        id: evt.data.id,
+        first_name: evt.data.first_name,
+        last_name: evt.data.last_name,
+        username: evt.data.username,
+        public_metadata: evt.data.public_metadata ?? {},
+      })
+    } catch (err) {
+      console.error('Name moderation failed:', err)
     }
   }
 

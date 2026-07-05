@@ -1,8 +1,7 @@
 'use client'
 
-import { ThemedUserButton } from '@/components/auth/ThemedUserButton'
 import { AppLogo } from '@/components/layout/AppLogo'
-import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { UserMenu } from '@/components/layout/UserMenu'
 import { useUserStats } from '@/components/providers/UserStatsProvider'
 import { FavouriteIcon, FireIcon } from 'hugeicons-react'
 import { usePathname } from 'next/navigation'
@@ -16,7 +15,9 @@ export function TopBar() {
 
   const streak = stats?.streak ?? 0
   const extendedToday = stats?.extendedToday ?? false
-  const streakColor = extendedToday ? 'text-orange-500' : 'text-muted-foreground'
+  const streakColor = extendedToday
+    ? 'text-orange-500'
+    : 'text-muted-foreground'
   const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
 
   return (
@@ -47,8 +48,7 @@ export function TopBar() {
           />
           <span className={`font-bold ${streakColor}`}>{streak}</span>
         </div>
-        <ThemeToggle />
-        <ThemedUserButton afterSignOutUrl='/sign-in' />
+        <UserMenu variant='compact' />
       </div>
     </header>
   )
