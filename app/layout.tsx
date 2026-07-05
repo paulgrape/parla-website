@@ -1,14 +1,14 @@
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { SerwistProvider } from '@/components/providers/SerwistProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import {
+  APP_DEFAULT_TITLE,
+  APP_DESCRIPTION,
+  APP_NAME,
+} from '@/lib/constants'
 import type { Metadata, Viewport } from 'next'
 import { Baloo_2, Nunito } from 'next/font/google'
 import './globals.css'
-
-const APP_NAME = 'Parla'
-const APP_DEFAULT_TITLE = 'Parla — Learn Italian'
-const APP_DESCRIPTION =
-  'Duolingo-style Italian language learning platform with spaced repetition'
 
 const baloo2 = Baloo_2({
   variable: '--font-baloo2',

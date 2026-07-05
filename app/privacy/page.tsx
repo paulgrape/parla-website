@@ -1,13 +1,15 @@
-import { AppLogo } from '@/components/layout/AppLogo'
+import {
+  ParlaReturnNav,
+  ParlaReturnNavFallback,
+} from '@/components/layout/ParlaReturnNav'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft01Icon } from 'hugeicons-react'
+import { APP_NAME } from '@/lib/constants'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description:
-    'How Parla, a non-commercial Italian learning app by Pavel Vinogradov, collects and handles your data.',
+  description: `How ${APP_NAME}, a non-commercial Italian learning app by Pavel Vinogradov, collects and handles your data.`,
 }
 
 const LAST_UPDATED = 'July 4, 2026'
@@ -20,22 +22,9 @@ export default function PrivacyPage() {
   return (
     <main className='min-h-screen bg-muted p-4 py-10'>
       <div className='mx-auto max-w-2xl space-y-6'>
-        <Link
-          href='/'
-          className='inline-flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
-        >
-          <ArrowLeft01Icon
-            size={18}
-            strokeWidth={2}
-            aria-hidden
-          />
-          Back to Parla
-        </Link>
-
-        <AppLogo
-          size='md'
-          href='/'
-        />
+        <Suspense fallback={<ParlaReturnNavFallback />}>
+          <ParlaReturnNav />
+        </Suspense>
 
         <Card className='space-y-8'>
           <header>
@@ -58,9 +47,9 @@ export default function PrivacyPage() {
               Overview
             </h2>
             <p>
-              Parla is a non-commercial, personal Italian learning project. It
+              {APP_NAME} is a non-commercial, personal Italian learning project. It
               collects the minimum needed to run the app and track your learning
-              progress. Parla does not sell your data, does not show ads, and
+              progress. {APP_NAME} does not sell your data, does not show ads, and
               does not use advertising or tracking cookies.
             </p>
           </section>
@@ -130,7 +119,7 @@ export default function PrivacyPage() {
               Service Providers
             </h2>
             <p>
-              Parla relies on a few trusted providers to operate. Your data may
+              {APP_NAME} relies on a few trusted providers to operate. Your data may
               be processed by them solely to run the app:
             </p>
             <ul className='list-disc space-y-2 pl-5 marker:text-primary'>
@@ -168,7 +157,7 @@ export default function PrivacyPage() {
               Cookies &amp; Local Storage
             </h2>
             <p>
-              Parla uses only essential cookies and local storage &mdash; mainly
+              {APP_NAME} uses only essential cookies and local storage &mdash; mainly
               the authentication session cookies set by Clerk to keep you signed
               in. There are no advertising or analytics tracking cookies, so no
               cookie-consent banner is required.
@@ -229,7 +218,7 @@ export default function PrivacyPage() {
               Children&apos;s Privacy
             </h2>
             <p>
-              Parla is not directed at children under 13, and we do not
+              {APP_NAME} is not directed at children under 13, and we do not
               knowingly collect personal data from them. If you believe a child
               has provided us with personal data, please contact us and we will
               delete it.
@@ -292,7 +281,7 @@ export default function PrivacyPage() {
               .
             </p>
             <p className='text-sm text-muted-foreground'>
-              Parla is a personal, non-commercial project. This page is a
+              {APP_NAME} is a personal, non-commercial project. This page is a
               good-faith summary of how the app handles data and is not formal
               legal advice.
             </p>

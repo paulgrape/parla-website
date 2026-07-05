@@ -1,14 +1,16 @@
-import { AppLogo } from '@/components/layout/AppLogo'
+import {
+  ParlaReturnNav,
+  ParlaReturnNavFallback,
+} from '@/components/layout/ParlaReturnNav'
 import { Card } from '@/components/ui/card'
+import { APP_NAME } from '@/lib/constants'
 import type { Metadata } from 'next'
-import { ArrowLeft01Icon } from 'hugeicons-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'About',
-  description:
-    'Parla is a non-commercial Italian learning app by Pavel Vinogradov, inspired by Duolingo and built with love for the language.',
+  description: `${APP_NAME} is a non-commercial Italian learning app by Pavel Vinogradov, inspired by Duolingo and built with love for the language.`,
 }
 
 const sectionHeadingClassName =
@@ -18,24 +20,14 @@ export default function AboutPage() {
   return (
     <main className='min-h-screen bg-muted p-4 py-10'>
       <div className='mx-auto max-w-2xl space-y-6'>
-        <Link
-          href='/'
-          className='inline-flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
-        >
-          <ArrowLeft01Icon
-            size={18}
-            strokeWidth={2}
-            aria-hidden
-          />
-          Back to Parla
-        </Link>
-
-        <AppLogo size='md' href='/' />
+        <Suspense fallback={<ParlaReturnNavFallback />}>
+          <ParlaReturnNav />
+        </Suspense>
 
         <Card className='space-y-8'>
           <header>
             <h1 className='text-3xl font-black font-display text-primary'>
-              About Parla
+              About {APP_NAME}
             </h1>
             <p className='mt-2 text-muted-foreground'>
               A personal, non-commercial Italian learning app.
@@ -47,10 +39,10 @@ export default function AboutPage() {
             className='space-y-4 leading-relaxed text-foreground'
           >
             <h2 id='about-parla-heading' className={sectionHeadingClassName}>
-              About Parla
+              About {APP_NAME}
             </h2>
             <p>
-              Parla is a non-commercial, personal project built out of love for
+              {APP_NAME} is a non-commercial, personal project built out of love for
               the Italian language. I started it because I wanted a focused
               place to practice every day — not another generic app, but
               something shaped around how I actually learn: short sessions,
@@ -59,7 +51,7 @@ export default function AboutPage() {
             <p>
               The experience is inspired by Duolingo — playful, bite-sized
               lessons, hearts, streaks, and that satisfying feeling of clearing
-              a level — but Parla is my own take. I kept the parts that motivate
+              a level — but {APP_NAME} is my own take. I kept the parts that motivate
               me and stripped away what I did not need, so the app stays lean and
               centered on Italian.
             </p>
@@ -109,7 +101,7 @@ export default function AboutPage() {
             </figure>
 
             <p>
-              I am a senior frontend developer based in Europe. Building Parla
+              I am a senior frontend developer based in Europe. Building {APP_NAME}
               lets me combine the craft I work with every day — React, Next.js,
               thoughtful UI — with a language I care about deeply. Italy, its
               culture, and its way of expressing ideas drew me in long before
@@ -126,14 +118,14 @@ export default function AboutPage() {
               Disclaimer
             </h2>
             <p>
-              Parla is not affiliated with Duolingo or any commercial language
+              {APP_NAME} is not affiliated with Duolingo or any commercial language
               platform. There are no ads, no subscriptions, and no plan to turn
               it into a product. It exists to learn, experiment, and share
               something useful with fellow Italian learners — and to keep my own
               practice honest.
             </p>
             <p>
-              If you are using Parla, grazie. I hope it helps you as much as
+              If you are using {APP_NAME}, grazie. I hope it helps you as much as
               building it helps me. Buon apprendimento.
             </p>
           </section>
