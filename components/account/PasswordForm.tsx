@@ -60,7 +60,7 @@ export function PasswordForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!canSubmit) return
+    if (!user || !canSubmit) return
 
     setSaving(true)
     setError(null)
