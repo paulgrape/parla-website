@@ -1,87 +1,69 @@
 'use client'
 
-import { Card } from '@/components/ui/card'
-import { useSoundEnabled } from '@/hooks/useSoundEnabled'
+import { PreferencesTab } from '@/components/settings/PreferencesTab'
+import { ProfileTab } from '@/components/settings/ProfileTab'
 import { cn } from '@/lib/utils'
-import { useTheme } from 'next-themes'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useId } from 'react'
 
-const THEME_OPTIONS = [
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'system', label: 'System' },
+type SettingsTab = 'preferences' | 'profile'
+
+const TABS = [
+  { value: 'preferences', label: 'Preferences' },
+  { value: 'profile', label: 'Profile' },
 ] as const
 
-type ThemeOption = (typeof THEME_OPTIONS)[number]['value']
-
 export function SettingsContent() {
-  const { theme, setTheme } = useTheme()
-  const { enabled: soundEnabled, setEnabled: setSoundEnabled } = useSoundEnabled()
-  const themeReady = theme !== undefined
-  const activeTheme = (theme ?? 'system') as ThemeOption
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const baseId = useId()
+  const tab: SettingsTab =
+    searchParams.get('tab') === 'profile' ? 'profile' : 'preferences'
+
+  function selectTab(next: SettingsTab) {
+    router.replace(`/settings?tab=${next}`, { scroll: false })
+  }
 
   return (
     <div className='mx-auto max-w-lg space-y-6'>
       <h1 className='text-3xl font-black font-display'>Settings</h1>
 
-      <Card className='space-y-4'>
-        <div>
-          <h2 className='text-lg font-bold'>Appearance</h2>
-          <p className='text-sm text-muted-foreground'>Light / dark mode</p>
-        </div>
-        <div
-          role='group'
-          aria-label='Theme'
-          className='flex gap-2'
-        >
-          {THEME_OPTIONS.map(({ value, label }) => (
+      <div
+        role='tablist'
+        aria-label='Settings sections'
+        className='flex gap-2 rounded-2xl border-2 border-border p-1'
+      >
+        {TABS.map(({ value, label }) => {
+          const active = tab === value
+          return (
             <button
               key={value}
               type='button'
-              aria-pressed={themeReady ? activeTheme === value : undefined}
-              disabled={!themeReady}
-              onClick={() => setTheme(value)}
+              role='tab'
+              id={`${baseId}-tab-${value}`}
+              aria-selected={active}
+              aria-controls={`${baseId}-panel-${value}`}
+              onClick={() => selectTab(value)}
               className={cn(
-                'flex-1 rounded-2xl border-2 px-4 py-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                themeReady && activeTheme === value
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border text-foreground hover:bg-muted',
+                'flex-1 rounded-xl px-4 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                active
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
               {label}
             </button>
-          ))}
-        </div>
-      </Card>
+          )
+        })}
+      </div>
 
-      <Card className='flex items-center justify-between gap-4'>
-        <div>
-          <h2 className='text-lg font-bold'>Sound effects</h2>
-          <p className='text-sm text-muted-foreground'>
-            Play sounds for answers and navigation
-          </p>
-        </div>
-        <button
-          type='button'
-          role='switch'
-          aria-checked={soundEnabled}
-          aria-label='Sound effects'
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          className={cn(
-            'relative h-8 w-14 shrink-0 rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-            soundEnabled
-              ? 'border-primary bg-primary'
-              : 'border-border bg-muted',
-          )}
-        >
-          <span
-            aria-hidden
-            className={cn(
-              'absolute top-0.5 block h-6 w-6 rounded-full bg-white shadow transition-transform',
-              soundEnabled ? 'translate-x-6' : 'translate-x-0.5',
-            )}
-          />
-        </button>
-      </Card>
+      <div
+        role='tabpanel'
+        id={`${baseId}-panel-${tab}`}
+        aria-labelledby={`${baseId}-tab-${tab}`}
+      >
+        {tab === 'preferences' ? <PreferencesTab /> : <ProfileTab />}
+      </div>
     </div>
   )
 }

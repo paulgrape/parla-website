@@ -7,6 +7,13 @@ interface MarkdownProps {
   className?: string
 }
 
+function safeHref(href: string | undefined): string | undefined {
+  if (!href) return undefined
+  const trimmed = href.trim()
+  if (/^(https?:|mailto:|\/|#)/i.test(trimmed)) return trimmed
+  return undefined
+}
+
 export function Markdown({ children, className }: MarkdownProps) {
   return (
     <div className={cn('prose-sm max-w-none', className)}>
@@ -50,6 +57,22 @@ export function Markdown({ children, className }: MarkdownProps) {
               {c}
             </code>
           ),
+          a: ({ href, children: c }) => {
+            const safe = safeHref(href)
+            if (!safe) return <>{c}</>
+            const external = /^https?:/i.test(safe)
+            return (
+              <a
+                href={safe}
+                className='font-medium text-primary underline underline-offset-2'
+                {...(external
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
+              >
+                {c}
+              </a>
+            )
+          },
         }}
       >
         {children}
