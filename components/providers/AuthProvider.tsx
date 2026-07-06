@@ -11,7 +11,15 @@ function hasValidClerkKey() {
 function ClerkWithTheme({ children }: { children: React.ReactNode }) {
   const appearance = useClerkAppearance()
 
-  return <ClerkProvider appearance={appearance}>{children}</ClerkProvider>
+  return (
+    <ClerkProvider
+      appearance={appearance}
+      signInUrl='/sign-in'
+      signUpUrl='/sign-up'
+    >
+      {children}
+    </ClerkProvider>
+  )
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
