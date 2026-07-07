@@ -224,14 +224,20 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
     case 'MATCH_COMPLETE': {
       if (state.phase !== 'active') return state
       const {xp, earnedIds} = awardXpOnce(state, true)
-      const nextState: ActiveLessonState = {
-        ...state,
-        xp,
-        earnedIds,
-        mistakeIds: removeCurrentMistakeIfFixed(state, true)
-      }
 
-      return advanceLesson(nextState)
+      return {
+        phase: 'answer_revealed',
+        levelIds: state.levelIds,
+        currentId: state.currentId,
+        remainingIds: state.remainingIds,
+        mistakeIds: removeCurrentMistakeIfFixed(state, true),
+        fixingMistakes: state.fixingMistakes,
+        lives: state.lives,
+        xp,
+        mistakes: state.mistakes,
+        earnedIds,
+        correct: true
+      }
     }
 
     case 'CONTINUE': {
@@ -409,6 +415,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   }
 
   const handleSubmit = (correct: boolean) => {
+    if (correct) setCorrectTitle(pickCorrectTitle())
     playSound(correct ? 'correct' : 'wrong')
     if (correct) {
       setShowXpPop(true)
@@ -422,7 +429,6 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const handleTranslationCheck = () => {
     if (state.phase !== 'active' || !selected || !currentExercise) return
     const correct = selected === currentExercise.answer
-    if (correct) setCorrectTitle(pickCorrectTitle())
     handleSubmit(correct)
   }
 
@@ -462,6 +468,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const handleMatchComplete = () => {
     if (state.phase !== 'active') return
 
+    setCorrectTitle(pickCorrectTitle())
     playSound('correct')
     setShowXpPop(true)
     setTimeout(() => setShowXpPop(false), 1000)
@@ -626,7 +633,12 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const lives = state.lives
   const revealed = state.phase === 'answer_revealed'
 
-  const showTranslationResult = revealed && currentExercise?.type === 'translation'
+  const showResultPopup =
+    revealed &&
+    (currentExercise?.type === 'translation' ||
+      currentExercise?.type === 'fill_blank' ||
+      currentExercise?.type === 'listening' ||
+      currentExercise?.type === 'match')
 
   return (
     <div className='relative mx-auto max-w-lg px-4 py-6'>
@@ -659,7 +671,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
       {fixingMistakes && (
         <div
           role='status'
-          className='mb-4 rounded-2xl bg-orange-50 px-4 py-3 text-center text-sm font-black text-orange-600'
+          className='mb-4 rounded-2xl bg-orange-500/15 px-4 py-3 text-center text-sm font-black text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
         >
           Fix your mistakes to finish the level.
         </div>
@@ -681,7 +693,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
         />
       )}
 
-      {currentExercise?.type === 'match' && state.phase === 'active' && (
+      {currentExercise?.type === 'match' && (state.phase === 'active' || state.phase === 'answer_revealed') && (
         <MatchExercise
           key={currentExercise.id}
           answer={currentExercise.answer}
@@ -692,27 +704,27 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
 
       {currentExercise?.type === 'fill_blank' && (
         <FillBlankExercise
+          key={currentExercise.id}
           prompt={currentExercise.prompt}
           answer={currentExercise.answer}
           revealed={revealed}
           onSubmit={handleSubmit}
-          onContinue={handleContinue}
         />
       )}
 
       {currentExercise?.type === 'listening' && (
         <ListeningExercise
+          key={currentExercise.id}
           audioText={currentExercise.audioText ?? currentExercise.answer}
           answer={currentExercise.answer}
           revealed={revealed}
           onSubmit={handleSubmit}
-          onContinue={handleContinue}
           onSkipListening={requestSkipListening}
         />
       )}
 
       <ResultDialog
-        open={showTranslationResult}
+        open={showResultPopup}
         variant={state.phase === 'answer_revealed' && state.correct ? 'correct' : 'wrong'}
         title={state.phase === 'answer_revealed' && state.correct ? correctTitle : 'Not quite'}
         correctAnswer={state.phase === 'answer_revealed' && !state.correct ? currentExercise?.answer : undefined}
