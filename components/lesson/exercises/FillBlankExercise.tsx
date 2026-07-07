@@ -9,10 +9,9 @@ interface FillBlankExerciseProps {
   answer: string
   revealed: boolean
   onSubmit: (correct: boolean) => void
-  onContinue: () => void
 }
 
-export function FillBlankExercise({prompt, answer, revealed, onSubmit, onContinue}: FillBlankExerciseProps) {
+export function FillBlankExercise({prompt, answer, revealed, onSubmit}: FillBlankExerciseProps) {
   const [input, setInput] = useState('')
   const inputId = useId()
 
@@ -46,20 +45,7 @@ export function FillBlankExercise({prompt, answer, revealed, onSubmit, onContinu
         />
       </div>
 
-      {revealed ? (
-        <div className='space-y-4'>
-          <p className='text-center font-bold'>
-            Correct answer: <span className='text-primary'>{answer}</span>
-          </p>
-          <Button
-            onClick={onContinue}
-            className='w-full'
-            size='lg'
-          >
-            Continue
-          </Button>
-        </div>
-      ) : (
+      {!revealed && (
         <Button
           onClick={handleSubmit}
           disabled={!input.trim()}

@@ -22,7 +22,9 @@ export default hasClerk
   ? clerkMiddleware(
       async (auth, request) => {
         if (!isPublicRoute(request)) {
-          await auth.protect({unauthenticatedUrl: SIGN_IN_URL})
+          await auth.protect({
+            unauthenticatedUrl: new URL(SIGN_IN_URL, request.url).toString()
+          })
         }
       },
       {signInUrl: SIGN_IN_URL, signUpUrl: SIGN_UP_URL}

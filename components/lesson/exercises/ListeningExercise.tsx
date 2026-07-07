@@ -11,18 +11,10 @@ interface ListeningExerciseProps {
   answer: string
   revealed: boolean
   onSubmit: (correct: boolean) => void
-  onContinue: () => void
   onSkipListening: () => void
 }
 
-export function ListeningExercise({
-  audioText,
-  answer,
-  revealed,
-  onSubmit,
-  onContinue,
-  onSkipListening
-}: ListeningExerciseProps) {
+export function ListeningExercise({audioText, answer, revealed, onSubmit, onSkipListening}: ListeningExerciseProps) {
   const [input, setInput] = useState('')
   const inputId = useId()
 
@@ -69,20 +61,7 @@ export function ListeningExercise({
         />
       </div>
 
-      {revealed ? (
-        <div className='space-y-4'>
-          <p className='text-center font-bold'>
-            Correct answer: <span className='text-primary'>{answer}</span>
-          </p>
-          <Button
-            onClick={onContinue}
-            className='w-full'
-            size='lg'
-          >
-            Continue
-          </Button>
-        </div>
-      ) : (
+      {!revealed && (
         <div className='space-y-3'>
           <Button
             onClick={handleSubmit}

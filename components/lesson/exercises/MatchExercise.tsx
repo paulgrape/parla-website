@@ -1,9 +1,8 @@
 'use client'
 
-import {Button} from '@/components/ui/button'
 import {cn} from '@/lib/utils'
 import {Tick01Icon} from 'hugeicons-react'
-import {useMemo, useState} from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 
 interface MatchExerciseProps {
   answer: string
@@ -50,12 +49,20 @@ export function MatchExercise({answer, onMistake, onComplete}: MatchExerciseProp
   const [selection, setSelection] = useState<Selection | null>(null)
   const [matchedItalian, setMatchedItalian] = useState<Set<string>>(new Set())
   const [matchedEnglish, setMatchedEnglish] = useState<Set<string>>(new Set())
-  const [wrong, setWrong] = useState<Selection | null>(null)
+  const [wrong, setWrong] = useState<Selection[] | null>(null)
   const [wrongAnnouncement, setWrongAnnouncement] = useState('')
   const [italianWords] = useState<string[]>(() => shuffle(pairs.map(p => p.italian)))
   const [englishWords] = useState<string[]>(() => shuffle(pairs.map(p => p.english)))
+  const completedRef = useRef(false)
 
   const allMatched = matchedItalian.size === pairs.length && pairs.length > 0
+
+  useEffect(() => {
+    if (allMatched && !completedRef.current) {
+      completedRef.current = true
+      onComplete()
+    }
+  }, [allMatched, onComplete])
 
   const isMatched = (side: Side, word: string) => (side === 'it' ? matchedItalian.has(word) : matchedEnglish.has(word))
 
@@ -80,19 +87,18 @@ export function MatchExercise({answer, onMistake, onComplete}: MatchExerciseProp
     const isPair = pairs.some(p => p.italian === italian && p.english === english)
 
     if (isPair) {
-      // Completion is confirmed via the Continue button, not auto-advanced.
       setMatchedItalian(prev => new Set(prev).add(italian))
       setMatchedEnglish(prev => new Set(prev).add(english))
       setSelection(null)
     } else {
       onMistake()
-      setWrong({side, word})
+      setWrong([selection, {side, word}])
       setWrongAnnouncement('Incorrect match. Try again.')
       setSelection(null)
       setTimeout(() => {
         setWrong(null)
         setWrongAnnouncement('')
-      }, 500)
+      }, 300)
     }
   }
 
@@ -101,7 +107,7 @@ export function MatchExercise({answer, onMistake, onComplete}: MatchExerciseProp
       {words.map(word => {
         const matched = isMatched(side, word)
         const selected = selection?.side === side && selection.word === word
-        const isWrong = wrong?.side === side && wrong.word === word
+        const isWrong = wrong?.some(w => w.side === side && w.word === word) ?? false
 
         return (
           <button
@@ -146,15 +152,6 @@ export function MatchExercise({answer, onMistake, onComplete}: MatchExerciseProp
         {renderColumn('it', italianWords)}
         {renderColumn('en', englishWords)}
       </div>
-
-      <Button
-        onClick={onComplete}
-        disabled={!allMatched}
-        className='w-full'
-        size='lg'
-      >
-        Continue
-      </Button>
     </div>
   )
 }
