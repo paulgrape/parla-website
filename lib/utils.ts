@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import {type ClassValue, clsx} from 'clsx'
+import {twMerge} from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,17 +14,13 @@ export function levenshtein(a: string, b: string): number {
       matrix[i][j] =
         b[i - 1] === a[j - 1]
           ? matrix[i - 1][j - 1]
-          : Math.min(matrix[i - 1][j - 1], matrix[i][j - 1], matrix[i - 1][j]) +
-            1
+          : Math.min(matrix[i - 1][j - 1], matrix[i][j - 1], matrix[i - 1][j]) + 1
     }
   }
   return matrix[b.length][a.length]
 }
 
-export function isAnswerCorrect(
-  userAnswer: string,
-  correctAnswer: string,
-): boolean {
+export function isAnswerCorrect(userAnswer: string, correctAnswer: string): boolean {
   const normalized = userAnswer.trim().toLowerCase()
   const correct = correctAnswer.trim().toLowerCase()
   if (normalized === correct) return true

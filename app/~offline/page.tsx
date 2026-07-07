@@ -1,4 +1,4 @@
-import { AppLogo } from '@/components/layout/AppLogo'
+import {AppLogo} from '@/components/layout/AppLogo'
 
 export default function OfflinePage() {
   return (
@@ -7,12 +7,8 @@ export default function OfflinePage() {
         size='md'
         showTagline
       />
-      <h1 className='text-2xl font-black text-foreground font-display'>
-        You&apos;re offline
-      </h1>
-      <p className='max-w-sm text-muted-foreground'>
-        Check your internet connection and try again.
-      </p>
+      <h1 className='text-foreground font-display text-2xl font-black'>You&apos;re offline</h1>
+      <p className='text-muted-foreground max-w-sm'>Check your internet connection and try again.</p>
     </main>
   )
 }

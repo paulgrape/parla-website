@@ -1,21 +1,21 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { Moon01Icon, Sun01Icon } from 'hugeicons-react'
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import {cn} from '@/lib/utils'
+import {Moon01Icon, Sun01Icon} from 'hugeicons-react'
+import {useTheme} from 'next-themes'
+import {useSyncExternalStore} from 'react'
 
 interface ThemeToggleProps {
   className?: string
 }
 
-export function ThemeToggle({ className }: ThemeToggleProps) {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export function ThemeToggle({className}: ThemeToggleProps) {
+  const {resolvedTheme, setTheme} = useTheme()
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
 
   const isDark = resolvedTheme === 'dark'
 
@@ -30,14 +30,14 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label='Toggle theme'
       aria-pressed={mounted ? isDark : undefined}
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-300 hover:bg-muted hover:text-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-        className,
+        'text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-primary flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+        className
       )}
     >
       <span
         className={cn(
           'flex items-center justify-center transition-transform duration-300 ease-in-out',
-          mounted && isDark && 'rotate-90',
+          mounted && isDark && 'rotate-90'
         )}
       >
         {!mounted ? (

@@ -1,6 +1,6 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
+import {defineConfig, globalIgnores} from 'eslint/config'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -18,15 +18,10 @@ const eslintConfig = defineConfig([
       'jsx-a11y/no-autofocus': 'error',
       'jsx-a11y/no-redundant-roles': 'error',
       'jsx-a11y/role-has-required-aria-props': 'error',
-      'jsx-a11y/role-supports-aria-props': 'error',
-    },
+      'jsx-a11y/role-supports-aria-props': 'error'
+    }
   },
-  globalIgnores([
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-  ]),
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts'])
 ])
 
 export default eslintConfig

@@ -5,7 +5,7 @@ const ALLOWED_RETURN_ROOTS = [
   '/guidebook',
   '/review',
   '/settings',
-  '/account',
+  '/account'
 ] as const
 
 export function isSafeInternalPath(path: string): boolean {
@@ -16,9 +16,7 @@ export function isSafeInternalPath(path: string): boolean {
 
   if (pathname === '/') return true
 
-  return ALLOWED_RETURN_ROOTS.some(
-    root => pathname === root || pathname.startsWith(`${root}/`),
-  )
+  return ALLOWED_RETURN_ROOTS.some(root => pathname === root || pathname.startsWith(`${root}/`))
 }
 
 export function getReferrerPath(): string | null {

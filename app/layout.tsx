@@ -1,55 +1,52 @@
-import { AuthProvider } from '@/components/providers/AuthProvider'
-import { SerwistProvider } from '@/components/providers/SerwistProvider'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import {
-  APP_DEFAULT_TITLE,
-  APP_DESCRIPTION,
-  APP_NAME,
-} from '@/lib/constants'
-import type { Metadata, Viewport } from 'next'
-import { Baloo_2, Nunito } from 'next/font/google'
+import {AuthProvider} from '@/components/providers/AuthProvider'
+import {SerwistProvider} from '@/components/providers/SerwistProvider'
+import {ThemeProvider} from '@/components/providers/ThemeProvider'
+import {APP_DEFAULT_TITLE, APP_DESCRIPTION, APP_NAME} from '@/lib/constants'
+import type {Metadata, Viewport} from 'next'
+import {Baloo_2, Nunito} from 'next/font/google'
+
 import './globals.css'
 
 const baloo2 = Baloo_2({
   variable: '--font-baloo2',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
+  display: 'swap'
 })
 
 const nunito = Nunito({
   variable: '--font-nunito',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
+  display: 'swap'
 })
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
   title: {
     default: APP_DEFAULT_TITLE,
-    template: `%s — ${APP_NAME}`,
+    template: `%s — ${APP_NAME}`
   },
   description: APP_DESCRIPTION,
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: APP_NAME,
+    title: APP_NAME
   },
   formatDetection: {
-    telephone: false,
-  },
+    telephone: false
+  }
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0f0f0f' },
-    { media: '(prefers-color-scheme: light)', color: '#58cc02' },
-  ],
+    {media: '(prefers-color-scheme: dark)', color: '#0f0f0f'},
+    {media: '(prefers-color-scheme: light)', color: '#58cc02'}
+  ]
 }
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode
 }>) {
@@ -59,7 +56,7 @@ export default function RootLayout({
       className={`${baloo2.variable} ${nunito.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className='min-h-full flex flex-col bg-background'>
+      <body className='bg-background flex min-h-full flex-col'>
         <SerwistProvider swUrl='/serwist/sw.js'>
           <ThemeProvider>
             <AuthProvider>{children}</AuthProvider>

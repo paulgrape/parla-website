@@ -1,8 +1,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
-import { defaultCache } from '@serwist/turbopack/worker'
-import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import { Serwist } from 'serwist'
+import {defaultCache} from '@serwist/turbopack/worker'
+import type {PrecacheEntry, SerwistGlobalConfig} from 'serwist'
+import {Serwist} from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -22,12 +22,12 @@ const serwist = new Serwist({
     entries: [
       {
         url: '/~offline',
-        matcher({ request }) {
+        matcher({request}) {
           return request.destination === 'document'
-        },
-      },
-    ],
-  },
+        }
+      }
+    ]
+  }
 })
 
 serwist.addEventListeners()

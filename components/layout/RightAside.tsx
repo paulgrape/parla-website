@@ -1,13 +1,13 @@
 'use client'
 
-import { StreakCard } from '@/components/dashboard/StreakCard'
-import { XpBar } from '@/components/dashboard/XpBar'
-import { LegalLinks } from '@/components/layout/LegalLinks'
-import { useUserStats } from '@/components/providers/UserStatsProvider'
-import { FavouriteIcon, FireIcon, StarIcon } from 'hugeicons-react'
+import {StreakCard} from '@/components/dashboard/StreakCard'
+import {XpBar} from '@/components/dashboard/XpBar'
+import {LegalLinks} from '@/components/layout/LegalLinks'
+import {useUserStats} from '@/components/providers/UserStatsProvider'
+import {FavouriteIcon, FireIcon, StarIcon} from 'hugeicons-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import {usePathname} from 'next/navigation'
+import {useEffect, useState} from 'react'
 
 function formatCountdown(ms: number) {
   const totalMinutes = Math.max(0, Math.ceil(ms / 60000))
@@ -21,7 +21,7 @@ function formatCountdown(ms: number) {
 
 export function RightAside() {
   const pathname = usePathname()
-  const { stats } = useUserStats()
+  const {stats} = useUserStats()
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -40,14 +40,11 @@ export function RightAside() {
   const maxHearts = stats?.maxHearts ?? 5
   const hearts = stats?.hearts ?? maxHearts
   const nextHeartAt = stats?.nextHeartAt ?? null
-  const regenHint =
-    nextHeartAt && hearts < maxHearts
-      ? `+1 in ${formatCountdown(nextHeartAt - now)}`
-      : null
+  const regenHint = nextHeartAt && hearts < maxHearts ? `+1 in ${formatCountdown(nextHeartAt - now)}` : null
 
   return (
-    <aside className='sticky top-0 hidden h-screen w-92 shrink-0 flex-col gap-5 overflow-y-auto border-l-2 border-border bg-card p-6 lg:flex'>
-      <div className='flex items-center justify-between gap-2 rounded-2xl border-2 border-border px-4 py-3'>
+    <aside className='border-border bg-card sticky top-0 hidden h-screen w-92 shrink-0 flex-col gap-5 overflow-y-auto border-l-2 p-6 lg:flex'>
+      <div className='border-border flex items-center justify-between gap-2 rounded-2xl border-2 px-4 py-3'>
         <div
           className={`flex items-center gap-1.5 font-black ${
             extendedToday ? 'text-orange-500' : 'text-muted-foreground'
@@ -59,14 +56,14 @@ export function RightAside() {
           />
           {streak}
         </div>
-        <div className='flex items-center gap-1.5 font-black text-primary'>
+        <div className='text-primary flex items-center gap-1.5 font-black'>
           <StarIcon
             size={22}
             strokeWidth={2.5}
           />
           {xp}
         </div>
-        <div className='flex items-center gap-1.5 font-black text-destructive'>
+        <div className='text-destructive flex items-center gap-1.5 font-black'>
           <FavouriteIcon
             size={22}
             strokeWidth={2.5}
@@ -75,11 +72,7 @@ export function RightAside() {
         </div>
       </div>
 
-      {regenHint && (
-        <p className='-mt-3 text-center text-xs font-bold text-muted-foreground'>
-          Next heart {regenHint}
-        </p>
-      )}
+      {regenHint && <p className='text-muted-foreground -mt-3 text-center text-xs font-bold'>Next heart {regenHint}</p>}
 
       <StreakCard
         streak={streak}
@@ -91,18 +84,19 @@ export function RightAside() {
       {nextReview > 0 && (
         <Link
           href='/review'
-          className='rounded-3xl border-2 border-primary bg-primary/5 p-4 transition-colors hover:bg-primary/10'
+          className='border-primary bg-primary/5 hover:bg-primary/10 rounded-3xl border-2 p-4 transition-colors'
         >
-          <p className='font-bold text-primary'>
+          <p className='text-primary font-bold'>
             {nextReview} word{nextReview !== 1 ? 's' : ''} ready for review
           </p>
-          <p className='text-sm text-muted-foreground'>
-            Tap to start a review session
-          </p>
+          <p className='text-muted-foreground text-sm'>Tap to start a review session</p>
         </Link>
       )}
 
-      <LegalLinks variant='aside' className='px-2' />
+      <LegalLinks
+        variant='aside'
+        className='px-2'
+      />
     </aside>
   )
 }

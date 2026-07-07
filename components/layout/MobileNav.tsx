@@ -1,15 +1,15 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { BookOpen01Icon, Home01Icon, ArrowReloadHorizontalIcon, Settings01Icon } from 'hugeicons-react'
+import {cn} from '@/lib/utils'
+import {ArrowReloadHorizontalIcon, BookOpen01Icon, Home01Icon, Settings01Icon} from 'hugeicons-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import {usePathname} from 'next/navigation'
 
 const links = [
-  { href: '/dashboard', label: 'Learn', icon: Home01Icon },
-  { href: '/sections', label: 'Sections', icon: BookOpen01Icon },
-  { href: '/review', label: 'Review', icon: ArrowReloadHorizontalIcon },
-  { href: '/settings', label: 'Settings', icon: Settings01Icon },
+  {href: '/dashboard', label: 'Learn', icon: Home01Icon},
+  {href: '/sections', label: 'Sections', icon: BookOpen01Icon},
+  {href: '/review', label: 'Review', icon: ArrowReloadHorizontalIcon},
+  {href: '/settings', label: 'Settings', icon: Settings01Icon}
 ]
 
 export function MobileNav() {
@@ -21,9 +21,9 @@ export function MobileNav() {
   return (
     <nav
       aria-label='Mobile navigation'
-      className='fixed inset-x-0 bottom-0 z-40 flex border-t-2 border-border bg-card md:hidden'
+      className='border-border bg-card fixed inset-x-0 bottom-0 z-40 flex border-t-2 md:hidden'
     >
-      {links.map(({ href, label, icon: Icon }) => {
+      {links.map(({href, label, icon: Icon}) => {
         const active = pathname === href || pathname.startsWith(href + '/')
         return (
           <Link
@@ -32,7 +32,7 @@ export function MobileNav() {
             aria-current={active ? 'page' : undefined}
             className={cn(
               'flex flex-1 flex-col items-center justify-center gap-1 py-3 text-xs font-bold transition-colors',
-              active ? 'text-primary' : 'text-muted-foreground',
+              active ? 'text-primary' : 'text-muted-foreground'
             )}
           >
             <Icon

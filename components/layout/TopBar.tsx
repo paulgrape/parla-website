@@ -1,27 +1,25 @@
 'use client'
 
-import { AppLogo } from '@/components/layout/AppLogo'
-import { UserMenu } from '@/components/layout/UserMenu'
-import { useUserStats } from '@/components/providers/UserStatsProvider'
-import { FavouriteIcon, FireIcon } from 'hugeicons-react'
-import { usePathname } from 'next/navigation'
+import {AppLogo} from '@/components/layout/AppLogo'
+import {UserMenu} from '@/components/layout/UserMenu'
+import {useUserStats} from '@/components/providers/UserStatsProvider'
+import {FavouriteIcon, FireIcon} from 'hugeicons-react'
+import {usePathname} from 'next/navigation'
 
 export function TopBar() {
   const pathname = usePathname()
-  const { stats } = useUserStats()
+  const {stats} = useUserStats()
 
   // Desktop has no top navbar; immersive lesson flow hides it on mobile too.
   if (pathname.startsWith('/lesson/')) return null
 
   const streak = stats?.streak ?? 0
   const extendedToday = stats?.extendedToday ?? false
-  const streakColor = extendedToday
-    ? 'text-orange-500'
-    : 'text-muted-foreground'
+  const streakColor = extendedToday ? 'text-orange-500' : 'text-muted-foreground'
   const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
 
   return (
-    <header className='sticky top-0 z-30 flex items-center justify-between border-b-2 border-border bg-card px-4 py-3 md:hidden'>
+    <header className='border-border bg-card sticky top-0 z-30 flex items-center justify-between border-b-2 px-4 py-3 md:hidden'>
       <AppLogo size='sm' />
       <div className='flex items-center gap-4'>
         <div
@@ -34,7 +32,7 @@ export function TopBar() {
             className='text-destructive'
             aria-hidden
           />
-          <span className='font-bold text-destructive'>{hearts}</span>
+          <span className='text-destructive font-bold'>{hearts}</span>
         </div>
         <div
           className='flex items-center gap-1'

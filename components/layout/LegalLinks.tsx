@@ -1,14 +1,14 @@
 'use client'
 
-import { legalHrefWithFrom } from '@/lib/parlaReturnNav'
-import { cn } from '@/lib/utils'
+import {legalHrefWithFrom} from '@/lib/parlaReturnNav'
+import {cn} from '@/lib/utils'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import {usePathname} from 'next/navigation'
 
 const links = [
-  { href: '/about', label: 'About', asideLabel: 'ABOUT' },
-  { href: '/terms', label: 'Terms of Service', asideLabel: 'TERMS' },
-  { href: '/privacy', label: 'Privacy Policy', asideLabel: 'PRIVACY' },
+  {href: '/about', label: 'About', asideLabel: 'ABOUT'},
+  {href: '/terms', label: 'Terms of Service', asideLabel: 'TERMS'},
+  {href: '/privacy', label: 'Privacy Policy', asideLabel: 'PRIVACY'}
 ] as const
 
 const footerLinkClassName =
@@ -22,7 +22,7 @@ interface LegalLinksProps {
   variant?: 'footer' | 'aside'
 }
 
-export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
+export function LegalLinks({className, variant = 'footer'}: LegalLinksProps) {
   const pathname = usePathname()
 
   if (variant === 'aside') {
@@ -30,11 +30,11 @@ export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
       <nav
         aria-label='Legal'
         className={cn(
-          'flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70',
-          className,
+          'text-muted-foreground/70 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-bold tracking-wider uppercase',
+          className
         )}
       >
-        {links.map(({ href, asideLabel }) => (
+        {links.map(({href, asideLabel}) => (
           <Link
             key={href}
             href={legalHrefWithFrom(href, pathname)}
@@ -50,12 +50,9 @@ export function LegalLinks({ className, variant = 'footer' }: LegalLinksProps) {
   return (
     <nav
       aria-label='Legal'
-      className={cn(
-        'text-center text-sm text-muted-foreground',
-        className,
-      )}
+      className={cn('text-muted-foreground text-center text-sm', className)}
     >
-      {links.map(({ href, label }, index) => (
+      {links.map(({href, label}, index) => (
         <span key={href}>
           {index > 0 && <span aria-hidden='true'> · </span>}
           <Link

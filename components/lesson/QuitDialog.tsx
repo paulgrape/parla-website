@@ -1,10 +1,10 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useId } from 'react'
+import {Button} from '@/components/ui/button'
+import {Dialog} from '@/components/ui/dialog'
+import {useReducedMotion} from '@/hooks/useReducedMotion'
+import {AnimatePresence, motion} from 'framer-motion'
+import {useId} from 'react'
 
 interface QuitDialogProps {
   open: boolean
@@ -12,7 +12,7 @@ interface QuitDialogProps {
   onConfirm: () => void
 }
 
-export function QuitDialog({ open, onCancel, onConfirm }: QuitDialogProps) {
+export function QuitDialog({open, onCancel, onConfirm}: QuitDialogProps) {
   const titleId = useId()
   const descriptionId = useId()
   const reducedMotion = useReducedMotion()
@@ -29,25 +29,21 @@ export function QuitDialog({ open, onCancel, onConfirm }: QuitDialogProps) {
           backdropLabel='Keep learning'
         >
           <motion.div
-            initial={reducedMotion ? false : { scale: 0.92, y: 12 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={reducedMotion ? undefined : { scale: 0.92, y: 12 }}
-            transition={
-              reducedMotion
-                ? { duration: 0 }
-                : { type: 'spring', stiffness: 320, damping: 28 }
-            }
-            className='w-full max-w-sm rounded-3xl border-2 border-border bg-card p-6 text-center'
+            initial={reducedMotion ? false : {scale: 0.92, y: 12}}
+            animate={{scale: 1, y: 0}}
+            exit={reducedMotion ? undefined : {scale: 0.92, y: 12}}
+            transition={reducedMotion ? {duration: 0} : {type: 'spring', stiffness: 320, damping: 28}}
+            className='border-border bg-card w-full max-w-sm rounded-3xl border-2 p-6 text-center'
           >
             <h3
               id={titleId}
-              className='text-2xl font-black font-display'
+              className='font-display text-2xl font-black'
             >
               Quit this level?
             </h3>
             <p
               id={descriptionId}
-              className='mt-2 text-sm font-bold text-muted-foreground'
+              className='text-muted-foreground mt-2 text-sm font-bold'
             >
               You&apos;ll lose your progress for this level.
             </p>

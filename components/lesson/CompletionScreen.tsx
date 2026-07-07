@@ -1,11 +1,11 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { AnimatePresence, motion } from 'framer-motion'
-import { FireIcon, StarIcon } from 'hugeicons-react'
-import { useEffect, useId, useState } from 'react'
+import {Button} from '@/components/ui/button'
+import {Dialog} from '@/components/ui/dialog'
+import {useReducedMotion} from '@/hooks/useReducedMotion'
+import {AnimatePresence, motion} from 'framer-motion'
+import {FireIcon, StarIcon} from 'hugeicons-react'
+import {useEffect, useId, useState} from 'react'
 
 interface CompletionScreenProps {
   totalXp: number
@@ -15,13 +15,7 @@ interface CompletionScreenProps {
   onContinue: () => void
 }
 
-export function CompletionScreen({
-  totalXp,
-  streak,
-  perfect,
-  mistakes,
-  onContinue,
-}: CompletionScreenProps) {
+export function CompletionScreen({totalXp, streak, perfect, mistakes, onContinue}: CompletionScreenProps) {
   const titleId = useId()
   const descriptionId = useId()
   const reducedMotion = useReducedMotion()
@@ -48,20 +42,16 @@ export function CompletionScreen({
       panelClassName='w-full max-w-md'
     >
       <motion.div
-        initial={reducedMotion ? false : { opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={reducedMotion ? { duration: 0 } : undefined}
+        initial={reducedMotion ? false : {opacity: 0, scale: 0.9}}
+        animate={{opacity: 1, scale: 1}}
+        transition={reducedMotion ? {duration: 0} : undefined}
         className='relative flex flex-col items-center gap-6 px-6 pt-6 pb-24 text-center'
       >
         <motion.div
-          initial={reducedMotion ? false : { scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={
-            reducedMotion
-              ? { duration: 0 }
-              : { type: 'spring', delay: 0.2 }
-          }
-          className='flex h-24 w-24 items-center justify-center rounded-full bg-primary'
+          initial={reducedMotion ? false : {scale: 0}}
+          animate={{scale: 1}}
+          transition={reducedMotion ? {duration: 0} : {type: 'spring', delay: 0.2}}
+          className='bg-primary flex h-24 w-24 items-center justify-center rounded-full'
           aria-hidden
         >
           <StarIcon
@@ -75,7 +65,7 @@ export function CompletionScreen({
         <div>
           <h2
             id={titleId}
-            className='text-3xl font-black text-primary font-display'
+            className='text-primary font-display text-3xl font-black'
           >
             Level Complete!
           </h2>
@@ -90,7 +80,7 @@ export function CompletionScreen({
           {!perfect && mistakes > 0 && (
             <p
               id={descriptionId}
-              className='mt-2 text-sm font-bold text-primary'
+              className='text-primary mt-2 text-sm font-bold'
             >
               Nice recovery. You fixed {mistakes} mistake
               {mistakes === 1 ? '' : 's'}.
@@ -108,17 +98,11 @@ export function CompletionScreen({
 
         <div className='flex gap-6 md:gap-8'>
           <div>
-            <p className='text-sm font-bold uppercase text-muted-foreground'>
-              XP Earned
-            </p>
-            <p className='text-3xl font-black text-primary md:text-4xl'>
-              {totalXp}
-            </p>
+            <p className='text-muted-foreground text-sm font-bold uppercase'>XP Earned</p>
+            <p className='text-primary text-3xl font-black md:text-4xl'>{totalXp}</p>
           </div>
           <div>
-            <p className='text-sm font-bold uppercase text-muted-foreground'>
-              Streak
-            </p>
+            <p className='text-muted-foreground text-sm font-bold uppercase'>Streak</p>
             <p className='flex items-center justify-center gap-1 text-3xl font-black text-orange-500 md:text-4xl'>
               <FireIcon
                 size={22}
@@ -133,10 +117,10 @@ export function CompletionScreen({
         <AnimatePresence>
           {showContinue && (
             <motion.div
-              initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={reducedMotion ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
+              initial={reducedMotion ? false : {opacity: 0, y: 16}}
+              animate={{opacity: 1, y: 0}}
+              exit={{opacity: 0, y: 16}}
+              transition={reducedMotion ? {duration: 0} : {duration: 0.35, ease: 'easeOut'}}
               className='absolute inset-x-6 bottom-6'
             >
               <Button

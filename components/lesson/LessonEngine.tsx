@@ -1,31 +1,26 @@
 'use client'
 
-import { useUserStats } from '@/components/providers/UserStatsProvider'
-import { Button } from '@/components/ui/button'
-import { useApi } from '@/lib/api'
-import { playSound } from '@/lib/sound'
-import type { Exercise } from '@llp/types'
-import { Cancel01Icon } from 'hugeicons-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { CompletionScreen } from './CompletionScreen'
-import { StreakExtendScreen } from './StreakExtendScreen'
-import { FillBlankExercise } from './exercises/FillBlankExercise'
-import { ListeningExercise } from './exercises/ListeningExercise'
-import { MatchExercise } from './exercises/MatchExercise'
-import { TranslationExercise, XpPop } from './exercises/TranslationExercise'
-import { HeartBar } from './HeartBar'
-import { ProgressBar } from './ProgressBar'
-import { QuitDialog } from './QuitDialog'
-import { ResultDialog } from './ResultDialog'
+import {useUserStats} from '@/components/providers/UserStatsProvider'
+import {Button} from '@/components/ui/button'
+import {useApi} from '@/lib/api'
+import {playSound} from '@/lib/sound'
+import type {Exercise} from '@llp/types'
+import {Cancel01Icon} from 'hugeicons-react'
+import {useRouter} from 'next/navigation'
+import {useEffect, useMemo, useReducer, useRef, useState} from 'react'
 
-const CORRECT_TITLES = [
-  'Well done!',
-  'Good job!',
-  'Awesome!',
-  'Great!',
-  'Nice!',
-]
+import {CompletionScreen} from './CompletionScreen'
+import {HeartBar} from './HeartBar'
+import {ProgressBar} from './ProgressBar'
+import {QuitDialog} from './QuitDialog'
+import {ResultDialog} from './ResultDialog'
+import {StreakExtendScreen} from './StreakExtendScreen'
+import {FillBlankExercise} from './exercises/FillBlankExercise'
+import {ListeningExercise} from './exercises/ListeningExercise'
+import {MatchExercise} from './exercises/MatchExercise'
+import {TranslationExercise, XpPop} from './exercises/TranslationExercise'
+
+const CORRECT_TITLES = ['Well done!', 'Good job!', 'Awesome!', 'Great!', 'Nice!']
 
 function pickCorrectTitle() {
   return CORRECT_TITLES[Math.floor(Math.random() * CORRECT_TITLES.length)]
@@ -42,7 +37,7 @@ function formatHeartCountdown(ms: number) {
 }
 
 type LessonState =
-  | { phase: 'idle' }
+  | {phase: 'idle'}
   | ActiveLessonState
   | RevealedLessonState
   | {
@@ -59,8 +54,8 @@ type LessonState =
       perfect: boolean
       mistakes: number
     }
-  | { phase: 'listening_skipped_empty' }
-  | { phase: 'failed' }
+  | {phase: 'listening_skipped_empty'}
+  | {phase: 'failed'}
 
 interface ActiveLessonState {
   phase: 'active'
@@ -81,11 +76,11 @@ interface RevealedLessonState extends Omit<ActiveLessonState, 'phase'> {
 }
 
 type LessonAction =
-  | { type: 'START'; exerciseIds: string[]; lives: number }
-  | { type: 'SUBMIT'; correct: boolean }
-  | { type: 'CONTINUE' }
-  | { type: 'MATCH_MISTAKE' }
-  | { type: 'MATCH_COMPLETE' }
+  | {type: 'START'; exerciseIds: string[]; lives: number}
+  | {type: 'SUBMIT'; correct: boolean}
+  | {type: 'CONTINUE'}
+  | {type: 'MATCH_MISTAKE'}
+  | {type: 'MATCH_COMPLETE'}
   | {
       type: 'SKIP_LISTENING'
       listeningIds: string[]
@@ -99,7 +94,7 @@ type LessonAction =
       perfect: boolean
       mistakes: number
     }
-  | { type: 'FAIL' }
+  | {type: 'FAIL'}
 
 const XP_PER_EXERCISE = 10
 const PERFECT_BONUS_XP = 20
@@ -114,34 +109,29 @@ function removeItems(items: string[], itemsToRemove: string[]) {
   return items.filter(item => !itemsToRemove.includes(item))
 }
 
-function removeCurrentMistakeIfFixed(
-  state: ActiveLessonState,
-  correct: boolean,
-) {
+function removeCurrentMistakeIfFixed(state: ActiveLessonState, correct: boolean) {
   if (!correct || !state.fixingMistakes) return state.mistakeIds
   return state.mistakeIds.filter(id => id !== state.currentId)
 }
 
 function awardXpOnce(state: ActiveLessonState, correct: boolean) {
   if (!correct || state.earnedIds.includes(state.currentId)) {
-    return { xp: state.xp, earnedIds: state.earnedIds }
+    return {xp: state.xp, earnedIds: state.earnedIds}
   }
 
   return {
     xp: state.xp + XP_PER_EXERCISE,
-    earnedIds: [...state.earnedIds, state.currentId],
+    earnedIds: [...state.earnedIds, state.currentId]
   }
 }
 
-function readyToComplete(
-  state: Pick<ActiveLessonState, 'xp' | 'mistakes'>,
-): LessonState {
+function readyToComplete(state: Pick<ActiveLessonState, 'xp' | 'mistakes'>): LessonState {
   const perfect = state.mistakes === 0
   return {
     phase: 'ready_to_complete',
     totalXp: state.xp + (perfect ? PERFECT_BONUS_XP : 0),
     perfect,
-    mistakes: state.mistakes,
+    mistakes: state.mistakes
   }
 }
 
@@ -153,7 +143,7 @@ function advanceLesson(state: ActiveLessonState): LessonState {
       phase: 'active',
       currentId: nextId,
       remainingIds,
-      fixingMistakes: false,
+      fixingMistakes: false
     }
   }
 
@@ -164,7 +154,7 @@ function advanceLesson(state: ActiveLessonState): LessonState {
       phase: 'active',
       currentId: mistakeId,
       remainingIds: [],
-      fixingMistakes: true,
+      fixingMistakes: true
     }
   }
 
@@ -175,7 +165,7 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
   switch (action.type) {
     case 'START': {
       const [currentId, ...remainingIds] = action.exerciseIds
-      if (!currentId) return { phase: 'listening_skipped_empty' }
+      if (!currentId) return {phase: 'listening_skipped_empty'}
 
       return {
         phase: 'active',
@@ -187,20 +177,20 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         lives: action.lives,
         xp: 0,
         mistakes: 0,
-        earnedIds: [],
+        earnedIds: []
       }
     }
 
     case 'SUBMIT': {
       if (state.phase !== 'active') return state
-      const { xp, earnedIds } = awardXpOnce(state, action.correct)
+      const {xp, earnedIds} = awardXpOnce(state, action.correct)
       const lives = action.correct ? state.lives : state.lives - 1
       const mistakes = action.correct ? state.mistakes : state.mistakes + 1
       const mistakeIds = action.correct
         ? removeCurrentMistakeIfFixed(state, true)
         : addUnique(state.mistakeIds, state.currentId)
 
-      if (lives <= 0) return { phase: 'failed' }
+      if (lives <= 0) return {phase: 'failed'}
 
       return {
         phase: 'answer_revealed',
@@ -213,7 +203,7 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         xp,
         mistakes,
         earnedIds,
-        correct: action.correct,
+        correct: action.correct
       }
     }
 
@@ -221,24 +211,24 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
       if (state.phase !== 'active') return state
       const lives = state.lives - 1
 
-      if (lives <= 0) return { phase: 'failed' }
+      if (lives <= 0) return {phase: 'failed'}
 
       return {
         ...state,
         lives,
         mistakes: state.mistakes + 1,
-        mistakeIds: addUnique(state.mistakeIds, state.currentId),
+        mistakeIds: addUnique(state.mistakeIds, state.currentId)
       }
     }
 
     case 'MATCH_COMPLETE': {
       if (state.phase !== 'active') return state
-      const { xp, earnedIds } = awardXpOnce(state, true)
+      const {xp, earnedIds} = awardXpOnce(state, true)
       const nextState: ActiveLessonState = {
         ...state,
         xp,
         earnedIds,
-        mistakeIds: removeCurrentMistakeIfFixed(state, true),
+        mistakeIds: removeCurrentMistakeIfFixed(state, true)
       }
 
       return advanceLesson(nextState)
@@ -256,13 +246,12 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         lives: state.lives,
         xp: state.xp,
         mistakes: state.mistakes,
-        earnedIds: state.earnedIds,
+        earnedIds: state.earnedIds
       })
     }
 
     case 'SKIP_LISTENING': {
-      if (state.phase !== 'active' && state.phase !== 'answer_revealed')
-        return state
+      if (state.phase !== 'active' && state.phase !== 'answer_revealed') return state
 
       const remainingIds = removeItems(state.remainingIds, action.listeningIds)
       const mistakeIds = removeItems(state.mistakeIds, action.listeningIds)
@@ -275,12 +264,12 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
           ...state,
           levelIds,
           remainingIds,
-          mistakeIds,
+          mistakeIds
         }
       }
 
       if (allLevelExercisesAreListening && state.earnedIds.length === 0) {
-        return { phase: 'listening_skipped_empty' }
+        return {phase: 'listening_skipped_empty'}
       }
 
       return advanceLesson({
@@ -293,7 +282,7 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         lives: state.lives,
         xp: state.xp,
         mistakes: state.mistakes,
-        earnedIds: state.earnedIds,
+        earnedIds: state.earnedIds
       })
     }
 
@@ -304,11 +293,11 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         streak: action.streak,
         streakExtended: action.streakExtended,
         perfect: action.perfect,
-        mistakes: action.mistakes,
+        mistakes: action.mistakes
       }
 
     case 'FAIL':
-      return { phase: 'failed' }
+      return {phase: 'failed'}
 
     default:
       return state
@@ -320,30 +309,28 @@ interface LessonEngineProps {
   exercises: Exercise[]
 }
 
-export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
+export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const router = useRouter()
-  const { fetchApi } = useApi()
-  const { stats, loading, loseHeart } = useUserStats()
-  const [state, dispatch] = useReducer(lessonReducer, { phase: 'idle' })
+  const {fetchApi} = useApi()
+  const {stats, loading, loseHeart} = useUserStats()
+  const [state, dispatch] = useReducer(lessonReducer, {phase: 'idle'})
   const [selected, setSelected] = useState<string | null>(null)
   const [showXpPop, setShowXpPop] = useState(false)
   const [showQuitDialog, setShowQuitDialog] = useState(false)
   const [showSkipDialog, setShowSkipDialog] = useState(false)
   const [correctTitle, setCorrectTitle] = useState(CORRECT_TITLES[0])
-  const [listeningSkipUntil, setListeningSkipUntil] = useState<number | null>(
-    () => {
-      if (typeof window === 'undefined') return null
+  const [listeningSkipUntil, setListeningSkipUntil] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null
 
-      const stored = window.localStorage.getItem(LISTENING_SKIP_STORAGE_KEY)
-      const skipUntil = stored ? Number(stored) : null
-      if (skipUntil && Number.isFinite(skipUntil) && skipUntil > Date.now()) {
-        return skipUntil
-      }
+    const stored = window.localStorage.getItem(LISTENING_SKIP_STORAGE_KEY)
+    const skipUntil = stored ? Number(stored) : null
+    if (skipUntil && Number.isFinite(skipUntil) && skipUntil > Date.now()) {
+      return skipUntil
+    }
 
-      window.localStorage.removeItem(LISTENING_SKIP_STORAGE_KEY)
-      return null
-    },
-  )
+    window.localStorage.removeItem(LISTENING_SKIP_STORAGE_KEY)
+    return null
+  })
   const [now, setNow] = useState(() => Date.now())
   const [streakScreenDone, setStreakScreenDone] = useState(false)
   const completionPostingRef = useRef(false)
@@ -351,31 +338,18 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   const maxHearts = stats?.maxHearts ?? 5
   const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
   const nextHeartAt = stats?.nextHeartAt ?? null
-  const heartRegenLabel =
-    nextHeartAt && nextHeartAt > now
-      ? formatHeartCountdown(nextHeartAt - now)
-      : null
+  const heartRegenLabel = nextHeartAt && nextHeartAt > now ? formatHeartCountdown(nextHeartAt - now) : null
 
-  const listeningSkipActive =
-    listeningSkipUntil !== null && listeningSkipUntil > now
+  const listeningSkipActive = listeningSkipUntil !== null && listeningSkipUntil > now
 
   const levelExercises = useMemo(
-    () =>
-      exercises.filter(
-        exercise => !listeningSkipActive || exercise.type !== 'listening',
-      ),
-    [exercises, listeningSkipActive],
+    () => exercises.filter(exercise => !listeningSkipActive || exercise.type !== 'listening'),
+    [exercises, listeningSkipActive]
   )
 
-  const levelExerciseIds = useMemo(
-    () => levelExercises.map(exercise => exercise.id),
-    [levelExercises],
-  )
+  const levelExerciseIds = useMemo(() => levelExercises.map(exercise => exercise.id), [levelExercises])
 
-  const exercisesById = useMemo(
-    () => new Map(exercises.map(exercise => [exercise.id, exercise])),
-    [exercises],
-  )
+  const exercisesById = useMemo(() => new Map(exercises.map(exercise => [exercise.id, exercise])), [exercises])
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -392,13 +366,10 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   }, [listeningSkipUntil])
 
   const currentExercise =
-    state.phase === 'active' || state.phase === 'answer_revealed'
-      ? (exercisesById.get(state.currentId) ?? null)
-      : null
+    state.phase === 'active' || state.phase === 'answer_revealed' ? (exercisesById.get(state.currentId) ?? null) : null
 
   useEffect(() => {
-    if (state.phase !== 'ready_to_complete' || completionPostingRef.current)
-      return
+    if (state.phase !== 'ready_to_complete' || completionPostingRef.current) return
 
     completionPostingRef.current = true
     fetchApi<{
@@ -406,13 +377,10 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       newStreak: number
       totalXp: number
       streakExtended: boolean
-    }>(
-      '/progress',
-      {
-        method: 'POST',
-        body: JSON.stringify({ lessonId, xpEarned: state.totalXp }),
-      },
-    )
+    }>('/progress', {
+      method: 'POST',
+      body: JSON.stringify({lessonId, xpEarned: state.totalXp})
+    })
       .then(result => {
         dispatch({
           type: 'COMPLETE',
@@ -420,7 +388,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           streak: result.newStreak,
           streakExtended: result.streakExtended,
           perfect: state.perfect,
-          mistakes: state.mistakes,
+          mistakes: state.mistakes
         })
       })
       .catch(() => {
@@ -430,7 +398,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           streak: 0,
           streakExtended: false,
           perfect: state.perfect,
-          mistakes: state.mistakes,
+          mistakes: state.mistakes
         })
       })
   }, [fetchApi, lessonId, state])
@@ -448,7 +416,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     } else {
       void loseHeart()
     }
-    dispatch({ type: 'SUBMIT', correct })
+    dispatch({type: 'SUBMIT', correct})
   }
 
   const handleTranslationCheck = () => {
@@ -462,20 +430,18 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     if (state.phase !== 'answer_revealed') return
 
     setSelected(null)
-    dispatch({ type: 'CONTINUE' })
+    dispatch({type: 'CONTINUE'})
   }
 
   const handleMatchMistake = () => {
     if (state.phase !== 'active') return
     playSound('wrong')
     void loseHeart()
-    dispatch({ type: 'MATCH_MISTAKE' })
+    dispatch({type: 'MATCH_MISTAKE'})
   }
 
   const handleClose = () => {
-    const hasProgress =
-      (state.phase === 'active' || state.phase === 'answer_revealed') &&
-      state.earnedIds.length > 0
+    const hasProgress = (state.phase === 'active' || state.phase === 'answer_revealed') && state.earnedIds.length > 0
 
     if (hasProgress) {
       setShowQuitDialog(true)
@@ -499,14 +465,14 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     playSound('correct')
     setShowXpPop(true)
     setTimeout(() => setShowXpPop(false), 1000)
-    dispatch({ type: 'MATCH_COMPLETE' })
+    dispatch({type: 'MATCH_COMPLETE'})
   }
 
   const handleStart = () => {
     if (hearts <= 0) return
     completionPostingRef.current = false
     setStreakScreenDone(false)
-    dispatch({ type: 'START', exerciseIds: levelExerciseIds, lives: hearts })
+    dispatch({type: 'START', exerciseIds: levelExerciseIds, lives: hearts})
   }
 
   const handleSkipListening = () => {
@@ -517,12 +483,8 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     setSelected(null)
     dispatch({
       type: 'SKIP_LISTENING',
-      listeningIds: exercises
-        .filter(exercise => exercise.type === 'listening')
-        .map(exercise => exercise.id),
-      nonListeningIds: exercises
-        .filter(exercise => exercise.type !== 'listening')
-        .map(exercise => exercise.id),
+      listeningIds: exercises.filter(exercise => exercise.type === 'listening').map(exercise => exercise.id),
+      nonListeningIds: exercises.filter(exercise => exercise.type !== 'listening').map(exercise => exercise.id)
     })
   }
 
@@ -534,20 +496,14 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
   if (state.phase === 'idle') {
     if (loading && !stats) {
-      return (
-        <p className='py-20 text-center text-muted-foreground'>
-          Loading your hearts...
-        </p>
-      )
+      return <p className='text-muted-foreground py-20 text-center'>Loading your hearts...</p>
     }
 
     if (!loading && hearts <= 0) {
       return (
         <div className='flex flex-col items-center justify-center gap-6 py-20 text-center'>
-          <h2 className='text-2xl font-black text-destructive'>
-            Out of hearts!
-          </h2>
-          <p className='max-w-md text-muted-foreground'>
+          <h2 className='text-destructive text-2xl font-black'>Out of hearts!</h2>
+          <p className='text-muted-foreground max-w-md'>
             {heartRegenLabel
               ? `You need at least one heart to start a level. Your next heart arrives in ${heartRegenLabel}.`
               : 'You need at least one heart to start a level.'}
@@ -557,8 +513,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
       )
     }
 
-    const allExercisesSkipped =
-      levelExercises.length === 0 && exercises.length > 0
+    const allExercisesSkipped = levelExercises.length === 0 && exercises.length > 0
 
     return (
       <div className='flex flex-col items-center justify-center gap-6 py-20'>
@@ -568,10 +523,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
         </p>
         {allExercisesSkipped ? (
           <div className='max-w-md text-center'>
-            <p className='mb-4 font-bold'>
-              This level only has listening exercises. Resume listening to start
-              it now.
-            </p>
+            <p className='mb-4 font-bold'>This level only has listening exercises. Resume listening to start it now.</p>
             <Button
               size='lg'
               onClick={handleResumeListening}
@@ -611,9 +563,8 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     return (
       <div className='flex flex-col items-center justify-center gap-6 py-20 text-center'>
         <h2 className='text-2xl font-black'>Listening skipped</h2>
-        <p className='max-w-md text-muted-foreground'>
-          There are no non-listening exercises left in this level. Resume
-          listening or return to the map.
+        <p className='text-muted-foreground max-w-md'>
+          There are no non-listening exercises left in this level. Resume listening or return to the map.
         </p>
         <div className='flex gap-3'>
           <Button
@@ -631,8 +582,8 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
   if (state.phase === 'failed') {
     return (
       <div className='flex flex-col items-center justify-center gap-6 py-20 text-center'>
-        <h2 className='text-2xl font-black text-destructive'>Out of hearts!</h2>
-        <p className='max-w-md text-muted-foreground'>
+        <h2 className='text-destructive text-2xl font-black'>Out of hearts!</h2>
+        <p className='text-muted-foreground max-w-md'>
           {heartRegenLabel
             ? `This level wasn't saved. Your next heart arrives in ${heartRegenLabel}.`
             : "This level wasn't saved. Come back when your hearts refill."}
@@ -663,33 +614,19 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
     )
   }
 
-  const fixingMistakes =
-    state.phase === 'active' || state.phase === 'answer_revealed'
-      ? state.fixingMistakes
-      : false
-  const mistakeCount =
-    state.phase === 'active' || state.phase === 'answer_revealed'
-      ? state.mistakeIds.length
-      : 0
+  const fixingMistakes = state.phase === 'active' || state.phase === 'answer_revealed' ? state.fixingMistakes : false
+  const mistakeCount = state.phase === 'active' || state.phase === 'answer_revealed' ? state.mistakeIds.length : 0
   const activeLevelExerciseIds =
-    state.phase === 'active' || state.phase === 'answer_revealed'
-      ? state.levelIds
-      : levelExerciseIds
-  const originalIndex = currentExercise
-    ? Math.max(0, activeLevelExerciseIds.indexOf(currentExercise.id))
-    : 0
+    state.phase === 'active' || state.phase === 'answer_revealed' ? state.levelIds : levelExerciseIds
+  const originalIndex = currentExercise ? Math.max(0, activeLevelExerciseIds.indexOf(currentExercise.id)) : 0
   const progressIndex = fixingMistakes
     ? activeLevelExerciseIds.length
     : originalIndex + (state.phase === 'answer_revealed' ? 1 : 0)
-  const progressTotal = Math.max(
-    1,
-    activeLevelExerciseIds.length + mistakeCount,
-  )
+  const progressTotal = Math.max(1, activeLevelExerciseIds.length + mistakeCount)
   const lives = state.lives
   const revealed = state.phase === 'answer_revealed'
 
-  const showTranslationResult =
-    revealed && currentExercise?.type === 'translation'
+  const showTranslationResult = revealed && currentExercise?.type === 'translation'
 
   return (
     <div className='relative mx-auto max-w-lg px-4 py-6'>
@@ -699,7 +636,7 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
           type='button'
           aria-label='Close level'
           onClick={handleClose}
-          className='-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+          className='text-muted-foreground hover:bg-muted focus-visible:ring-primary -ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
           <Cancel01Icon
             size={22}
@@ -776,21 +713,9 @@ export function LessonEngine({ lessonId, exercises }: LessonEngineProps) {
 
       <ResultDialog
         open={showTranslationResult}
-        variant={
-          state.phase === 'answer_revealed' && state.correct
-            ? 'correct'
-            : 'wrong'
-        }
-        title={
-          state.phase === 'answer_revealed' && state.correct
-            ? correctTitle
-            : 'Not quite'
-        }
-        correctAnswer={
-          state.phase === 'answer_revealed' && !state.correct
-            ? currentExercise?.answer
-            : undefined
-        }
+        variant={state.phase === 'answer_revealed' && state.correct ? 'correct' : 'wrong'}
+        title={state.phase === 'answer_revealed' && state.correct ? correctTitle : 'Not quite'}
+        correctAnswer={state.phase === 'answer_revealed' && !state.correct ? currentExercise?.answer : undefined}
         onContinue={handleContinue}
       />
 

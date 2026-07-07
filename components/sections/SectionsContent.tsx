@@ -1,24 +1,24 @@
 'use client'
 
-import { SectionsSkeleton } from '@/components/skeletons/PageSkeletons'
-import { Progress } from '@/components/ui/progress'
-import { useApi } from '@/lib/api'
-import { isSectionComplete, isSectionUnlocked } from '@/lib/sections'
-import { cn } from '@/lib/utils'
-import type { Section } from '@llp/types'
-import { ArrowLeft01Icon, LockIcon, Tick01Icon } from 'hugeicons-react'
+import {SectionsSkeleton} from '@/components/skeletons/PageSkeletons'
+import {Progress} from '@/components/ui/progress'
+import {useApi} from '@/lib/api'
+import {isSectionComplete, isSectionUnlocked} from '@/lib/sections'
+import {cn} from '@/lib/utils'
+import type {Section} from '@llp/types'
+import {ArrowLeft01Icon, LockIcon, Tick01Icon} from 'hugeicons-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 
 const SECTION_THEMES = [
-  { card: 'bg-primary', shadow: '#46a302' },
-  { card: 'bg-sky-500', shadow: '#0284c7' },
-  { card: 'bg-purple-500', shadow: '#7c3aed' },
-  { card: 'bg-orange-500', shadow: '#c2410c' },
+  {card: 'bg-primary', shadow: '#46a302'},
+  {card: 'bg-sky-500', shadow: '#0284c7'},
+  {card: 'bg-purple-500', shadow: '#7c3aed'},
+  {card: 'bg-orange-500', shadow: '#c2410c'}
 ]
 
 export function SectionsContent() {
-  const { fetchApi } = useApi()
+  const {fetchApi} = useApi()
   const [sections, setSections] = useState<Section[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -36,8 +36,8 @@ export function SectionsContent() {
 
   if (error) {
     return (
-      <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-6 text-center'>
-        <p className='font-bold text-destructive'>{error}</p>
+      <div className='border-destructive/30 bg-destructive/5 rounded-2xl border-2 p-6 text-center'>
+        <p className='text-destructive font-bold'>{error}</p>
       </div>
     )
   }
@@ -49,7 +49,7 @@ export function SectionsContent() {
       <div className='flex items-center gap-3'>
         <Link
           href='/dashboard'
-          className='flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
+          className='text-muted-foreground hover:text-foreground focus-visible:ring-primary flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
           <ArrowLeft01Icon
             size={18}
@@ -71,41 +71,33 @@ export function SectionsContent() {
           const isUnlocked = isSectionUnlocked(sections, index)
           const isLocked = !isComplete && !isUnlocked
           const isActive = index === activeSectionIndex
-          const progressPct =
-            lessonCount > 0
-              ? Math.round((completedCount / lessonCount) * 100)
-              : 0
+          const progressPct = lessonCount > 0 ? Math.round((completedCount / lessonCount) * 100) : 0
 
           return (
             <article
               key={section.id}
-              className={cn(
-                'overflow-hidden rounded-2xl border-2 border-border bg-card',
-                isLocked && 'opacity-60',
-              )}
+              className={cn('border-border bg-card overflow-hidden rounded-2xl border-2', isLocked && 'opacity-60')}
             >
               <div
                 className={cn('relative px-5 py-4 text-white', theme.card)}
                 style={{
                   backgroundImage:
-                    'repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,0.04) 10px, rgba(255,255,255,0.04) 20px)',
+                    'repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,0.04) 10px, rgba(255,255,255,0.04) 20px)'
                 }}
               >
                 <Link
                   href={`/sections/details/${section.id}`}
-                  className='text-xs font-black uppercase tracking-wide text-white/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded'
+                  className='rounded text-xs font-black tracking-wide text-white/80 uppercase hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none'
                 >
                   {section.cefrLevel} &bull; See details
                 </Link>
-                <h2 className='mt-1 text-xl font-black font-display'>
-                  {section.title}
-                </h2>
+                <h2 className='font-display mt-1 text-xl font-black'>{section.title}</h2>
               </div>
 
               <div className='flex items-center justify-between gap-4 p-5'>
                 <div className='flex-1 space-y-2'>
                   {isComplete ? (
-                    <p className='flex items-center gap-2 text-sm font-black uppercase text-primary'>
+                    <p className='text-primary flex items-center gap-2 text-sm font-black uppercase'>
                       <Tick01Icon
                         size={18}
                         strokeWidth={2.5}
@@ -114,7 +106,7 @@ export function SectionsContent() {
                       Completed!
                     </p>
                   ) : isLocked ? (
-                    <p className='flex items-center gap-2 text-sm font-bold text-muted-foreground'>
+                    <p className='text-muted-foreground flex items-center gap-2 text-sm font-bold'>
                       <LockIcon
                         size={16}
                         strokeWidth={2}
@@ -128,12 +120,10 @@ export function SectionsContent() {
                         value={progressPct}
                         className='h-3'
                       />
-                      <p className='text-xs font-bold text-muted-foreground'>
-                        {progressPct}% complete
-                      </p>
+                      <p className='text-muted-foreground text-xs font-bold'>{progressPct}% complete</p>
                     </div>
                   ) : (
-                    <p className='text-sm font-bold text-muted-foreground'>
+                    <p className='text-muted-foreground text-sm font-bold'>
                       {completedCount}/{lessonCount} lessons
                     </p>
                   )}
@@ -142,7 +132,7 @@ export function SectionsContent() {
                 {isLocked ? (
                   <span
                     aria-disabled
-                    className='shrink-0 cursor-not-allowed rounded-xl border-2 border-border bg-muted px-5 py-2.5 text-sm font-black uppercase tracking-wide text-muted-foreground'
+                    className='border-border bg-muted text-muted-foreground shrink-0 cursor-not-allowed rounded-xl border-2 px-5 py-2.5 text-sm font-black tracking-wide uppercase'
                   >
                     Locked
                   </span>
@@ -150,10 +140,10 @@ export function SectionsContent() {
                   <Link
                     href={`/dashboard?sectionId=${section.id}`}
                     className={cn(
-                      'shrink-0 rounded-xl px-5 py-2.5 text-sm font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      'focus-visible:ring-primary shrink-0 rounded-xl px-5 py-2.5 text-sm font-black tracking-wide uppercase transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
                       isActive && !isComplete
                         ? 'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]'
-                        : 'border-2 border-border bg-card text-foreground',
+                        : 'border-border bg-card text-foreground border-2'
                     )}
                   >
                     {isComplete ? 'Review' : isActive ? 'Continue' : 'Start'}

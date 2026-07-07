@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import {useEffect, useRef} from 'react'
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 function getFocusableElements(container: HTMLElement) {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-  ).filter(el => el.offsetParent !== null || el === document.activeElement)
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    el => el.offsetParent !== null || el === document.activeElement
+  )
 }
 
 interface UseDialogA11yOptions {
@@ -17,11 +17,7 @@ interface UseDialogA11yOptions {
   closeOnEscape?: boolean
 }
 
-export function useDialogA11y({
-  open,
-  onClose,
-  closeOnEscape = true,
-}: UseDialogA11yOptions) {
+export function useDialogA11y({open, onClose, closeOnEscape = true}: UseDialogA11yOptions) {
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
 

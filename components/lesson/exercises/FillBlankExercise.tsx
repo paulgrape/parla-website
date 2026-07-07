@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { isAnswerCorrect } from '@/lib/utils'
-import { useId, useState } from 'react'
+import {Button} from '@/components/ui/button'
+import {isAnswerCorrect} from '@/lib/utils'
+import {useId, useState} from 'react'
 
 interface FillBlankExerciseProps {
   prompt: string
@@ -12,13 +12,7 @@ interface FillBlankExerciseProps {
   onContinue: () => void
 }
 
-export function FillBlankExercise({
-  prompt,
-  answer,
-  revealed,
-  onSubmit,
-  onContinue,
-}: FillBlankExerciseProps) {
+export function FillBlankExercise({prompt, answer, revealed, onSubmit, onContinue}: FillBlankExerciseProps) {
   const [input, setInput] = useState('')
   const inputId = useId()
 
@@ -29,9 +23,7 @@ export function FillBlankExercise({
   return (
     <div className='flex flex-col gap-8'>
       <div>
-        <p className='text-sm font-bold uppercase text-muted-foreground mb-2'>
-          Fill in the blank
-        </p>
+        <p className='text-muted-foreground mb-2 text-sm font-bold uppercase'>Fill in the blank</p>
         <h2 className='text-2xl font-black'>{prompt}</h2>
       </div>
 
@@ -50,7 +42,7 @@ export function FillBlankExercise({
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !revealed && handleSubmit()}
           placeholder='Type your answer...'
-          className='w-full rounded-2xl border-2 border-border px-6 py-4 text-lg font-bold focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60'
+          className='border-border focus:border-primary focus-visible:ring-primary w-full rounded-2xl border-2 px-6 py-4 text-lg font-bold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60'
         />
       </div>
 

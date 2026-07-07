@@ -1,21 +1,15 @@
 'use client'
 
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { playSound } from '@/lib/sound'
-import { cn } from '@/lib/utils'
-import type { Lesson, Unit } from '@llp/types'
-import {
-  ArrowLeft01Icon,
-  BookOpen01Icon,
-  LockIcon,
-  StarIcon,
-  Tick01Icon,
-} from 'hugeicons-react'
+import {useReducedMotion} from '@/hooks/useReducedMotion'
+import {playSound} from '@/lib/sound'
+import {cn} from '@/lib/utils'
+import type {Lesson, Unit} from '@llp/types'
+import {ArrowLeft01Icon, BookOpen01Icon, LockIcon, StarIcon, Tick01Icon} from 'hugeicons-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef } from 'react'
+import {useEffect, useMemo, useRef} from 'react'
 
 interface UnitMapProps {
-  units: (Unit & { lessons: Lesson[] })[]
+  units: (Unit & {lessons: Lesson[]})[]
   completedLessons: string[]
   heartsAvailable?: boolean
   sectionOrder?: number
@@ -24,27 +18,18 @@ interface UnitMapProps {
 const WAVE_OFFSETS = [0, -60, -100, -60, 0, 60, 100, 60]
 
 const UNIT_THEMES = [
-  { banner: 'bg-primary', shadow: '#46a302' },
-  { banner: 'bg-purple-500', shadow: '#7c3aed' },
-  { banner: 'bg-sky-500', shadow: '#0284c7' },
-  { banner: 'bg-orange-500', shadow: '#c2410c' },
-  { banner: 'bg-pink-500', shadow: '#be185d' },
+  {banner: 'bg-primary', shadow: '#46a302'},
+  {banner: 'bg-purple-500', shadow: '#7c3aed'},
+  {banner: 'bg-sky-500', shadow: '#0284c7'},
+  {banner: 'bg-orange-500', shadow: '#c2410c'},
+  {banner: 'bg-pink-500', shadow: '#be185d'}
 ]
 
-export function UnitMap({
-  units,
-  completedLessons,
-  heartsAvailable = true,
-  sectionOrder = 1,
-}: UnitMapProps) {
+export function UnitMap({units, completedLessons, heartsAvailable = true, sectionOrder = 1}: UnitMapProps) {
   const reducedMotion = useReducedMotion()
   const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
-  const allLessons = useMemo(
-    () =>
-      units.flatMap(u => u.lessons.map(l => ({ ...l, unitOrder: u.order }))),
-    [units],
-  )
+  const allLessons = useMemo(() => units.flatMap(u => u.lessons.map(l => ({...l, unitOrder: u.order}))), [units])
 
   const isUnlocked = (lessonId: string, index: number) => {
     if (index === 0) return true
@@ -55,8 +40,7 @@ export function UnitMap({
   const nextLessonId = useMemo(() => {
     for (let i = 0; i < allLessons.length; i++) {
       const lesson = allLessons[i]
-      const unlocked =
-        i === 0 || completedLessons.includes(allLessons[i - 1].id)
+      const unlocked = i === 0 || completedLessons.includes(allLessons[i - 1].id)
       if (!completedLessons.includes(lesson.id) && unlocked) {
         return lesson.id
       }
@@ -77,7 +61,7 @@ export function UnitMap({
     if (!alreadyCentered) {
       el.scrollIntoView({
         block: 'center',
-        behavior: reducedMotion ? 'auto' : 'smooth',
+        behavior: reducedMotion ? 'auto' : 'smooth'
       })
     }
   }, [nextLessonId, reducedMotion])
@@ -93,23 +77,23 @@ export function UnitMap({
             className='space-y-0'
           >
             <div
-              className='sticky md:top-4 top-20'
-              style={{ zIndex: 10 + unitIndex }}
+              className='sticky top-20 md:top-4'
+              style={{zIndex: 10 + unitIndex}}
             >
               <div
                 aria-hidden
-                className='pointer-events-none absolute inset-x-0 bottom-full h-8 bg-background md:h-4'
+                className='bg-background pointer-events-none absolute inset-x-0 bottom-full h-8 md:h-4'
               />
               <div
                 className={cn(
                   'relative flex items-center justify-between gap-4 rounded-2xl px-5 py-4 text-white shadow-[0_4px_0_0_rgba(0,0,0,0.15)]',
-                  theme.banner,
+                  theme.banner
                 )}
               >
                 <div>
                   <Link
                     href='/sections'
-                    className='inline-flex items-center gap-1 text-sm font-bold group text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg -ml-1 pr-2 py-1 my-auto'
+                    className='group text-foreground/80 hover:text-foreground focus-visible:ring-primary my-auto -ml-1 inline-flex items-center gap-1 rounded-lg py-1 pr-2 text-sm font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
                   >
                     <ArrowLeft01Icon
                       size={18}
@@ -117,17 +101,15 @@ export function UnitMap({
                       aria-hidden
                     />
 
-                    <p className='text-xs font-black uppercase tracking-wide text-foreground/80 group-hover:text-foreground transition-colors my-auto'>
+                    <p className='text-foreground/80 group-hover:text-foreground my-auto text-xs font-black tracking-wide uppercase transition-colors'>
                       Section {sectionOrder}, Unit {unit.order}
                     </p>
                   </Link>
-                  <h2 className='text-lg font-black font-display md:text-xl'>
-                    {unit.title}
-                  </h2>
+                  <h2 className='font-display text-lg font-black md:text-xl'>{unit.title}</h2>
                 </div>
                 <Link
                   href={`/guidebook/${unit.id}`}
-                  className='flex shrink-0 items-center gap-1.5 rounded-xl bg-white/20 px-3 py-2 text-xs font-black uppercase tracking-wide text-white transition-colors hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+                  className='flex shrink-0 items-center gap-1.5 rounded-xl bg-white/20 px-3 py-2 text-xs font-black tracking-wide text-white uppercase transition-colors hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent focus-visible:outline-none'
                 >
                   <BookOpen01Icon
                     size={16}
@@ -141,9 +123,7 @@ export function UnitMap({
 
             <div className='flex flex-col items-center gap-4 pt-8'>
               {unit.lessons.map((lesson, lessonIndex) => {
-                const globalIndex = allLessons.findIndex(
-                  l => l.id === lesson.id,
-                )
+                const globalIndex = allLessons.findIndex(l => l.id === lesson.id)
                 const completed = completedLessons.includes(lesson.id)
                 const unlocked = isUnlocked(lesson.id, globalIndex)
                 const canOpen = unlocked && heartsAvailable
@@ -168,9 +148,7 @@ export function UnitMap({
                     : unlocked
                       ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                       : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
-                  unlocked &&
-                    !heartsAvailable &&
-                    'cursor-not-allowed opacity-60',
+                  unlocked && !heartsAvailable && 'cursor-not-allowed opacity-60'
                 )
 
                 const nodeIcon = completed ? (
@@ -200,7 +178,7 @@ export function UnitMap({
                       if (el) nodeRefs.current.set(lesson.id, el)
                     }}
                     className='flex flex-col items-center'
-                    style={{ marginLeft: offset }}
+                    style={{marginLeft: offset}}
                   >
                     {canOpen ? (
                       <Link
@@ -224,7 +202,7 @@ export function UnitMap({
                     <p
                       className={cn(
                         'mt-3 max-w-32 text-center text-sm font-bold',
-                        unlocked ? 'text-foreground' : 'text-muted-foreground',
+                        unlocked ? 'text-foreground' : 'text-muted-foreground'
                       )}
                     >
                       Level {lesson.order}: {lesson.title}

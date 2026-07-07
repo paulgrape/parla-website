@@ -1,12 +1,12 @@
 'use client'
 
-import { ProfileStatsHeader } from '@/components/account/ProfileStatsHeader'
-import { cn } from '@/lib/utils'
-import { useClerk, useUser } from '@clerk/nextjs'
-import { Logout01Icon, Settings01Icon } from 'hugeicons-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
-import { createPortal } from 'react-dom'
+import {ProfileStatsHeader} from '@/components/account/ProfileStatsHeader'
+import {cn} from '@/lib/utils'
+import {useClerk, useUser} from '@clerk/nextjs'
+import {Logout01Icon, Settings01Icon} from 'hugeicons-react'
+import {useRouter} from 'next/navigation'
+import {useEffect, useId, useRef, useState, useSyncExternalStore} from 'react'
+import {createPortal} from 'react-dom'
 
 interface UserMenuProps {
   variant?: 'full' | 'compact'
@@ -49,45 +49,34 @@ function useIsClient() {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false,
+    () => false
   )
 }
 
-function UserAvatar({
-  imageUrl,
-  fallback,
-  size,
-}: {
-  imageUrl?: string
-  fallback: string
-  size: number
-}) {
+function UserAvatar({imageUrl, fallback, size}: {imageUrl?: string; fallback: string; size: number}) {
   if (imageUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageUrl}
         alt=''
-        style={{ width: size, height: size }}
-        className='shrink-0 rounded-full border-2 border-border object-cover'
+        style={{width: size, height: size}}
+        className='border-border shrink-0 rounded-full border-2 object-cover'
       />
     )
   }
   return (
     <div
       aria-hidden
-      style={{ width: size, height: size }}
-      className='flex shrink-0 items-center justify-center rounded-full border-2 border-border bg-muted text-sm font-black text-muted-foreground'
+      style={{width: size, height: size}}
+      className='border-border bg-muted text-muted-foreground flex shrink-0 items-center justify-center rounded-full border-2 text-sm font-black'
     >
       {fallback}
     </div>
   )
 }
 
-function getPopoverPosition(
-  trigger: HTMLElement,
-  variant: 'full' | 'compact',
-): PopoverPosition {
+function getPopoverPosition(trigger: HTMLElement, variant: 'full' | 'compact'): PopoverPosition {
   const rect = trigger.getBoundingClientRect()
   const width = getPopoverWidth(variant)
   const mobile = isMobileLayout(variant)
@@ -95,21 +84,17 @@ function getPopoverPosition(
 
   let left = mobile ? VIEWPORT_PADDING : rect.left
 
-  left = Math.max(
-    VIEWPORT_PADDING,
-    Math.min(left, viewportWidth - width - VIEWPORT_PADDING),
-  )
+  left = Math.max(VIEWPORT_PADDING, Math.min(left, viewportWidth - width - VIEWPORT_PADDING))
 
   if (mobile) {
     const top = rect.bottom + POPOVER_GAP
-    const maxHeight =
-      window.innerHeight - top - MOBILE_NAV_HEIGHT - VIEWPORT_PADDING
+    const maxHeight = window.innerHeight - top - MOBILE_NAV_HEIGHT - VIEWPORT_PADDING
 
     return {
       top: Math.max(VIEWPORT_PADDING, top),
       left,
       width,
-      maxHeight: Math.max(200, maxHeight),
+      maxHeight: Math.max(200, maxHeight)
     }
   }
 
@@ -118,20 +103,20 @@ function getPopoverPosition(
       top: rect.top - POPOVER_GAP,
       left,
       width,
-      transform: 'translateY(-100%)',
+      transform: 'translateY(-100%)'
     }
   }
 
   return {
     top: rect.bottom + POPOVER_GAP,
     left,
-    width,
+    width
   }
 }
 
-export function UserMenu({ variant = 'full' }: UserMenuProps) {
-  const { user } = useUser()
-  const { signOut } = useClerk()
+export function UserMenu({variant = 'full'}: UserMenuProps) {
+  const {user} = useUser()
+  const {signOut} = useClerk()
   const router = useRouter()
   const menuId = useId()
   const isClient = useIsClient()
@@ -209,7 +194,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
   async function handleSignOut() {
     setSigningOut(true)
     try {
-      await signOut({ redirectUrl: '/sign-in' })
+      await signOut({redirectUrl: '/sign-in'})
     } catch {
       setSigningOut(false)
     }
@@ -226,7 +211,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
     'aria-expanded': open,
     'aria-haspopup': 'dialog' as const,
     'aria-controls': menuId,
-    onClick: () => setOpen(value => !value),
+    onClick: () => setOpen(value => !value)
   }
 
   const popover =
@@ -244,13 +229,11 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
           maxWidth: `calc(100vw - ${VIEWPORT_PADDING * 2}px)`,
           maxHeight: position.maxHeight,
           transform: position.transform,
-          zIndex: 100,
+          zIndex: 100
         }}
         className={cn(
-          'box-border overflow-x-hidden overflow-y-auto rounded-3xl border-2 border-border bg-card p-3 shadow-lg sm:p-4',
-          variant === 'compact'
-            ? 'max-h-[calc(100vh-5rem)]'
-            : 'max-h-[min(32rem,calc(100vh-4rem))]',
+          'border-border bg-card box-border overflow-x-hidden overflow-y-auto rounded-3xl border-2 p-3 shadow-lg sm:p-4',
+          variant === 'compact' ? 'max-h-[calc(100vh-5rem)]' : 'max-h-[min(32rem,calc(100vh-4rem))]'
         )}
       >
         <div className='min-w-0 space-y-3 sm:space-y-4'>
@@ -260,7 +243,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
             <button
               type='button'
               onClick={handleProfileSettings}
-              className='flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card px-3 text-xs font-bold uppercase tracking-wide text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:h-12 sm:px-4 sm:text-sm'
+              className='border-border bg-card text-foreground hover:bg-muted focus-visible:ring-primary flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-2xl border-2 px-3 text-xs font-bold tracking-wide uppercase transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:h-12 sm:px-4 sm:text-sm'
             >
               <Settings01Icon
                 size={18}
@@ -275,7 +258,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
               type='button'
               onClick={() => void handleSignOut()}
               disabled={signingOut}
-              className='flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-2xl bg-primary px-3 text-xs font-bold uppercase tracking-wide text-primary-foreground shadow-[0_4px_0_0_#46a302] transition-all hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:active:translate-y-0 sm:h-12 sm:px-4 sm:text-sm'
+              className='bg-primary text-primary-foreground hover:bg-primary-dark focus-visible:ring-primary flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-2xl px-3 text-xs font-bold tracking-wide uppercase shadow-[0_4px_0_0_#46a302] transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:active:translate-y-0 sm:h-12 sm:px-4 sm:text-sm'
             >
               <Logout01Icon
                 size={18}
@@ -295,7 +278,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
       {variant === 'full' ? (
         <button
           {...triggerProps}
-          className='flex w-full items-center gap-3 rounded-2xl cursor-pointer px-3 py-2.5 text-left font-bold transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+          className='hover:bg-muted focus-visible:ring-primary flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
           <UserAvatar
             imageUrl={user?.imageUrl}
@@ -308,7 +291,7 @@ export function UserMenu({ variant = 'full' }: UserMenuProps) {
         <button
           {...triggerProps}
           aria-label='Open account menu'
-          className='flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+          className='focus-visible:ring-primary flex items-center rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
           <UserAvatar
             imageUrl={user?.imageUrl}
