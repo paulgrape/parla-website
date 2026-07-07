@@ -1,20 +1,14 @@
 'use client'
 
-import {
-  accountInputClassName,
-  accountPrimaryButtonClassName,
-} from '@/components/account/accountStyles'
-import { Card } from '@/components/ui/card'
-import { checkProfileNames } from '@/lib/nameModeration'
-import { cn } from '@/lib/utils'
-import { useReverification, useUser } from '@clerk/nextjs'
-import {
-  isClerkAPIResponseError,
-  isReverificationCancelledError,
-} from '@clerk/nextjs/errors'
-import type { UserResource } from '@clerk/types'
-import { Edit02Icon } from 'hugeicons-react'
-import { useId, useRef, useState } from 'react'
+import {accountInputClassName, accountPrimaryButtonClassName} from '@/components/account/accountStyles'
+import {Card} from '@/components/ui/card'
+import {checkProfileNames} from '@/lib/nameModeration'
+import {cn} from '@/lib/utils'
+import {useReverification, useUser} from '@clerk/nextjs'
+import {isClerkAPIResponseError, isReverificationCancelledError} from '@clerk/nextjs/errors'
+import type {UserResource} from '@clerk/types'
+import {Edit02Icon} from 'hugeicons-react'
+import {useId, useRef, useState} from 'react'
 
 function getClerkErrorMessage(error: unknown) {
   if (isClerkAPIResponseError(error)) {
@@ -24,7 +18,7 @@ function getClerkErrorMessage(error: unknown) {
   return 'Something went wrong.'
 }
 
-function ProfileFormFields({ user }: { user: UserResource }) {
+function ProfileFormFields({user}: {user: UserResource}) {
   const avatarInputId = useId()
   const firstNameId = useId()
   const lastNameId = useId()
@@ -40,28 +34,21 @@ function ProfileFormFields({ user }: { user: UserResource }) {
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const updateProfile = useReverification(
-    (params: {
-      firstName?: string
-      lastName?: string
-      username?: string
-    }) => user.update(params),
+  const updateProfile = useReverification((params: {firstName?: string; lastName?: string; username?: string}) =>
+    user.update(params)
   )
 
   const email = user.primaryEmailAddress?.emailAddress ?? ''
-  const emailVerified =
-    user.primaryEmailAddress?.verification?.status === 'verified'
+  const emailVerified = user.primaryEmailAddress?.verification?.status === 'verified'
   const isDirty =
-    firstName !== (user.firstName ?? '') ||
-    lastName !== (user.lastName ?? '') ||
-    username !== (user.username ?? '')
+    firstName !== (user.firstName ?? '') || lastName !== (user.lastName ?? '') || username !== (user.username ?? '')
 
   async function handleAvatarChange(file: File) {
     setUploadingAvatar(true)
     setError(null)
     setMessage(null)
     try {
-      await user.setProfileImage({ file })
+      await user.setProfileImage({file})
       setMessage('Profile photo updated.')
     } catch (err) {
       setError(getClerkErrorMessage(err))
@@ -74,7 +61,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
     event.preventDefault()
     if (!isDirty) return
 
-    const nameCheck = checkProfileNames({ firstName, lastName, username })
+    const nameCheck = checkProfileNames({firstName, lastName, username})
     if (!nameCheck.ok) {
       setError(nameCheck.reason)
       return
@@ -123,9 +110,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
       >
         <div>
           <h2 className='text-lg font-bold'>Profile</h2>
-          <p className='text-sm text-muted-foreground'>
-            Update your name, username, and photo
-          </p>
+          <p className='text-muted-foreground text-sm'>Update your name, username, and photo</p>
         </div>
 
         <div className='flex items-center gap-4'>
@@ -134,12 +119,12 @@ function ProfileFormFields({ user }: { user: UserResource }) {
             <img
               src={user.imageUrl}
               alt=''
-              className='h-20 w-20 shrink-0 rounded-full border-2 border-border object-cover'
+              className='border-border h-20 w-20 shrink-0 rounded-full border-2 object-cover'
             />
           ) : (
             <div
               aria-hidden
-              className='flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-border bg-muted text-2xl font-black text-muted-foreground'
+              className='border-border bg-muted text-muted-foreground flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 text-2xl font-black'
             >
               {(firstName || username || 'L').charAt(0).toUpperCase()}
             </div>
@@ -164,7 +149,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
               disabled={uploadingAvatar}
               onClick={() => fileInputRef.current?.click()}
               className={cn(
-                'inline-flex items-center gap-2 rounded-2xl border-2 border-border px-4 py-2 text-sm font-bold transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60',
+                'border-border hover:bg-muted focus-visible:ring-primary inline-flex items-center gap-2 rounded-2xl border-2 px-4 py-2 text-sm font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               )}
             >
               <Edit02Icon
@@ -174,9 +159,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
               />
               {uploadingAvatar ? 'Uploading…' : 'Change photo'}
             </button>
-            <p className='text-xs text-muted-foreground'>
-              JPG, PNG, or GIF. Max 10 MB.
-            </p>
+            <p className='text-muted-foreground text-xs'>JPG, PNG, or GIF. Max 10 MB.</p>
           </div>
         </div>
 
@@ -250,10 +233,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
           />
           <p
             id={`${emailId}-status`}
-            className={cn(
-              'text-xs',
-              emailVerified ? 'text-muted-foreground' : 'text-primary',
-            )}
+            className={cn('text-xs', emailVerified ? 'text-muted-foreground' : 'text-primary')}
           >
             {emailVerified
               ? 'Email verified.'
@@ -264,7 +244,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
         {error ? (
           <p
             role='alert'
-            className='text-sm font-medium text-destructive'
+            className='text-destructive text-sm font-medium'
           >
             {error}
           </p>
@@ -273,7 +253,7 @@ function ProfileFormFields({ user }: { user: UserResource }) {
         {message ? (
           <p
             role='status'
-            className='text-sm font-medium text-primary'
+            className='text-primary text-sm font-medium'
           >
             {message}
           </p>
@@ -292,17 +272,22 @@ function ProfileFormFields({ user }: { user: UserResource }) {
 }
 
 export function ProfileForm() {
-  const { user, isLoaded } = useUser()
+  const {user, isLoaded} = useUser()
 
   if (!isLoaded) {
     return (
       <Card aria-busy='true'>
-        <p className='text-sm text-muted-foreground'>Loading profile…</p>
+        <p className='text-muted-foreground text-sm'>Loading profile…</p>
       </Card>
     )
   }
 
   if (!user) return null
 
-  return <ProfileFormFields key={user.id} user={user} />
+  return (
+    <ProfileFormFields
+      key={user.id}
+      user={user}
+    />
+  )
 }

@@ -1,10 +1,10 @@
-import { AuthLegalFooter } from '@/components/auth/AuthLegalFooter'
-import { AppLogo } from '@/components/layout/AppLogo'
-import { SignUp } from '@clerk/nextjs'
+import {AuthLegalFooter} from '@/components/auth/AuthLegalFooter'
+import {AppLogo} from '@/components/layout/AppLogo'
+import {SignUp} from '@clerk/nextjs'
 
 export default function SignUpPage() {
   return (
-    <div className='flex min-h-screen items-center justify-center bg-muted p-4'>
+    <div className='bg-muted flex min-h-screen items-center justify-center p-4'>
       <div className='w-full max-w-md'>
         <div className='mb-8 w-full'>
           <AppLogo

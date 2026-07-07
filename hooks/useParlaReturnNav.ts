@@ -1,10 +1,10 @@
 'use client'
 
-import { APP_NAME } from '@/lib/constants'
-import { getReferrerPath, isSafeInternalPath } from '@/lib/parlaReturnNav'
-import { useAuth } from '@clerk/nextjs'
-import { useSearchParams } from 'next/navigation'
-import { useMemo } from 'react'
+import {APP_NAME} from '@/lib/constants'
+import {getReferrerPath, isSafeInternalPath} from '@/lib/parlaReturnNav'
+import {useAuth} from '@clerk/nextjs'
+import {useSearchParams} from 'next/navigation'
+import {useMemo} from 'react'
 
 export type ParlaReturnNavState = {
   mode: 'back' | 'go'
@@ -25,7 +25,7 @@ function parseFromParam(from: string | null): string | null {
 
 export function useParlaReturnNav(): ParlaReturnNavState {
   const searchParams = useSearchParams()
-  const { isSignedIn, isLoaded } = useAuth()
+  const {isSignedIn, isLoaded} = useAuth()
 
   const returnPath = useMemo(() => {
     const fromPath = parseFromParam(searchParams.get('from'))
@@ -37,7 +37,7 @@ export function useParlaReturnNav(): ParlaReturnNavState {
     return {
       mode: 'back',
       href: returnPath,
-      label: `Back to ${APP_NAME}`,
+      label: `Back to ${APP_NAME}`
     }
   }
 
@@ -45,13 +45,13 @@ export function useParlaReturnNav(): ParlaReturnNavState {
     return {
       mode: 'go',
       href: '/sign-in',
-      label: `Go to ${APP_NAME}`,
+      label: `Go to ${APP_NAME}`
     }
   }
 
   return {
     mode: 'go',
     href: isSignedIn ? '/' : '/sign-in',
-    label: `Go to ${APP_NAME}`,
+    label: `Go to ${APP_NAME}`
   }
 }

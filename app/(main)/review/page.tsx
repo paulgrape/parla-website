@@ -1,14 +1,14 @@
 'use client'
 
-import { ReviewSkeleton } from '@/components/skeletons/PageSkeletons'
-import { Button } from '@/components/ui/button'
-import { useApi } from '@/lib/api'
-import { cn } from '@/lib/utils'
-import type { ReviewItem } from '@llp/types'
-import { useEffect, useState } from 'react'
+import {ReviewSkeleton} from '@/components/skeletons/PageSkeletons'
+import {Button} from '@/components/ui/button'
+import {useApi} from '@/lib/api'
+import {cn} from '@/lib/utils'
+import type {ReviewItem} from '@llp/types'
+import {useEffect, useState} from 'react'
 
 export default function ReviewPage() {
-  const { fetchApi } = useApi()
+  const {fetchApi} = useApi()
   const [items, setItems] = useState<ReviewItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -32,7 +32,7 @@ export default function ReviewPage() {
 
     await fetchApi(`/review/${current.id}`, {
       method: 'POST',
-      body: JSON.stringify({ quality }),
+      body: JSON.stringify({quality})
     })
 
     if (currentIndex + 1 >= items.length) {
@@ -49,14 +49,10 @@ export default function ReviewPage() {
 
   if (done) {
     return (
-      <div className='mx-auto max-w-md text-center space-y-4 py-20'>
+      <div className='mx-auto max-w-md space-y-4 py-20 text-center'>
         <h1 className='text-2xl font-black'>All caught up!</h1>
-        <p className='text-muted-foreground'>
-          No vocabulary due for review right now.
-        </p>
-        <Button onClick={() => (window.location.href = '/dashboard')}>
-          Back to map
-        </Button>
+        <p className='text-muted-foreground'>No vocabulary due for review right now.</p>
+        <Button onClick={() => (window.location.href = '/dashboard')}>Back to map</Button>
       </div>
     )
   }
@@ -80,19 +76,13 @@ export default function ReviewPage() {
             : `Showing Italian: ${current.italian}. Press to show English.`
         }
         className={cn(
-          'w-full min-h-[200px] rounded-3xl border-2 border-border bg-card p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-          flipped && 'bg-primary/5 border-primary',
+          'border-border bg-card focus-visible:ring-primary flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-3xl border-2 p-6 text-left transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+          flipped && 'bg-primary/5 border-primary'
         )}
       >
-        <p className='text-sm font-bold uppercase text-muted-foreground mb-2'>
-          {flipped ? 'English' : 'Italian'}
-        </p>
-        <p className='text-3xl font-black'>
-          {flipped ? current.english : current.italian}
-        </p>
-        <p className='mt-4 text-xs text-muted-foreground'>
-          Tap or press to flip
-        </p>
+        <p className='text-muted-foreground mb-2 text-sm font-bold uppercase'>{flipped ? 'English' : 'Italian'}</p>
+        <p className='text-3xl font-black'>{flipped ? current.english : current.italian}</p>
+        <p className='text-muted-foreground mt-4 text-xs'>Tap or press to flip</p>
       </button>
 
       {flipped && (
@@ -102,10 +92,10 @@ export default function ReviewPage() {
           aria-label='Rate how well you remembered this word'
         >
           {[
-            { label: 'Hard', quality: 1 },
-            { label: 'Good', quality: 3 },
-            { label: 'Easy', quality: 5 },
-          ].map(({ label, quality }) => (
+            {label: 'Hard', quality: 1},
+            {label: 'Good', quality: 3},
+            {label: 'Easy', quality: 5}
+          ].map(({label, quality}) => (
             <Button
               key={quality}
               variant={quality === 5 ? 'default' : 'outline'}

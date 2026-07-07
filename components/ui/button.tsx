@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils'
-import { cva, type VariantProps } from 'class-variance-authority'
+import {cn} from '@/lib/utils'
+import {type VariantProps, cva} from 'class-variance-authority'
 
 const buttonVariants = cva(
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 inline-flex items-center justify-center gap-2 font-bold uppercase tracking-wide transition-all disabled:opacity-50 disabled:pointer-events-none',
@@ -10,33 +10,30 @@ const buttonVariants = cva(
           'bg-primary text-primary-foreground hover:bg-primary-dark shadow-[0_4px_0_0_#46a302] active:shadow-none active:translate-y-1',
         outline: 'border-2 border-border bg-card hover:bg-muted',
         ghost: 'hover:bg-muted',
-        destructive:
-          'bg-destructive text-white shadow-[0_4px_0_0_#cc0000] active:shadow-none active:translate-y-1',
+        destructive: 'bg-destructive text-white shadow-[0_4px_0_0_#cc0000] active:shadow-none active:translate-y-1'
       },
       size: {
         default: 'h-12 px-6 rounded-2xl text-sm',
         sm: 'h-10 px-4 rounded-xl text-xs',
-        lg: 'h-14 px-8 rounded-2xl text-base',
-      },
+        lg: 'h-14 px-8 rounded-2xl text-base'
+      }
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
-    },
-  },
+      size: 'default'
+    }
+  }
 )
 
-export { buttonVariants }
+export {buttonVariants}
 
 export interface ButtonProps
-  extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {}
 
-export function Button({ className, variant, size, ...props }: ButtonProps) {
+export function Button({className, variant, size, ...props}: ButtonProps) {
   return (
     <button
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({variant, size, className}))}
       {...props}
     />
   )

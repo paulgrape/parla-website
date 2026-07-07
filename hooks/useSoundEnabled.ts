@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import {useSyncExternalStore} from 'react'
 
 export const SOUND_ENABLED_STORAGE_KEY = 'llp:soundEnabled'
 const SOUND_SETTINGS_CHANGE_EVENT = 'sound-settings-change'
@@ -35,14 +35,10 @@ export function setSoundEnabled(enabled: boolean) {
 }
 
 export function useSoundEnabled() {
-  const enabled = useSyncExternalStore(
-    subscribeSoundEnabled,
-    getSoundEnabledSnapshot,
-    getSoundEnabledServerSnapshot,
-  )
+  const enabled = useSyncExternalStore(subscribeSoundEnabled, getSoundEnabledSnapshot, getSoundEnabledServerSnapshot)
 
   return {
     enabled,
-    setEnabled: setSoundEnabled,
+    setEnabled: setSoundEnabled
   }
 }

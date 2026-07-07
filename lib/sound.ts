@@ -1,4 +1,4 @@
-import { isSoundEnabled } from '@/hooks/useSoundEnabled'
+import {isSoundEnabled} from '@/hooks/useSoundEnabled'
 
 export type SoundName = 'click' | 'correct' | 'wrong'
 
@@ -34,7 +34,7 @@ export function preloadSounds(): Promise<void> {
           const arrayBuffer = await response.arrayBuffer()
           const buffer = await ctx.decodeAudioData(arrayBuffer)
           buffers.set(name, buffer)
-        }),
+        })
       )
     })().catch(() => {})
   }

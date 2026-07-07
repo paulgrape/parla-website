@@ -1,16 +1,16 @@
 'use client'
 
-import { GuidebookSkeleton } from '@/components/skeletons/PageSkeletons'
-import { AudioButton } from '@/components/ui/AudioButton'
-import { Markdown } from '@/components/ui/Markdown'
-import { useApi } from '@/lib/api'
-import type { Guidebook } from '@llp/types'
-import { ArrowLeft01Icon } from 'hugeicons-react'
+import {GuidebookSkeleton} from '@/components/skeletons/PageSkeletons'
+import {AudioButton} from '@/components/ui/AudioButton'
+import {Markdown} from '@/components/ui/Markdown'
+import {useApi} from '@/lib/api'
+import type {Guidebook} from '@llp/types'
+import {ArrowLeft01Icon} from 'hugeicons-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 
-export function GuidebookContent({ unitId }: { unitId: string }) {
-  const { fetchApi } = useApi()
+export function GuidebookContent({unitId}: {unitId: string}) {
+  const {fetchApi} = useApi()
   const [guidebook, setGuidebook] = useState<Guidebook | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -28,13 +28,11 @@ export function GuidebookContent({ unitId }: { unitId: string }) {
 
   if (error || !guidebook) {
     return (
-      <div className='rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-6 text-center'>
-        <p className='font-bold text-destructive'>
-          {error ?? 'Guidebook not found.'}
-        </p>
+      <div className='border-destructive/30 bg-destructive/5 rounded-2xl border-2 p-6 text-center'>
+        <p className='text-destructive font-bold'>{error ?? 'Guidebook not found.'}</p>
         <Link
           href='/dashboard'
-          className='mt-4 inline-block text-sm font-bold text-primary'
+          className='text-primary mt-4 inline-block text-sm font-bold'
         >
           Back to learn
         </Link>
@@ -46,7 +44,7 @@ export function GuidebookContent({ unitId }: { unitId: string }) {
     <div className='space-y-8'>
       <Link
         href='/dashboard'
-        className='inline-flex items-center gap-1 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1'
+        className='text-muted-foreground hover:text-foreground focus-visible:ring-primary inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
       >
         <ArrowLeft01Icon
           size={18}
@@ -57,19 +55,15 @@ export function GuidebookContent({ unitId }: { unitId: string }) {
       </Link>
 
       <header>
-        <h1 className='text-2xl font-black font-display md:text-3xl'>
-          {guidebook.unitTitle} Guidebook
-        </h1>
-        <p className='mt-2 text-sm text-muted-foreground'>
-          Explore grammar tips and key phrases for this unit.
-        </p>
+        <h1 className='font-display text-2xl font-black md:text-3xl'>{guidebook.unitTitle} Guidebook</h1>
+        <p className='text-muted-foreground mt-2 text-sm'>Explore grammar tips and key phrases for this unit.</p>
       </header>
 
       {guidebook.phrases.length > 0 && (
         <section aria-labelledby='phrases-heading'>
           <h2
             id='phrases-heading'
-            className='mb-4 text-sm font-black uppercase tracking-wide text-primary'
+            className='text-primary mb-4 text-sm font-black tracking-wide uppercase'
           >
             Key phrases
           </h2>
@@ -77,18 +71,12 @@ export function GuidebookContent({ unitId }: { unitId: string }) {
             {guidebook.phrases.map(phrase => (
               <li
                 key={phrase.order}
-                className='flex items-start gap-3 rounded-2xl border-2 border-border bg-card p-4'
+                className='border-border bg-card flex items-start gap-3 rounded-2xl border-2 p-4'
               >
-                <AudioButton
-                  text={phrase.audioText ?? phrase.italian}
-                />
+                <AudioButton text={phrase.audioText ?? phrase.italian} />
                 <div>
-                  <p className='font-bold text-foreground'>
-                    {phrase.italian}
-                  </p>
-                  <p className='mt-0.5 text-sm text-muted-foreground'>
-                    {phrase.english}
-                  </p>
+                  <p className='text-foreground font-bold'>{phrase.italian}</p>
+                  <p className='text-muted-foreground mt-0.5 text-sm'>{phrase.english}</p>
                 </div>
               </li>
             ))}
@@ -100,11 +88,11 @@ export function GuidebookContent({ unitId }: { unitId: string }) {
         <section aria-labelledby='grammar-heading'>
           <h2
             id='grammar-heading'
-            className='mb-4 text-sm font-black uppercase tracking-wide text-primary'
+            className='text-primary mb-4 text-sm font-black tracking-wide uppercase'
           >
             Grammar tips
           </h2>
-          <div className='rounded-2xl border-2 border-border bg-card p-5'>
+          <div className='border-border bg-card rounded-2xl border-2 p-5'>
             <Markdown>{guidebook.grammarTips}</Markdown>
           </div>
         </section>

@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { Tick01Icon } from 'hugeicons-react'
-import { useMemo, useState } from 'react'
+import {Button} from '@/components/ui/button'
+import {cn} from '@/lib/utils'
+import {Tick01Icon} from 'hugeicons-react'
+import {useMemo, useState} from 'react'
 
 interface MatchExerciseProps {
   answer: string
@@ -30,18 +30,13 @@ function parsePairs(answer: string): Pair[] {
   return parsed
     .map(item => {
       if (Array.isArray(item) && item.length >= 2) {
-        return { italian: String(item[0]), english: String(item[1]) }
+        return {italian: String(item[0]), english: String(item[1])}
       }
-      if (
-        item &&
-        typeof item === 'object' &&
-        'italian' in item &&
-        'english' in item
-      ) {
-        const pair = item as { italian: string; english: string }
-        return { italian: pair.italian, english: pair.english }
+      if (item && typeof item === 'object' && 'italian' in item && 'english' in item) {
+        const pair = item as {italian: string; english: string}
+        return {italian: pair.italian, english: pair.english}
       }
-      return { italian: '', english: '' }
+      return {italian: '', english: ''}
     })
     .filter(p => p.italian && p.english)
 }
@@ -50,33 +45,24 @@ function shuffle<T>(items: T[]): T[] {
   return [...items].sort(() => Math.random() - 0.5)
 }
 
-export function MatchExercise({
-  answer,
-  onMistake,
-  onComplete,
-}: MatchExerciseProps) {
+export function MatchExercise({answer, onMistake, onComplete}: MatchExerciseProps) {
   const pairs: Pair[] = useMemo(() => parsePairs(answer), [answer])
   const [selection, setSelection] = useState<Selection | null>(null)
   const [matchedItalian, setMatchedItalian] = useState<Set<string>>(new Set())
   const [matchedEnglish, setMatchedEnglish] = useState<Set<string>>(new Set())
   const [wrong, setWrong] = useState<Selection | null>(null)
   const [wrongAnnouncement, setWrongAnnouncement] = useState('')
-  const [italianWords] = useState<string[]>(() =>
-    shuffle(pairs.map(p => p.italian)),
-  )
-  const [englishWords] = useState<string[]>(() =>
-    shuffle(pairs.map(p => p.english)),
-  )
+  const [italianWords] = useState<string[]>(() => shuffle(pairs.map(p => p.italian)))
+  const [englishWords] = useState<string[]>(() => shuffle(pairs.map(p => p.english)))
 
   const allMatched = matchedItalian.size === pairs.length && pairs.length > 0
 
-  const isMatched = (side: Side, word: string) =>
-    side === 'it' ? matchedItalian.has(word) : matchedEnglish.has(word)
+  const isMatched = (side: Side, word: string) => (side === 'it' ? matchedItalian.has(word) : matchedEnglish.has(word))
 
   const resolvePair = (a: Selection, b: Selection) => {
     const italian = a.side === 'it' ? a.word : b.word
     const english = a.side === 'en' ? a.word : b.word
-    return { italian, english }
+    return {italian, english}
   }
 
   const handleSelect = (side: Side, word: string) => {
@@ -84,16 +70,14 @@ export function MatchExercise({
 
     // First pick, or re-picking within the same column.
     if (!selection || selection.side === side) {
-      setSelection({ side, word })
+      setSelection({side, word})
       setWrong(null)
       return
     }
 
     // Second pick from the other column: evaluate the pair.
-    const { italian, english } = resolvePair(selection, { side, word })
-    const isPair = pairs.some(
-      p => p.italian === italian && p.english === english,
-    )
+    const {italian, english} = resolvePair(selection, {side, word})
+    const isPair = pairs.some(p => p.italian === italian && p.english === english)
 
     if (isPair) {
       // Completion is confirmed via the Continue button, not auto-advanced.
@@ -102,7 +86,7 @@ export function MatchExercise({
       setSelection(null)
     } else {
       onMistake()
-      setWrong({ side, word })
+      setWrong({side, word})
       setWrongAnnouncement('Incorrect match. Try again.')
       setSelection(null)
       setTimeout(() => {
@@ -129,10 +113,7 @@ export function MatchExercise({
               matched && 'border-primary bg-primary/10 text-primary',
               selected && !matched && 'border-primary bg-primary/10',
               isWrong && 'border-destructive animate-shake',
-              !matched &&
-                !selected &&
-                !isWrong &&
-                'border-border hover:border-primary',
+              !matched && !selected && !isWrong && 'border-border hover:border-primary'
             )}
           >
             <span>{word}</span>
@@ -157,9 +138,7 @@ export function MatchExercise({
         {wrongAnnouncement}
       </div>
       <div>
-        <p className='text-sm font-bold uppercase text-muted-foreground mb-2'>
-          Match the pairs
-        </p>
+        <p className='text-muted-foreground mb-2 text-sm font-bold uppercase'>Match the pairs</p>
         <h2 className='text-xl font-black'>Tap one from each column</h2>
       </div>
 

@@ -1,4 +1,4 @@
-import { LegalLinks } from '@/components/layout/LegalLinks'
+import {LegalLinks} from '@/components/layout/LegalLinks'
 
 export function AuthLegalFooter() {
   return (

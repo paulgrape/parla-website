@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import {useSyncExternalStore} from 'react'
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -17,9 +17,5 @@ function getReducedMotionServerSnapshot() {
 }
 
 export function useReducedMotion() {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
-  )
+  return useSyncExternalStore(subscribeReducedMotion, getReducedMotionSnapshot, getReducedMotionServerSnapshot)
 }

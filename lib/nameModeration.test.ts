@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { checkName, checkProfileNames, getNameViolations } from './nameModeration'
+import {describe, expect, it} from 'vitest'
+
+import {checkName, checkProfileNames, getNameViolations} from './nameModeration'
 
 describe('checkName', () => {
   it('accepts normal names and unicode letters', () => {
@@ -53,13 +54,11 @@ describe('checkName', () => {
 
 describe('checkProfileNames', () => {
   it('passes when all fields are clean', () => {
-    expect(
-      checkProfileNames({ firstName: 'Anna', lastName: 'Bianchi', username: 'annab' }).ok,
-    ).toBe(true)
+    expect(checkProfileNames({firstName: 'Anna', lastName: 'Bianchi', username: 'annab'}).ok).toBe(true)
   })
 
   it('fails on the first offending field', () => {
-    const result = checkProfileNames({ firstName: 'Anna', username: 'admin' })
+    const result = checkProfileNames({firstName: 'Anna', username: 'admin'})
     expect(result.ok).toBe(false)
   })
 })
@@ -70,7 +69,7 @@ describe('getNameViolations', () => {
       id: 'user_123',
       first_name: 'Anna',
       last_name: 'Bianchi',
-      username: 'annab',
+      username: 'annab'
     })
     expect(result.violations).toHaveLength(0)
     expect(result.revert).toEqual({})
@@ -81,7 +80,7 @@ describe('getNameViolations', () => {
       id: 'user_ABC1234567890',
       first_name: 'fuck',
       last_name: 'shit',
-      username: 'admin',
+      username: 'admin'
     })
     expect(result.violations).toHaveLength(3)
     expect(result.revert.firstName).toBe('')

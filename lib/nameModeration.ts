@@ -1,8 +1,4 @@
-import {
-  RegExpMatcher,
-  englishDataset,
-  englishRecommendedTransformers,
-} from 'obscenity'
+import {RegExpMatcher, englishDataset, englishRecommendedTransformers} from 'obscenity'
 
 const MAX_NAME_LENGTH = 30
 const MIN_NAME_LENGTH = 1
@@ -13,57 +9,54 @@ const RESERVED_HANDLE_SUBSTRINGS = ['admin', 'moderator', 'support'] as const
 
 const profanityMatcher = new RegExpMatcher({
   ...englishDataset.build(),
-  ...englishRecommendedTransformers,
+  ...englishRecommendedTransformers
 })
 
-export type NameCheckResult = { ok: true } | { ok: false; reason: string }
+export type NameCheckResult = {ok: true} | {ok: false; reason: string}
 
 function containsReservedHandle(value: string): boolean {
   const normalized = value.toLowerCase().replace(/[^a-z]/g, '')
   return RESERVED_HANDLE_SUBSTRINGS.some(handle => normalized.includes(handle))
 }
 
-export function checkName(
-  rawValue: string | null | undefined,
-  fieldLabel = 'Name',
-): NameCheckResult {
-  if (rawValue == null) return { ok: true }
+export function checkName(rawValue: string | null | undefined, fieldLabel = 'Name'): NameCheckResult {
+  if (rawValue == null) return {ok: true}
 
   const value = rawValue.trim().replace(/\s+/g, ' ')
-  if (value.length === 0) return { ok: true }
+  if (value.length === 0) return {ok: true}
 
   if (value.length < MIN_NAME_LENGTH) {
-    return { ok: false, reason: `${fieldLabel} is too short.` }
+    return {ok: false, reason: `${fieldLabel} is too short.`}
   }
   if (value.length > MAX_NAME_LENGTH) {
     return {
       ok: false,
-      reason: `${fieldLabel} must be ${MAX_NAME_LENGTH} characters or fewer.`,
+      reason: `${fieldLabel} must be ${MAX_NAME_LENGTH} characters or fewer.`
     }
   }
 
   if (!ALLOWED_NAME_PATTERN.test(value)) {
     return {
       ok: false,
-      reason: `${fieldLabel} contains invalid characters.`,
+      reason: `${fieldLabel} contains invalid characters.`
     }
   }
 
   if (profanityMatcher.hasMatch(value)) {
     return {
       ok: false,
-      reason: `${fieldLabel} contains a word that is not allowed.`,
+      reason: `${fieldLabel} contains a word that is not allowed.`
     }
   }
 
   if (containsReservedHandle(value)) {
     return {
       ok: false,
-      reason: `${fieldLabel} contains a word that is not allowed.`,
+      reason: `${fieldLabel} contains a word that is not allowed.`
     }
   }
 
-  return { ok: true }
+  return {ok: true}
 }
 
 export function checkProfileNames(fields: {
@@ -74,7 +67,7 @@ export function checkProfileNames(fields: {
   const checks: [string | null | undefined, string][] = [
     [fields.firstName, 'First name'],
     [fields.lastName, 'Last name'],
-    [fields.username, 'Username'],
+    [fields.username, 'Username']
   ]
 
   for (const [value, label] of checks) {
@@ -82,12 +75,12 @@ export function checkProfileNames(fields: {
     if (!result.ok) return result
   }
 
-  return { ok: true }
+  return {ok: true}
 }
 
 export type NameViolationResult = {
   violations: string[]
-  revert: { firstName?: string; lastName?: string; username?: string }
+  revert: {firstName?: string; lastName?: string; username?: string}
 }
 
 export function getNameViolations(data: {
@@ -116,5 +109,5 @@ export function getNameViolations(data: {
     revert.username = `user${data.id.replace(/[^a-zA-Z0-9]/g, '').slice(-10)}`
   }
 
-  return { violations, revert }
+  return {violations, revert}
 }

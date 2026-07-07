@@ -1,15 +1,15 @@
 'use client'
 
-import { useDialogA11y } from '@/hooks/useDialogA11y'
-import { cn } from '@/lib/utils'
-import { createPortal } from 'react-dom'
-import { useSyncExternalStore } from 'react'
+import {useDialogA11y} from '@/hooks/useDialogA11y'
+import {cn} from '@/lib/utils'
+import {useSyncExternalStore} from 'react'
+import {createPortal} from 'react-dom'
 
 function useIsClient() {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false,
+    () => false
   )
 }
 
@@ -42,9 +42,9 @@ export function Dialog({
   className,
   panelClassName,
   backdropClassName,
-  children,
+  children
 }: DialogProps) {
-  const panelRef = useDialogA11y({ open, onClose, closeOnEscape })
+  const panelRef = useDialogA11y({open, onClose, closeOnEscape})
   const isClient = useIsClient()
 
   if (!open || !isClient) return null
@@ -53,10 +53,8 @@ export function Dialog({
     <div
       className={cn(
         'fixed inset-0 z-50',
-        variant === 'bottom'
-          ? 'flex items-end justify-center'
-          : 'flex items-center justify-center p-6',
-        className,
+        variant === 'bottom' ? 'flex items-end justify-center' : 'flex items-center justify-center p-6',
+        className
       )}
     >
       {closeOnBackdrop && onClose && (
@@ -64,10 +62,7 @@ export function Dialog({
           type='button'
           aria-label={backdropLabel}
           onClick={onClose}
-          className={cn(
-            'absolute inset-0 bg-background/70 backdrop-blur-sm',
-            backdropClassName,
-          )}
+          className={cn('bg-background/70 absolute inset-0 backdrop-blur-sm', backdropClassName)}
         />
       )}
       <div
@@ -78,15 +73,11 @@ export function Dialog({
         aria-describedby={descriptionId}
         aria-live={ariaLive}
         tabIndex={-1}
-        className={cn(
-          'relative z-10 outline-none',
-          variant === 'bottom' && 'w-full max-w-lg',
-          panelClassName,
-        )}
+        className={cn('relative z-10 outline-none', variant === 'bottom' && 'w-full max-w-lg', panelClassName)}
       >
         {children}
       </div>
     </div>,
-    document.body,
+    document.body
   )
 }

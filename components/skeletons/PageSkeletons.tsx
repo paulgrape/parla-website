@@ -1,14 +1,6 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import {Skeleton} from '@/components/ui/skeleton'
 
-function LoadingStatus({
-  label,
-  children,
-  className,
-}: {
-  label: string
-  children: React.ReactNode
-  className?: string
-}) {
+function LoadingStatus({label, children, className}: {label: string; children: React.ReactNode; className?: string}) {
   return (
     <div
       role='status'
@@ -39,12 +31,7 @@ export function DashboardSkeleton() {
                 key={lessonIndex}
                 className='h-16 w-16 rounded-full'
                 style={{
-                  marginLeft:
-                    lessonIndex % 4 === 1
-                      ? '-3rem'
-                      : lessonIndex % 4 === 3
-                        ? '3rem'
-                        : 0,
+                  marginLeft: lessonIndex % 4 === 1 ? '-3rem' : lessonIndex % 4 === 3 ? '3rem' : 0
                 }}
               />
             ))}
@@ -67,7 +54,7 @@ export function SectionsSkeleton() {
         {[0, 1, 2, 3].map(index => (
           <div
             key={index}
-            className='overflow-hidden rounded-2xl border-2 border-border bg-card'
+            className='border-border bg-card overflow-hidden rounded-2xl border-2'
           >
             <Skeleton className='h-24 w-full rounded-none' />
             <div className='flex items-center justify-between gap-4 p-5'>
@@ -102,11 +89,11 @@ export function SectionDetailSkeleton() {
 
       <div className='space-y-3'>
         <Skeleton className='h-6 w-40' />
-        <div className='rounded-2xl border-2 border-border bg-card px-4'>
+        <div className='border-border bg-card rounded-2xl border-2 px-4'>
           {[0, 1, 2].map(index => (
             <div
               key={index}
-              className='border-b border-border py-4 last:border-b-0'
+              className='border-border border-b py-4 last:border-b-0'
             >
               <Skeleton className='h-5 w-48' />
             </div>
@@ -135,7 +122,7 @@ export function GuidebookSkeleton() {
         {[0, 1, 2, 3].map(index => (
           <div
             key={index}
-            className='flex items-start gap-3 rounded-2xl border-2 border-border bg-card p-4'
+            className='border-border bg-card flex items-start gap-3 rounded-2xl border-2 p-4'
           >
             <Skeleton className='h-10 w-10 shrink-0 rounded-full' />
             <div className='flex-1 space-y-2'>

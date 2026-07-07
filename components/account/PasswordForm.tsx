@@ -1,15 +1,12 @@
 'use client'
 
-import {
-  accountInputClassName,
-  accountPrimaryButtonClassName,
-} from '@/components/account/accountStyles'
-import { Card } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { useUser } from '@clerk/nextjs'
-import { isClerkAPIResponseError } from '@clerk/nextjs/errors'
-import { ViewIcon, ViewOffIcon } from 'hugeicons-react'
-import { useId, useState } from 'react'
+import {accountInputClassName, accountPrimaryButtonClassName} from '@/components/account/accountStyles'
+import {Card} from '@/components/ui/card'
+import {cn} from '@/lib/utils'
+import {useUser} from '@clerk/nextjs'
+import {isClerkAPIResponseError} from '@clerk/nextjs/errors'
+import {ViewIcon, ViewOffIcon} from 'hugeicons-react'
+import {useId, useState} from 'react'
 
 function getClerkErrorMessage(error: unknown) {
   if (isClerkAPIResponseError(error)) {
@@ -20,7 +17,7 @@ function getClerkErrorMessage(error: unknown) {
 }
 
 export function PasswordForm() {
-  const { user, isLoaded } = useUser()
+  const {user, isLoaded} = useUser()
   const currentPasswordId = useId()
   const newPasswordId = useId()
   const [currentPassword, setCurrentPassword] = useState('')
@@ -34,7 +31,7 @@ export function PasswordForm() {
   if (!isLoaded) {
     return (
       <Card aria-busy='true'>
-        <p className='text-sm text-muted-foreground'>Loading security…</p>
+        <p className='text-muted-foreground text-sm'>Loading security…</p>
       </Card>
     )
   }
@@ -47,16 +44,14 @@ export function PasswordForm() {
     return (
       <Card className='space-y-2'>
         <h2 className='text-lg font-bold'>Password</h2>
-        <p className='text-sm text-muted-foreground'>
-          You signed in with a social account. Password change is not available
-          for this sign-in method.
+        <p className='text-muted-foreground text-sm'>
+          You signed in with a social account. Password change is not available for this sign-in method.
         </p>
       </Card>
     )
   }
 
-  const canSubmit =
-    currentPassword.length > 0 && newPassword.length >= 8 && !saving
+  const canSubmit = currentPassword.length > 0 && newPassword.length >= 8 && !saving
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -69,7 +64,7 @@ export function PasswordForm() {
     try {
       await user.updatePassword({
         currentPassword,
-        newPassword,
+        newPassword
       })
       setCurrentPassword('')
       setNewPassword('')
@@ -89,9 +84,7 @@ export function PasswordForm() {
       >
         <div>
           <h2 className='text-lg font-bold'>Password</h2>
-          <p className='text-sm text-muted-foreground'>
-            Use at least 8 characters
-          </p>
+          <p className='text-muted-foreground text-sm'>Use at least 8 characters</p>
         </div>
 
         <div className='space-y-2'>
@@ -114,7 +107,7 @@ export function PasswordForm() {
               type='button'
               onClick={() => setShowCurrent(value => !value)}
               aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
-              className='absolute inset-y-0 right-0 flex w-12 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              className='text-muted-foreground hover:text-foreground focus-visible:ring-primary absolute inset-y-0 right-0 flex w-12 items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
             >
               {showCurrent ? (
                 <ViewOffIcon
@@ -153,7 +146,7 @@ export function PasswordForm() {
               type='button'
               onClick={() => setShowNew(value => !value)}
               aria-label={showNew ? 'Hide new password' : 'Show new password'}
-              className='absolute inset-y-0 right-0 flex w-12 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              className='text-muted-foreground hover:text-foreground focus-visible:ring-primary absolute inset-y-0 right-0 flex w-12 items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
             >
               {showNew ? (
                 <ViewOffIcon
@@ -175,7 +168,7 @@ export function PasswordForm() {
         {error ? (
           <p
             role='alert'
-            className='text-sm font-medium text-destructive'
+            className='text-destructive text-sm font-medium'
           >
             {error}
           </p>
@@ -184,7 +177,7 @@ export function PasswordForm() {
         {message ? (
           <p
             role='status'
-            className='text-sm font-medium text-primary'
+            className='text-primary text-sm font-medium'
           >
             {message}
           </p>

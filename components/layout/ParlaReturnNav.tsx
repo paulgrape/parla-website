@@ -1,9 +1,9 @@
 'use client'
 
-import { AppLogo } from '@/components/layout/AppLogo'
-import { useParlaReturnNav } from '@/hooks/useParlaReturnNav'
-import { APP_NAME } from '@/lib/constants'
-import { ArrowLeft01Icon } from 'hugeicons-react'
+import {AppLogo} from '@/components/layout/AppLogo'
+import {useParlaReturnNav} from '@/hooks/useParlaReturnNav'
+import {APP_NAME} from '@/lib/constants'
+import {ArrowLeft01Icon} from 'hugeicons-react'
 import Link from 'next/link'
 
 const linkClassName =
@@ -12,10 +12,16 @@ const linkClassName =
 export function ParlaReturnNavFallback() {
   return (
     <>
-      <Link href='/sign-in' className={linkClassName}>
+      <Link
+        href='/sign-in'
+        className={linkClassName}
+      >
         Go to {APP_NAME}
       </Link>
-      <AppLogo size='md' href='/sign-in' />
+      <AppLogo
+        size='md'
+        href='/sign-in'
+      />
     </>
   )
 }
@@ -25,7 +31,10 @@ export function ParlaReturnNav() {
 
   return (
     <>
-      <Link href={nav.href} className={linkClassName}>
+      <Link
+        href={nav.href}
+        className={linkClassName}
+      >
         {nav.mode === 'back' && (
           <ArrowLeft01Icon
             size={18}
@@ -35,7 +44,10 @@ export function ParlaReturnNav() {
         )}
         {nav.label}
       </Link>
-      <AppLogo size='md' href={nav.href} />
+      <AppLogo
+        size='md'
+        href={nav.href}
+      />
     </>
   )
 }

@@ -1,15 +1,16 @@
 'use client'
 
-import { GlobalErrorView } from '@/components/errors/GlobalErrorView'
-import { APP_NAME } from '@/lib/constants'
-import { useEffect } from 'react'
+import {GlobalErrorView} from '@/components/errors/GlobalErrorView'
+import {APP_NAME} from '@/lib/constants'
+import {useEffect} from 'react'
+
 import './globals.css'
 
 export default function GlobalError({
   error,
-  unstable_retry,
+  unstable_retry
 }: {
-  error: Error & { digest?: string }
+  error: Error & {digest?: string}
   unstable_retry: () => void
 }) {
   useEffect(() => {
