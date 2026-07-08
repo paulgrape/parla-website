@@ -32,7 +32,19 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: APP_NAME
+    title: APP_NAME,
+    startupImage: [
+      {
+        url: '/splash/11-light.png',
+        media:
+          'screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
+      },
+      {
+        url: '/splash/11-dark.png',
+        media:
+          'screen and (prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
+      }
+    ]
   },
   formatDetection: {
     telephone: false
@@ -57,18 +69,6 @@ export default function RootLayout({
       className={`${baloo2.variable} ${nunito.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <link
-          rel='apple-touch-startup-image'
-          media='screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
-          href='/splash/11-light.png'
-        />
-        <link
-          rel='apple-touch-startup-image'
-          media='screen and (prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
-          href='/splash/11-dark.png'
-        />
-      </head>
       <body className='bg-background flex min-h-full flex-col'>
         <SerwistProvider swUrl='/serwist/sw.js'>
           <ThemeProvider>
