@@ -34,15 +34,37 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: APP_NAME,
     startupImage: [
+      // iPhone 11 / XR — standard display
       {
-        url: '/splash/11-light.png',
+        url: '/splash/iphone11-portrait-light.jpg',
         media:
           'screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
       },
       {
-        url: '/splash/11-dark.png',
+        url: '/splash/iphone11-portrait-dark.jpg',
         media:
           'screen and (prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
+      },
+      {
+        url: '/splash/iphone11-landscape-light.jpg',
+        media:
+          'screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)'
+      },
+      {
+        url: '/splash/iphone11-landscape-dark.jpg',
+        media:
+          'screen and (prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)'
+      },
+      // iPhone 11 / XR — Display Zoom (Settings → Display & Brightness → Display Zoom → Zoomed)
+      {
+        url: '/splash/iphone11-zoomed-light.jpg',
+        media:
+          'screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
+      },
+      {
+        url: '/splash/iphone11-zoomed-dark.jpg',
+        media:
+          'screen and (prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
       }
     ]
   },
