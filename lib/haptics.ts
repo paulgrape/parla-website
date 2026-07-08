@@ -1,4 +1,4 @@
-import {isSoundEnabled} from '@/hooks/useSoundEnabled'
+import {isHapticsEnabled} from '@/hooks/useHapticsEnabled'
 
 export type HapticPattern = 'correct' | 'wrong' | 'click'
 
@@ -9,7 +9,7 @@ const PATTERNS: Record<HapticPattern, number | number[]> = {
 }
 
 export function vibrate(pattern: HapticPattern) {
-  if (typeof window === 'undefined' || !isSoundEnabled()) return
+  if (typeof window === 'undefined' || !isHapticsEnabled()) return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   if (!('vibrate' in navigator)) return
 
