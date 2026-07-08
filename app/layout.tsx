@@ -2,6 +2,7 @@ import {AuthProvider} from '@/components/providers/AuthProvider'
 import {MotionProvider} from '@/components/providers/MotionProvider'
 import {SerwistProvider} from '@/components/providers/SerwistProvider'
 import {ThemeProvider} from '@/components/providers/ThemeProvider'
+import {IOSInstallPrompt} from '@/components/pwa/IOSInstallPrompt'
 import {APP_DEFAULT_TITLE, APP_DESCRIPTION, APP_NAME} from '@/lib/constants'
 import {IOS_SPLASH_SCREENS} from '@/lib/ios-splash-screens'
 import type {Metadata, Viewport} from 'next'
@@ -77,7 +78,10 @@ export default function RootLayout({
         <SerwistProvider swUrl='/serwist/sw.js'>
           <ThemeProvider>
             <MotionProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                {children}
+                <IOSInstallPrompt />
+              </AuthProvider>
             </MotionProvider>
           </ThemeProvider>
         </SerwistProvider>

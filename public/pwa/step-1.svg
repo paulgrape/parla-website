@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="520" viewBox="0 0 390 520" fill="none">
+  <rect width="390" height="520" rx="24" fill="#F5F5F5"/>
+  <rect x="24" y="24" width="342" height="472" rx="20" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="2"/>
+  <rect x="140" y="40" width="110" height="10" rx="5" fill="#E0E0E0"/>
+  <rect x="48" y="80" width="294" height="280" rx="16" fill="#ECECEC"/>
+  <text x="195" y="220" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#777777">Safari toolbar</text>
+  <rect x="48" y="390" width="294" height="72" rx="16" fill="#FFFFFF" stroke="#58CC02" stroke-width="3"/>
+  <circle cx="80" cy="426" r="16" fill="#58CC02"/>
+  <path d="M80 418v16M72 426h16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="110" y="422" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#1A1A1A">1. Tap Share</text>
+  <text x="110" y="442" font-family="system-ui,sans-serif" font-size="12" fill="#777777">Bottom center of Safari</text>
+</svg>
