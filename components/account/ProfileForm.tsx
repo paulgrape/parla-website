@@ -1,6 +1,7 @@
 'use client'
 
 import {accountInputClassName, accountPrimaryButtonClassName} from '@/components/account/accountStyles'
+import {useToast} from '@/components/providers/ToastProvider'
 import {Card} from '@/components/ui/card'
 import {checkProfileNames} from '@/lib/nameModeration'
 import {cn} from '@/lib/utils'
@@ -19,6 +20,7 @@ function getClerkErrorMessage(error: unknown) {
 }
 
 function ProfileFormFields({user}: {user: UserResource}) {
+  const {toast} = useToast()
   const avatarInputId = useId()
   const firstNameId = useId()
   const lastNameId = useId()
@@ -31,7 +33,6 @@ function ProfileFormFields({user}: {user: UserResource}) {
   const [username, setUsername] = useState(user.username ?? '')
   const [saving, setSaving] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const updateProfile = useReverification((params: {firstName?: string; lastName?: string; username?: string}) =>
@@ -46,12 +47,13 @@ function ProfileFormFields({user}: {user: UserResource}) {
   async function handleAvatarChange(file: File) {
     setUploadingAvatar(true)
     setError(null)
-    setMessage(null)
     try {
       await user.setProfileImage({file})
-      setMessage('Profile photo updated.')
+      toast('Profile photo updated.', 'success')
     } catch (err) {
-      setError(getClerkErrorMessage(err))
+      const errorMessage = getClerkErrorMessage(err)
+      setError(errorMessage)
+      toast(errorMessage, 'error')
     } finally {
       setUploadingAvatar(false)
     }
@@ -64,12 +66,12 @@ function ProfileFormFields({user}: {user: UserResource}) {
     const nameCheck = checkProfileNames({firstName, lastName, username})
     if (!nameCheck.ok) {
       setError(nameCheck.reason)
+      toast(nameCheck.reason, 'error')
       return
     }
 
     setSaving(true)
     setError(null)
-    setMessage(null)
 
     try {
       const updates: {
@@ -93,10 +95,12 @@ function ProfileFormFields({user}: {user: UserResource}) {
       }
 
       await updateProfile(updates)
-      setMessage('Profile saved.')
+      toast('Profile saved.', 'success')
     } catch (err) {
       if (isReverificationCancelledError(err)) return
-      setError(getClerkErrorMessage(err))
+      const errorMessage = getClerkErrorMessage(err)
+      setError(errorMessage)
+      toast(errorMessage, 'error')
     } finally {
       setSaving(false)
     }
@@ -247,15 +251,6 @@ function ProfileFormFields({user}: {user: UserResource}) {
             className='text-destructive text-sm font-medium'
           >
             {error}
-          </p>
-        ) : null}
-
-        {message ? (
-          <p
-            role='status'
-            className='text-primary text-sm font-medium'
-          >
-            {message}
           </p>
         ) : null}
 

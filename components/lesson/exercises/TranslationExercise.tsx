@@ -1,8 +1,9 @@
 'use client'
 
 import {Button} from '@/components/ui/button'
+import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {cn} from '@/lib/utils'
-import {AnimatePresence, motion} from 'framer-motion'
+import {AnimatePresence, m} from 'framer-motion'
 import {Cancel01Icon, SparklesIcon, Tick01Icon} from 'hugeicons-react'
 import {useEffect, useId, useRef, useState} from 'react'
 
@@ -31,6 +32,7 @@ export function TranslationExercise({
   const tooltipRef = useRef<HTMLDivElement>(null)
   const promptId = useId()
   const tooltipId = useId()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (!showTooltip) return
@@ -103,16 +105,17 @@ export function TranslationExercise({
             </button>
             <AnimatePresence>
               {showTooltip && (
-                <motion.span
+                <m.span
                   id={tooltipId}
                   role='tooltip'
-                  initial={{opacity: 0, y: 6}}
+                  initial={reducedMotion ? false : {opacity: 0, y: 6}}
                   animate={{opacity: 1, y: 0}}
-                  exit={{opacity: 0, y: 6}}
+                  exit={reducedMotion ? undefined : {opacity: 0, y: 6}}
+                  transition={reducedMotion ? {duration: 0} : undefined}
                   className='border-border bg-card absolute top-full left-0 z-10 mt-2 rounded-xl border-2 px-3 py-1.5 text-sm font-bold whitespace-nowrap shadow-md'
                 >
                   {correctAnswer}
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
           </div>
@@ -189,19 +192,21 @@ export function TranslationExercise({
 }
 
 export function XpPop({show}: {show: boolean}) {
+  const reducedMotion = useReducedMotion()
+
   return (
     <AnimatePresence>
       {show && (
-        <motion.span
-          initial={{opacity: 1, y: 0}}
-          animate={{opacity: 0, y: -40}}
+        <m.span
+          initial={reducedMotion ? {opacity: 1, y: 0} : {opacity: 1, y: 0}}
+          animate={reducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: -40}}
           exit={{opacity: 0}}
-          transition={{duration: 1}}
+          transition={{duration: reducedMotion ? 0 : 1}}
           className='text-primary pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 text-2xl font-black'
           aria-hidden
         >
           +10 XP
-        </motion.span>
+        </m.span>
       )}
     </AnimatePresence>
   )

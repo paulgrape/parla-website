@@ -1,12 +1,18 @@
 'use client'
 
+import {CheckFatFillIcon} from '@/components/icons/CheckFatFillIcon'
+import {LockKeyFillIcon} from '@/components/icons/LockKeyFillIcon'
+import {StarFillIcon} from '@/components/icons/StarFillIcon'
 import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {playSound} from '@/lib/sound'
 import {cn} from '@/lib/utils'
 import type {Lesson, Unit} from '@llp/types'
-import {ArrowLeft01Icon, BookOpen01Icon, LockIcon, StarIcon, Tick01Icon} from 'hugeicons-react'
+// import {LockIcon, StarIcon, Tick01Icon} from 'hugeicons-react'
+import {ArrowLeft01Icon, BookOpen01Icon} from 'hugeicons-react'
 import Link from 'next/link'
 import {useEffect, useMemo, useRef} from 'react'
+
+import {CurrentLessonIcon} from './CurrentLessonIcon'
 
 interface UnitMapProps {
   units: (Unit & {lessons: Lesson[]})[]
@@ -141,35 +147,30 @@ export function UnitMap({units, completedLessons, heartsAvailable = true, sectio
                           : ''
                 }`
 
+                const isCurrent = isNext && canOpen && !reducedMotion
+
                 const nodeClassName = cn(
-                  'flex h-16 w-16 items-center justify-center rounded-full border-4 font-bold transition-all duration-100 md:h-18 md:w-18',
+                  'flex h-16 w-[4.5rem] items-center justify-center rounded-[50%] font-bold transition-all duration-100 md:h-16 md:w-18',
                   completed
                     ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                     : unlocked
-                      ? 'border-primary-dark bg-card text-primary shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
+                      ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                       : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
                   unlocked && !heartsAvailable && 'cursor-not-allowed opacity-60'
                 )
 
                 const nodeIcon = completed ? (
-                  <Tick01Icon
-                    size={30}
-                    strokeWidth={2.5}
-                    aria-hidden
-                  />
+                  // <Tick01Icon size={30} strokeWidth={2.5} aria-hidden />
+                  <CheckFatFillIcon size={28} />
                 ) : unlocked ? (
-                  <StarIcon
-                    size={26}
-                    strokeWidth={2}
-                    aria-hidden
-                  />
+                  // <StarIcon size={26} strokeWidth={2.5} aria-hidden />
+                  <StarFillIcon size={30} />
                 ) : (
-                  <LockIcon
-                    size={22}
-                    strokeWidth={2}
-                    aria-hidden
-                  />
+                  // <LockIcon size={26} strokeWidth={2} aria-hidden />
+                  <LockKeyFillIcon size={26} />
                 )
+
+                const nodeIconContent = <CurrentLessonIcon animate={isCurrent}>{nodeIcon}</CurrentLessonIcon>
 
                 return (
                   <div
@@ -180,28 +181,37 @@ export function UnitMap({units, completedLessons, heartsAvailable = true, sectio
                     className='flex flex-col items-center'
                     style={{marginLeft: offset}}
                   >
-                    {canOpen ? (
-                      <Link
-                        href={`/lesson/${lesson.id}`}
-                        onClick={() => playSound('click')}
-                        aria-label={lessonLabel}
-                        aria-current={isNext ? 'step' : undefined}
-                        className={nodeClassName}
-                      >
-                        {nodeIcon}
-                      </Link>
-                    ) : (
-                      <span
-                        role='img'
-                        aria-label={lessonLabel}
-                        className={nodeClassName}
-                      >
-                        {nodeIcon}
-                      </span>
-                    )}
+                    <div className={cn(isCurrent && 'relative')}>
+                      {isCurrent && (
+                        <span
+                          aria-hidden
+                          className='border-primary/80 animate-node-ring-pulse pointer-events-none absolute -top-1.5 -right-1.5 -bottom-3.5 -left-1.5 rounded-full border-6'
+                        />
+                      )}
+                      {canOpen ? (
+                        <Link
+                          href={`/lesson/${lesson.id}`}
+                          onClick={() => playSound('click')}
+                          aria-label={lessonLabel}
+                          aria-current={isNext ? 'step' : undefined}
+                          data-testid={isCurrent ? 'current-lesson-node' : undefined}
+                          className={nodeClassName}
+                        >
+                          {nodeIconContent}
+                        </Link>
+                      ) : (
+                        <span
+                          role='img'
+                          aria-label={lessonLabel}
+                          className={nodeClassName}
+                        >
+                          {nodeIconContent}
+                        </span>
+                      )}
+                    </div>
                     <p
                       className={cn(
-                        'mt-3 max-w-32 text-center text-sm font-bold',
+                        'mt-6 mb-2 max-w-32 text-center text-sm font-bold',
                         unlocked ? 'text-foreground' : 'text-muted-foreground'
                       )}
                     >

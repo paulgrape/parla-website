@@ -1,14 +1,13 @@
 'use client'
 
+import {SectionCompleteBanner} from '@/components/dashboard/SectionCompleteBanner'
+import {StreakAtRiskBanner} from '@/components/dashboard/StreakAtRiskBanner'
 import {UnitMap} from '@/components/dashboard/UnitMap'
 import {useUserStats} from '@/components/providers/UserStatsProvider'
 import {DashboardSkeleton} from '@/components/skeletons/PageSkeletons'
 import {useApi} from '@/lib/api'
 import {resolveActiveSection} from '@/lib/sections'
-import {cn} from '@/lib/utils'
 import type {Lesson, Section, Unit} from '@llp/types'
-import {Tick01Icon} from 'hugeicons-react'
-import Link from 'next/link'
 import {useSearchParams} from 'next/navigation'
 import {useEffect, useState} from 'react'
 
@@ -20,6 +19,11 @@ function formatCountdown(ms: number) {
     return `${hours}h ${minutes}m`
   }
   return `${totalMinutes} min`
+}
+
+function isEveningLocal(now: number) {
+  const hour = new Date(now).getHours()
+  return hour >= 18
 }
 
 export function DashboardContent() {
@@ -83,9 +87,14 @@ export function DashboardContent() {
   const completedLessons = stats?.completedLessons ?? []
   const allLessonIds = units.flatMap(u => u.lessons.map(l => l.id))
   const isSectionComplete = allLessonIds.length > 0 && allLessonIds.every(id => completedLessons.includes(id))
+  const streak = stats?.streak ?? 0
+  const extendedToday = stats?.extendedToday ?? false
+  const showStreakAtRisk = streak > 0 && !extendedToday && isEveningLocal(now)
 
   return (
     <div className='space-y-8'>
+      {showStreakAtRisk && <StreakAtRiskBanner streak={streak} />}
+
       {!heartsAvailable && (
         <div className='border-destructive/30 bg-destructive/5 rounded-2xl border-2 p-4 text-center'>
           <p className='text-destructive font-black'>You&apos;re out of hearts</p>
@@ -113,28 +122,7 @@ export function DashboardContent() {
             sectionOrder={activeSection?.order ?? 1}
           />
 
-          {isSectionComplete && (
-            <div className='border-border bg-card space-y-4 rounded-2xl border-2 p-6 text-center'>
-              <p className='text-primary flex items-center justify-center gap-2 text-sm font-black uppercase'>
-                <Tick01Icon
-                  size={18}
-                  strokeWidth={2.5}
-                  aria-hidden
-                />
-                Section complete!
-              </p>
-              <p className='text-muted-foreground text-sm'>You finished all lessons in {activeSection?.title}.</p>
-              <Link
-                href='/sections'
-                className={cn(
-                  'focus-visible:ring-primary inline-block rounded-xl px-5 py-2.5 text-sm font-black tracking-wide uppercase transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-                  'bg-primary text-primary-foreground shadow-[0_4px_0_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_#46a302]'
-                )}
-              >
-                View sections
-              </Link>
-            </div>
-          )}
+          {isSectionComplete && <SectionCompleteBanner sectionTitle={activeSection?.title} />}
         </>
       )}
     </div>

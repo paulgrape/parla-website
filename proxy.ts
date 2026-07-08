@@ -3,7 +3,7 @@ import {clerkMiddleware, createRouteMatcher} from '@clerk/nextjs/server'
 const SIGN_IN_URL = '/sign-in'
 const SIGN_UP_URL = '/sign-up'
 
-const isPublicRoute = createRouteMatcher([
+const publicRoutes = [
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/terms(.*)',
@@ -11,7 +11,13 @@ const isPublicRoute = createRouteMatcher([
   '/about(.*)',
   '/api/webhooks(.*)',
   '/~offline'
-])
+]
+
+if (process.env.NODE_ENV !== 'production' || process.env.ALLOW_DEV_PAGES === '1') {
+  publicRoutes.push('/dev(.*)')
+}
+
+const isPublicRoute = createRouteMatcher(publicRoutes)
 
 const hasClerk = Boolean(
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_') &&

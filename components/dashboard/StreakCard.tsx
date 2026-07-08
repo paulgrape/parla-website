@@ -1,6 +1,7 @@
 'use client'
 
 import {Card} from '@/components/ui/card'
+import {useCountUp} from '@/hooks/useCountUp'
 import {FireIcon} from 'hugeicons-react'
 
 interface StreakCardProps {
@@ -10,6 +11,8 @@ interface StreakCardProps {
 }
 
 export function StreakCard({streak, longestStreak, active = true}: StreakCardProps) {
+  const displayStreak = useCountUp(streak)
+
   if (!active) {
     return (
       <Card className='border-border'>
@@ -23,7 +26,7 @@ export function StreakCard({streak, longestStreak, active = true}: StreakCardPro
           </div>
           <div>
             <p className='text-muted-foreground text-sm font-bold uppercase'>Current Streak</p>
-            <p className='text-muted-foreground text-4xl font-black'>{streak}</p>
+            <p className='text-muted-foreground text-4xl font-black'>{displayStreak}</p>
             <p className='text-muted-foreground text-xs'>Best: {longestStreak} days</p>
           </div>
         </div>
@@ -43,7 +46,7 @@ export function StreakCard({streak, longestStreak, active = true}: StreakCardPro
         </div>
         <div>
           <p className='text-sm font-bold text-orange-700 uppercase dark:text-orange-400'>Current Streak</p>
-          <p className='text-4xl font-black text-orange-500 dark:text-orange-400'>{streak}</p>
+          <p className='text-4xl font-black text-orange-500 dark:text-orange-400'>{displayStreak}</p>
           <p className='text-xs text-orange-600 dark:text-orange-500/90'>Best: {longestStreak} days</p>
         </div>
       </div>

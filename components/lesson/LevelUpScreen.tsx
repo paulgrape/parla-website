@@ -5,18 +5,15 @@ import {Dialog} from '@/components/ui/dialog'
 import {MotionDialogPanel, SlideUp} from '@/components/ui/motion'
 import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {AnimatePresence, m} from 'framer-motion'
-import {FireIcon, StarIcon} from 'hugeicons-react'
+import {StarIcon} from 'hugeicons-react'
 import {useEffect, useId, useState} from 'react'
 
-interface CompletionScreenProps {
-  totalXp: number
-  streak: number
-  perfect: boolean
-  mistakes: number
+interface LevelUpScreenProps {
+  level: number
   onContinue: () => void
 }
 
-export function CompletionScreen({totalXp, streak, perfect, mistakes, onContinue}: CompletionScreenProps) {
+export function LevelUpScreen({level, onContinue}: LevelUpScreenProps) {
   const titleId = useId()
   const descriptionId = useId()
   const reducedMotion = useReducedMotion()
@@ -46,7 +43,7 @@ export function CompletionScreen({totalXp, streak, perfect, mistakes, onContinue
         <m.div
           initial={reducedMotion ? false : {scale: 0}}
           animate={{scale: 1}}
-          transition={reducedMotion ? {duration: 0} : {type: 'spring', delay: 0.2}}
+          transition={reducedMotion ? {duration: 0} : {type: 'spring', delay: 0.15, stiffness: 320, damping: 18}}
           className='bg-primary flex h-24 w-24 items-center justify-center rounded-full'
           aria-hidden
         >
@@ -63,52 +60,25 @@ export function CompletionScreen({totalXp, streak, perfect, mistakes, onContinue
             id={titleId}
             className='text-primary font-display text-3xl font-black'
           >
-            Level Complete!
+            Level up!
           </h2>
-          {perfect && (
-            <p
-              id={descriptionId}
-              className='mt-2 text-sm font-bold text-orange-500'
-            >
-              Perfect level! +20 bonus XP
-            </p>
-          )}
-          {!perfect && mistakes > 0 && (
-            <p
-              id={descriptionId}
-              className='text-primary mt-2 text-sm font-bold'
-            >
-              Nice recovery. You fixed {mistakes} mistake
-              {mistakes === 1 ? '' : 's'}.
-            </p>
-          )}
-          {!perfect && mistakes === 0 && (
-            <p
-              id={descriptionId}
-              className='sr-only'
-            >
-              Level completed.
-            </p>
-          )}
+          <p
+            id={descriptionId}
+            className='text-muted-foreground mt-2 text-sm font-bold'
+          >
+            You reached XP level {level}. Keep going!
+          </p>
         </div>
 
-        <div className='flex gap-6 md:gap-8'>
-          <div>
-            <p className='text-muted-foreground text-sm font-bold uppercase'>XP Earned</p>
-            <p className='text-primary text-3xl font-black md:text-4xl'>{totalXp}</p>
-          </div>
-          <div>
-            <p className='text-muted-foreground text-sm font-bold uppercase'>Streak</p>
-            <p className='flex items-center justify-center gap-1 text-3xl font-black text-orange-500 md:text-4xl'>
-              <FireIcon
-                size={22}
-                strokeWidth={2}
-                aria-hidden
-              />
-              {streak}
-            </p>
-          </div>
-        </div>
+        <m.p
+          initial={reducedMotion ? false : {opacity: 0, scale: 0.85}}
+          animate={{opacity: 1, scale: 1}}
+          transition={reducedMotion ? {duration: 0} : {type: 'spring', delay: 0.3, stiffness: 300, damping: 20}}
+          className='text-primary text-6xl font-black tabular-nums md:text-7xl'
+          aria-hidden
+        >
+          {level}
+        </m.p>
 
         <AnimatePresence>
           {showContinue && (

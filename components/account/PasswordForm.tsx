@@ -1,6 +1,7 @@
 'use client'
 
 import {accountInputClassName, accountPrimaryButtonClassName} from '@/components/account/accountStyles'
+import {useToast} from '@/components/providers/ToastProvider'
 import {Card} from '@/components/ui/card'
 import {cn} from '@/lib/utils'
 import {useUser} from '@clerk/nextjs'
@@ -17,6 +18,7 @@ function getClerkErrorMessage(error: unknown) {
 }
 
 export function PasswordForm() {
+  const {toast} = useToast()
   const {user, isLoaded} = useUser()
   const currentPasswordId = useId()
   const newPasswordId = useId()
@@ -25,7 +27,6 @@ export function PasswordForm() {
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   if (!isLoaded) {
@@ -59,7 +60,6 @@ export function PasswordForm() {
 
     setSaving(true)
     setError(null)
-    setMessage(null)
 
     try {
       await user.updatePassword({
@@ -68,9 +68,11 @@ export function PasswordForm() {
       })
       setCurrentPassword('')
       setNewPassword('')
-      setMessage('Password updated.')
+      toast('Password updated.', 'success')
     } catch (err) {
-      setError(getClerkErrorMessage(err))
+      const errorMessage = getClerkErrorMessage(err)
+      setError(errorMessage)
+      toast(errorMessage, 'error')
     } finally {
       setSaving(false)
     }
@@ -171,15 +173,6 @@ export function PasswordForm() {
             className='text-destructive text-sm font-medium'
           >
             {error}
-          </p>
-        ) : null}
-
-        {message ? (
-          <p
-            role='status'
-            className='text-primary text-sm font-medium'
-          >
-            {message}
           </p>
         ) : null}
 
