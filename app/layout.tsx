@@ -61,12 +61,12 @@ export default function RootLayout({
         <link
           rel='apple-touch-startup-image'
           media='screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
-          href='/apps/web/public/splash/11-light.png'
+          href='/splash/11-light.png'
         />
         <link
           rel='apple-touch-startup-image'
           media='screen and (prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)'
-          href='/apps/web/public/splash/11-dark.png'
+          href='/splash/11-dark.png'
         />
       </head>
       <body className='bg-background flex min-h-full flex-col'>
