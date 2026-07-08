@@ -1,10 +1,11 @@
 'use client'
 
+import {CorrectBurst} from '@/components/lesson/CorrectBurst'
 import {Button} from '@/components/ui/button'
 import {Dialog} from '@/components/ui/dialog'
-import {useReducedMotion} from '@/hooks/useReducedMotion'
+import {MotionDialogPanel} from '@/components/ui/motion'
 import {cn} from '@/lib/utils'
-import {AnimatePresence, motion} from 'framer-motion'
+import {AnimatePresence} from 'framer-motion'
 import {Alert02Icon, Tick01Icon} from 'hugeicons-react'
 import {useId} from 'react'
 
@@ -53,7 +54,6 @@ export function ResultDialog({
   const styles = VARIANT_STYLES[variant]
   const titleId = useId()
   const descriptionId = useId()
-  const reducedMotion = useReducedMotion()
 
   return (
     <AnimatePresence>
@@ -66,11 +66,8 @@ export function ResultDialog({
           variant='bottom'
           ariaLive='assertive'
         >
-          <motion.div
-            initial={reducedMotion ? false : {y: '100%'}}
-            animate={{y: 0}}
-            exit={reducedMotion ? undefined : {y: '100%'}}
-            transition={reducedMotion ? {duration: 0} : {type: 'spring', stiffness: 320, damping: 32}}
+          <MotionDialogPanel
+            variant='bottom'
             className={cn(
               'w-full rounded-t-3xl border-t-2 px-5 pt-6 pb-8 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]',
               styles.sheet
@@ -78,9 +75,13 @@ export function ResultDialog({
           >
             <div className='flex items-center gap-3'>
               <div
-                className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-full', styles.iconBg)}
+                className={cn(
+                  'relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
+                  styles.iconBg
+                )}
                 aria-hidden
               >
+                <CorrectBurst show={open && variant === 'correct'} />
                 {variant === 'correct' ? (
                   <Tick01Icon
                     size={28}
@@ -129,7 +130,7 @@ export function ResultDialog({
             >
               {buttonLabel}
             </Button>
-          </motion.div>
+          </MotionDialogPanel>
         </Dialog>
       )}
     </AnimatePresence>

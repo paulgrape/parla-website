@@ -3,7 +3,9 @@
 import {useUserStats} from '@/components/providers/UserStatsProvider'
 import {Button} from '@/components/ui/button'
 import {useApi} from '@/lib/api'
+import {vibrate} from '@/lib/haptics'
 import {playSound} from '@/lib/sound'
+import {didLevelUp, xpToLevel} from '@/lib/xp'
 import type {Exercise} from '@llp/types'
 import {Cancel01Icon} from 'hugeicons-react'
 import {useRouter} from 'next/navigation'
@@ -11,6 +13,7 @@ import {useEffect, useMemo, useReducer, useRef, useState} from 'react'
 
 import {CompletionScreen} from './CompletionScreen'
 import {HeartBar} from './HeartBar'
+import {LevelUpScreen} from './LevelUpScreen'
 import {ProgressBar} from './ProgressBar'
 import {QuitDialog} from './QuitDialog'
 import {ResultDialog} from './ResultDialog'
@@ -53,6 +56,7 @@ type LessonState =
       streakExtended: boolean
       perfect: boolean
       mistakes: number
+      leveledUpTo: number | null
     }
   | {phase: 'listening_skipped_empty'}
   | {phase: 'failed'}
@@ -93,6 +97,7 @@ type LessonAction =
       streakExtended: boolean
       perfect: boolean
       mistakes: number
+      leveledUpTo: number | null
     }
   | {type: 'FAIL'}
 
@@ -299,7 +304,8 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         streak: action.streak,
         streakExtended: action.streakExtended,
         perfect: action.perfect,
-        mistakes: action.mistakes
+        mistakes: action.mistakes,
+        leveledUpTo: action.leveledUpTo
       }
 
     case 'FAIL':
@@ -339,6 +345,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   })
   const [now, setNow] = useState(() => Date.now())
   const [streakScreenDone, setStreakScreenDone] = useState(false)
+  const [levelUpScreenDone, setLevelUpScreenDone] = useState(false)
   const completionPostingRef = useRef(false)
 
   const maxHearts = stats?.maxHearts ?? 5
@@ -388,13 +395,17 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
       body: JSON.stringify({lessonId, xpEarned: state.totalXp})
     })
       .then(result => {
+        const previousXp = result.totalXp - result.xpEarned
+        const leveledUpTo = didLevelUp(previousXp, result.totalXp) ? xpToLevel(result.totalXp) : null
+
         dispatch({
           type: 'COMPLETE',
           totalXp: state.totalXp,
           streak: result.newStreak,
           streakExtended: result.streakExtended,
           perfect: state.perfect,
-          mistakes: state.mistakes
+          mistakes: state.mistakes,
+          leveledUpTo
         })
       })
       .catch(() => {
@@ -404,7 +415,8 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
           streak: 0,
           streakExtended: false,
           perfect: state.perfect,
-          mistakes: state.mistakes
+          mistakes: state.mistakes,
+          leveledUpTo: null
         })
       })
   }, [fetchApi, lessonId, state])
@@ -417,6 +429,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const handleSubmit = (correct: boolean) => {
     if (correct) setCorrectTitle(pickCorrectTitle())
     playSound(correct ? 'correct' : 'wrong')
+    vibrate(correct ? 'correct' : 'wrong')
     if (correct) {
       setShowXpPop(true)
       setTimeout(() => setShowXpPop(false), 1000)
@@ -442,6 +455,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
   const handleMatchMistake = () => {
     if (state.phase !== 'active') return
     playSound('wrong')
+    vibrate('wrong')
     void loseHeart()
     dispatch({type: 'MATCH_MISTAKE'})
   }
@@ -470,6 +484,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
 
     setCorrectTitle(pickCorrectTitle())
     playSound('correct')
+    vibrate('correct')
     setShowXpPop(true)
     setTimeout(() => setShowXpPop(false), 1000)
     dispatch({type: 'MATCH_COMPLETE'})
@@ -479,6 +494,7 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
     if (hearts <= 0) return
     completionPostingRef.current = false
     setStreakScreenDone(false)
+    setLevelUpScreenDone(false)
     dispatch({type: 'START', exerciseIds: levelExerciseIds, lives: hearts})
   }
 
@@ -606,6 +622,15 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
         <StreakExtendScreen
           streak={state.streak}
           onContinue={() => setStreakScreenDone(true)}
+        />
+      )
+    }
+
+    if (state.leveledUpTo && !levelUpScreenDone) {
+      return (
+        <LevelUpScreen
+          level={state.leveledUpTo}
+          onContinue={() => setLevelUpScreenDone(true)}
         />
       )
     }

@@ -1,5 +1,6 @@
 'use client'
 
+import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {cn} from '@/lib/utils'
 import {ArrowDown01Icon} from 'hugeicons-react'
 import {useId, useState} from 'react'
@@ -13,6 +14,7 @@ interface AccordionItemProps {
 export function AccordionItem({title, children, defaultOpen = false}: AccordionItemProps) {
   const [open, setOpen] = useState(defaultOpen)
   const panelId = useId()
+  const reducedMotion = useReducedMotion()
 
   return (
     <div className='border-border border-b-2 last:border-b-0'>
@@ -28,18 +30,31 @@ export function AccordionItem({title, children, defaultOpen = false}: AccordionI
           size={20}
           strokeWidth={2}
           aria-hidden
-          className={cn('text-muted-foreground shrink-0 transition-transform', open && 'rotate-180')}
+          className={cn(
+            'text-muted-foreground shrink-0 transition-transform',
+            !reducedMotion && 'duration-200',
+            open && 'rotate-180'
+          )}
         />
       </button>
-      {open && (
-        <div
-          id={panelId}
-          role='region'
-          className='pb-4'
-        >
-          {children}
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows]',
+          reducedMotion ? 'duration-0' : 'duration-200 ease-out',
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
+      >
+        <div className='overflow-hidden'>
+          <div
+            id={panelId}
+            role='region'
+            className={cn('pb-4', !open && 'invisible')}
+            aria-hidden={!open}
+          >
+            {children}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import {AuthProvider} from '@/components/providers/AuthProvider'
+import {MotionProvider} from '@/components/providers/MotionProvider'
 import {SerwistProvider} from '@/components/providers/SerwistProvider'
 import {ThemeProvider} from '@/components/providers/ThemeProvider'
 import {APP_DEFAULT_TITLE, APP_DESCRIPTION, APP_NAME} from '@/lib/constants'
@@ -59,7 +60,9 @@ export default function RootLayout({
       <body className='bg-background flex min-h-full flex-col'>
         <SerwistProvider swUrl='/serwist/sw.js'>
           <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <MotionProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </MotionProvider>
           </ThemeProvider>
         </SerwistProvider>
       </body>

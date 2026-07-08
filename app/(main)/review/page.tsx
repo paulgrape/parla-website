@@ -1,19 +1,25 @@
 'use client'
 
+import {ReviewComplete} from '@/components/review/ReviewComplete'
+import {REVIEW_CARD_EXIT_MS, ReviewFlashcard} from '@/components/review/ReviewFlashcard'
 import {ReviewSkeleton} from '@/components/skeletons/PageSkeletons'
 import {Button} from '@/components/ui/button'
+import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {useApi} from '@/lib/api'
-import {cn} from '@/lib/utils'
 import type {ReviewItem} from '@llp/types'
+import {AnimatePresence, m} from 'framer-motion'
 import {useEffect, useState} from 'react'
 
 export default function ReviewPage() {
   const {fetchApi} = useApi()
+  const reducedMotion = useReducedMotion()
   const [items, setItems] = useState<ReviewItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [loading, setLoading] = useState(true)
   const [done, setDone] = useState(false)
+  const [exiting, setExiting] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     fetchApi<ReviewItem[]>('/review')
@@ -27,20 +33,39 @@ export default function ReviewPage() {
 
   const current = items[currentIndex]
 
+  const advanceAfterSubmit = () => {
+    const exitMs = reducedMotion ? 0 : REVIEW_CARD_EXIT_MS
+
+    window.setTimeout(() => {
+      if (currentIndex + 1 >= items.length) {
+        setDone(true)
+      } else {
+        setCurrentIndex(i => i + 1)
+        setFlipped(false)
+      }
+      setExiting(false)
+      setSubmitting(false)
+    }, exitMs)
+  }
+
   const submitQuality = async (quality: number) => {
-    if (!current) return
+    if (!current || submitting) return
 
-    await fetchApi(`/review/${current.id}`, {
-      method: 'POST',
-      body: JSON.stringify({quality})
-    })
+    setSubmitting(true)
+    setExiting(true)
 
-    if (currentIndex + 1 >= items.length) {
-      setDone(true)
-    } else {
-      setCurrentIndex(i => i + 1)
-      setFlipped(false)
+    try {
+      await fetchApi(`/review/${current.id}`, {
+        method: 'POST',
+        body: JSON.stringify({quality})
+      })
+    } catch {
+      setExiting(false)
+      setSubmitting(false)
+      return
     }
+
+    advanceAfterSubmit()
   }
 
   if (loading) {
@@ -48,13 +73,7 @@ export default function ReviewPage() {
   }
 
   if (done) {
-    return (
-      <div className='mx-auto max-w-md space-y-4 py-20 text-center'>
-        <h1 className='text-2xl font-black'>All caught up!</h1>
-        <p className='text-muted-foreground'>No vocabulary due for review right now.</p>
-        <Button onClick={() => (window.location.href = '/dashboard')}>Back to map</Button>
-      </div>
-    )
+    return <ReviewComplete onBack={() => (window.location.href = '/dashboard')} />
   }
 
   return (
@@ -66,46 +85,44 @@ export default function ReviewPage() {
         </p>
       </div>
 
-      <button
-        type='button'
-        onClick={() => setFlipped(!flipped)}
-        aria-pressed={flipped}
-        aria-label={
-          flipped
-            ? `Showing English: ${current.english}. Press to show Italian.`
-            : `Showing Italian: ${current.italian}. Press to show English.`
-        }
-        className={cn(
-          'border-border bg-card focus-visible:ring-primary flex min-h-[200px] w-full cursor-pointer flex-col items-center justify-center rounded-3xl border-2 p-6 text-left transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-          flipped && 'bg-primary/5 border-primary'
-        )}
-      >
-        <p className='text-muted-foreground mb-2 text-sm font-bold uppercase'>{flipped ? 'English' : 'Italian'}</p>
-        <p className='text-3xl font-black'>{flipped ? current.english : current.italian}</p>
-        <p className='text-muted-foreground mt-4 text-xs'>Tap or press to flip</p>
-      </button>
+      <AnimatePresence mode='wait'>
+        <ReviewFlashcard
+          key={current.id}
+          item={current}
+          flipped={flipped}
+          exiting={exiting}
+          onFlip={() => !submitting && setFlipped(open => !open)}
+        />
+      </AnimatePresence>
 
-      {flipped && (
-        <div
-          className='grid grid-cols-3 gap-2'
-          role='group'
-          aria-label='Rate how well you remembered this word'
-        >
-          {[
-            {label: 'Hard', quality: 1},
-            {label: 'Good', quality: 3},
-            {label: 'Easy', quality: 5}
-          ].map(({label, quality}) => (
-            <Button
-              key={quality}
-              variant={quality === 5 ? 'default' : 'outline'}
-              onClick={() => submitQuality(quality)}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {flipped && !exiting && (
+          <m.div
+            initial={reducedMotion ? false : {opacity: 0, y: 8}}
+            animate={{opacity: 1, y: 0}}
+            exit={reducedMotion ? undefined : {opacity: 0, y: 8}}
+            transition={{duration: reducedMotion ? 0 : 0.25}}
+            className='grid grid-cols-3 gap-2'
+            role='group'
+            aria-label='Rate how well you remembered this word'
+          >
+            {[
+              {label: 'Hard', quality: 1},
+              {label: 'Good', quality: 3},
+              {label: 'Easy', quality: 5}
+            ].map(({label, quality}) => (
+              <Button
+                key={quality}
+                variant={quality === 5 ? 'default' : 'outline'}
+                disabled={submitting}
+                onClick={() => submitQuality(quality)}
+              >
+                {label}
+              </Button>
+            ))}
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

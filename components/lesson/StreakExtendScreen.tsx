@@ -2,8 +2,9 @@
 
 import {Button} from '@/components/ui/button'
 import {Dialog} from '@/components/ui/dialog'
+import {MotionDialogPanel, SlideUp} from '@/components/ui/motion'
 import {useReducedMotion} from '@/hooks/useReducedMotion'
-import {AnimatePresence, motion} from 'framer-motion'
+import {AnimatePresence, m} from 'framer-motion'
 import {FireIcon} from 'hugeicons-react'
 import {useEffect, useId, useState} from 'react'
 
@@ -47,13 +48,8 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
       className='bg-background/95'
       panelClassName='w-full max-w-md'
     >
-      <motion.div
-        initial={reducedMotion ? false : {opacity: 0, scale: 0.9}}
-        animate={{opacity: 1, scale: 1}}
-        transition={reducedMotion ? {duration: 0} : {type: 'spring', stiffness: 260, damping: 22}}
-        className='relative flex flex-col items-center gap-6 px-6 pt-6 pb-24 text-center'
-      >
-        <motion.div
+      <MotionDialogPanel className='relative flex flex-col items-center gap-6 px-6 pt-6 pb-24 text-center'>
+        <m.div
           initial={reducedMotion ? false : {scale: 0.85}}
           animate={{scale: fireActive ? 1 : 0.92}}
           transition={
@@ -68,7 +64,7 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
           }`}
           aria-hidden
         >
-          <motion.div
+          <m.div
             animate={
               fireActive && !reducedMotion ? {scale: [1, 1.12, 1], rotate: [0, -8, 8, 0]} : {scale: 1, rotate: 0}
             }
@@ -80,8 +76,8 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
               className={fireActive ? 'text-white' : 'text-muted-foreground'}
               fill={fireActive ? 'currentColor' : 'none'}
             />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         <div>
           <h2
@@ -100,7 +96,7 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
 
         <div className='relative flex h-20 items-center justify-center'>
           <AnimatePresence mode='wait'>
-            <motion.p
+            <m.p
               key={displayValue}
               initial={reducedMotion ? false : {opacity: 0, y: 16, scale: 0.85}}
               animate={{opacity: 1, y: 0, scale: 1}}
@@ -112,19 +108,13 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
               aria-live='polite'
             >
               {displayValue}
-            </motion.p>
+            </m.p>
           </AnimatePresence>
         </div>
 
         <AnimatePresence>
           {showContinue && (
-            <motion.div
-              initial={reducedMotion ? false : {opacity: 0, y: 16}}
-              animate={{opacity: 1, y: 0}}
-              exit={{opacity: 0, y: 16}}
-              transition={reducedMotion ? {duration: 0} : {duration: 0.35, ease: 'easeOut'}}
-              className='absolute inset-x-6 bottom-6'
-            >
+            <SlideUp className='absolute inset-x-6 bottom-6'>
               <Button
                 onClick={onContinue}
                 size='lg'
@@ -132,10 +122,10 @@ export function StreakExtendScreen({streak, onContinue}: StreakExtendScreenProps
               >
                 Continue
               </Button>
-            </motion.div>
+            </SlideUp>
           )}
         </AnimatePresence>
-      </motion.div>
+      </MotionDialogPanel>
     </Dialog>
   )
 }
