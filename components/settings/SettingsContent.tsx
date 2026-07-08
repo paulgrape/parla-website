@@ -1,5 +1,6 @@
 'use client'
 
+import {IOSInstallSettingsAction} from '@/components/settings/IOSInstallSettingsAction'
 import {PreferencesTab} from '@/components/settings/PreferencesTab'
 import {ProfileTab} from '@/components/settings/ProfileTab'
 import {cn} from '@/lib/utils'
@@ -61,6 +62,8 @@ export function SettingsContent() {
       >
         {tab === 'preferences' ? <PreferencesTab /> : <ProfileTab />}
       </div>
+
+      <IOSInstallSettingsAction />
     </div>
   )
 }

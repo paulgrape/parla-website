@@ -7,42 +7,66 @@ import {MotionDialogPanel} from '@/components/ui/motion'
 import {useIOSInstallPrompt} from '@/hooks/useIOSInstallPrompt'
 import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {APP_NAME} from '@/lib/constants'
-import {AnimatePresence} from 'framer-motion'
+import {IOS_INSTALL_FORCE_EVENT} from '@/lib/pwa'
+import {AnimatePresence, m} from 'framer-motion'
 import {Cancel01Icon} from 'hugeicons-react'
-import {useId} from 'react'
+import {useEffect, useId, useState} from 'react'
 
-const INSTALL_STEPS: InstallStep[] = [
+export const INSTALL_STEPS: InstallStep[] = [
   {
-    src: '/pwa/step-1.svg',
-    alt: 'Safari browser with the Share button highlighted in the bottom toolbar',
-    caption: '1. Tap Share in Safari'
+    srcLight: '/pwa/step-1-light.svg',
+    srcDark: '/pwa/step-1-dark.svg',
+    alt: 'Browser toolbar with the three-dots menu button highlighted',
+    caption: '1. Tap the ••• menu'
   },
   {
-    src: '/pwa/step-2.svg',
-    alt: 'iOS share sheet with Add to Home Screen highlighted',
-    caption: '2. Choose Add to Home Screen'
+    srcLight: '/pwa/step-2-light.svg',
+    srcDark: '/pwa/step-2-dark.svg',
+    alt: 'Browser menu with the Share option highlighted',
+    caption: '2. Tap Share'
   },
   {
-    src: '/pwa/step-3.svg',
-    alt: 'Add to Home Screen confirmation with Add button highlighted',
-    caption: '3. Tap Add to install'
+    srcLight: '/pwa/step-3-light.svg',
+    srcDark: '/pwa/step-3-dark.svg',
+    alt: 'Share sheet for Parla with the View More button highlighted',
+    caption: '3. Tap View More'
+  },
+  {
+    srcLight: '/pwa/step-4-light.svg',
+    srcDark: '/pwa/step-4-dark.svg',
+    alt: 'Share actions list with Add to Home Screen highlighted',
+    caption: '4. Tap Add to Home Screen'
+  },
+  {
+    srcLight: '/pwa/step-5-light.svg',
+    srcDark: '/pwa/step-5-dark.svg',
+    alt: 'Add to Home Screen confirmation for Parla with the Add button highlighted',
+    caption: '5. Tap Add'
   }
 ]
 
-export function IOSInstallPrompt() {
-  const {shouldShow, dismiss} = useIOSInstallPrompt()
+interface IOSInstallSheetProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function IOSInstallSheet({open, onClose}: IOSInstallSheetProps) {
   const titleId = useId()
   const descriptionId = useId()
   const reducedMotion = useReducedMotion()
 
+  const handleClose = () => {
+    onClose()
+  }
+
   return (
     <AnimatePresence>
-      {shouldShow && (
+      {open && (
         <Dialog
-          open={shouldShow}
+          open={open}
           titleId={titleId}
           descriptionId={descriptionId}
-          onClose={dismiss}
+          onClose={handleClose}
           closeOnBackdrop
           closeOnEscape
           backdropLabel='Dismiss install tip'
@@ -50,63 +74,94 @@ export function IOSInstallPrompt() {
         >
           <MotionDialogPanel
             variant='bottom'
-            drag={reducedMotion ? false : 'y'}
-            dragConstraints={{top: 0, bottom: 0}}
-            dragElastic={{top: 0, bottom: 0.4}}
-            onDragEnd={(_, info) => {
-              if (info.offset.y > 80 || info.velocity.y > 500) dismiss()
-            }}
-            className='bg-card border-border w-full rounded-t-3xl border-t-2 px-5 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.08)]'
+            className='bg-card border-border flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border-t-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]'
           >
-            <div
-              className='bg-border mx-auto mb-3 h-1.5 w-10 rounded-full'
-              aria-hidden
-            />
+            <m.div
+              drag={reducedMotion ? false : 'y'}
+              dragConstraints={{top: 0, bottom: 0}}
+              dragElastic={{top: 0, bottom: 0.4}}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 80 || info.velocity.y > 500) handleClose()
+              }}
+              className='shrink-0 cursor-grab touch-pan-y px-5 pt-3 active:cursor-grabbing'
+            >
+              <div
+                className='bg-border mx-auto h-1.5 w-10 rounded-full'
+                aria-hidden
+              />
+            </m.div>
 
-            <div className='mb-4 flex items-start justify-between gap-3'>
-              <div className='min-w-0'>
-                <h2
-                  id={titleId}
-                  className='font-display text-foreground text-xl font-bold'
+            <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]'>
+              <div className='mb-4 flex items-start justify-between gap-3'>
+                <div className='min-w-0'>
+                  <h2
+                    id={titleId}
+                    className='font-display text-foreground text-xl font-bold'
+                  >
+                    Install {APP_NAME}
+                  </h2>
+                  <p
+                    id={descriptionId}
+                    className='text-muted-foreground mt-1 text-sm'
+                  >
+                    Add to your Home Screen for a faster, full-screen experience.
+                  </p>
+                </div>
+
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  aria-label='Close install tip'
+                  onClick={handleClose}
+                  className='shrink-0'
                 >
-                  Install {APP_NAME}
-                </h2>
-                <p
-                  id={descriptionId}
-                  className='text-muted-foreground mt-1 text-sm'
-                >
-                  Add to your Home Screen for a faster, full-screen experience.
-                </p>
+                  <Cancel01Icon
+                    className='size-5'
+                    aria-hidden
+                  />
+                </Button>
               </div>
+
+              <InstallCarousel steps={INSTALL_STEPS} />
 
               <Button
                 type='button'
-                variant='ghost'
-                size='sm'
-                aria-label='Close install tip'
-                onClick={dismiss}
-                className='shrink-0'
+                variant='outline'
+                className='mt-4 w-full'
+                onClick={handleClose}
               >
-                <Cancel01Icon
-                  className='size-5'
-                  aria-hidden
-                />
+                Maybe later
               </Button>
             </div>
-
-            <InstallCarousel steps={INSTALL_STEPS} />
-
-            <Button
-              type='button'
-              variant='outline'
-              className='mt-4 w-full'
-              onClick={dismiss}
-            >
-              Maybe later
-            </Button>
           </MotionDialogPanel>
         </Dialog>
       )}
     </AnimatePresence>
+  )
+}
+
+export function IOSInstallPrompt() {
+  const {shouldShow, dismiss} = useIOSInstallPrompt()
+  const [forcedOpen, setForcedOpen] = useState(false)
+
+  useEffect(() => {
+    const onForce = () => setForcedOpen(true)
+    window.addEventListener(IOS_INSTALL_FORCE_EVENT, onForce)
+    return () => window.removeEventListener(IOS_INSTALL_FORCE_EVENT, onForce)
+  }, [])
+
+  const open = shouldShow || forcedOpen
+
+  const handleClose = () => {
+    if (forcedOpen) setForcedOpen(false)
+    if (shouldShow) dismiss()
+  }
+
+  return (
+    <IOSInstallSheet
+      open={open}
+      onClose={handleClose}
+    />
   )
 }

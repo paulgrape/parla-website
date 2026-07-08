@@ -1,4 +1,11 @@
 export const IOS_INSTALL_DISMISSED_KEY = 'llp:ios-install-dismissed'
+export const IOS_INSTALL_STATE_EVENT = 'llp:ios-install-state-change'
+export const IOS_INSTALL_FORCE_EVENT = 'llp:ios-install-force'
+
+function dispatchIOSInstallStateChange() {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new Event(IOS_INSTALL_STATE_EVENT))
+}
 
 export function isIOS(): boolean {
   if (typeof window === 'undefined') return false
@@ -48,9 +55,29 @@ export function setIOSInstallDismissed(): void {
   if (typeof window === 'undefined') return
   try {
     window.localStorage.setItem(IOS_INSTALL_DISMISSED_KEY, '1')
+    dispatchIOSInstallStateChange()
   } catch {
     // ignore quota / private mode
   }
+}
+
+export function clearIOSInstallDismissed(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(IOS_INSTALL_DISMISSED_KEY)
+    dispatchIOSInstallStateChange()
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+export function requestIOSInstallPrompt(): void {
+  clearIOSInstallDismissed()
+}
+
+export function forceIOSInstallPrompt(): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new Event(IOS_INSTALL_FORCE_EVENT))
 }
 
 export function shouldShowIOSInstallPrompt(): boolean {

@@ -3,13 +3,14 @@
 import {Button} from '@/components/ui/button'
 import {useReducedMotion} from '@/hooks/useReducedMotion'
 import {cn} from '@/lib/utils'
-import {animate, m, useMotionValue} from 'framer-motion'
 import {ArrowLeft01Icon, ArrowRight01Icon} from 'hugeicons-react'
+import {useTheme} from 'next-themes'
 import Image from 'next/image'
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useRef, useState, useSyncExternalStore} from 'react'
 
 export interface InstallStep {
-  src: string
+  srcLight: string
+  srcDark: string
   alt: string
   caption: string
 }
@@ -23,8 +24,16 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
   const [index, setIndex] = useState(0)
   const [width, setWidth] = useState(0)
   const viewportRef = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0)
+  const scrollRafRef = useRef<number | null>(null)
+  const prevWidthRef = useRef(0)
   const reducedMotion = useReducedMotion()
+  const {resolvedTheme} = useTheme()
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
+  const isDark = mounted && resolvedTheme === 'dark'
 
   useEffect(() => {
     const node = viewportRef.current
@@ -40,67 +49,81 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
 
   const goTo = useCallback(
     (next: number) => {
+      const node = viewportRef.current
+      if (!node || width <= 0) return
+
       const clamped = Math.max(0, Math.min(steps.length - 1, next))
       setIndex(clamped)
-      if (width <= 0) return
-      if (reducedMotion) {
-        x.set(-clamped * width)
-        return
-      }
-      void animate(x, -clamped * width, {type: 'spring', stiffness: 320, damping: 32})
+      node.scrollTo({
+        left: clamped * width,
+        behavior: reducedMotion ? 'auto' : 'smooth'
+      })
     },
-    [reducedMotion, steps.length, width, x]
+    [reducedMotion, steps.length, width]
   )
 
   useEffect(() => {
-    if (width <= 0) return
-    x.set(-index * width)
-  }, [index, width, x])
+    const node = viewportRef.current
+    if (!node || width <= 0) return
 
-  const onDragEnd = (_: unknown, info: {offset: {x: number}; velocity: {x: number}}) => {
-    const threshold = width * 0.2
-    if (info.offset.x < -threshold || info.velocity.x < -400) {
-      goTo(index + 1)
-    } else if (info.offset.x > threshold || info.velocity.x > 400) {
-      goTo(index - 1)
-    } else {
-      goTo(index)
+    const onScroll = () => {
+      if (scrollRafRef.current !== null) return
+      scrollRafRef.current = window.requestAnimationFrame(() => {
+        scrollRafRef.current = null
+        const nextIndex = Math.round(node.scrollLeft / width)
+        setIndex(Math.max(0, Math.min(steps.length - 1, nextIndex)))
+      })
     }
-  }
+
+    node.addEventListener('scroll', onScroll, {passive: true})
+    return () => {
+      node.removeEventListener('scroll', onScroll)
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current)
+      }
+    }
+  }, [steps.length, width])
+
+  useEffect(() => {
+    const node = viewportRef.current
+    if (!node || width <= 0) return
+    if (prevWidthRef.current === width) return
+    node.scrollLeft = index * width
+    prevWidthRef.current = width
+  }, [index, width])
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
       <div
         ref={viewportRef}
-        className='relative overflow-hidden rounded-2xl'
+        className='relative -mx-1 flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain scroll-smooth [&::-webkit-scrollbar]:hidden'
+        style={{touchAction: 'pan-x'}}
+        aria-roledescription='carousel'
+        aria-label='Install steps'
       >
-        <m.div
-          className='flex touch-pan-y'
-          style={{x}}
-          drag={reducedMotion ? false : 'x'}
-          dragConstraints={width > 0 ? {left: -(steps.length - 1) * width, right: 0} : undefined}
-          dragElastic={0.12}
-          onDragEnd={onDragEnd}
-        >
-          {steps.map(step => (
-            <div
-              key={step.src}
-              className='w-full shrink-0 px-1'
-              style={{width: width || '100%'}}
-            >
-              <div className='bg-muted relative aspect-[390/520] overflow-hidden rounded-2xl'>
-                <Image
-                  src={step.src}
-                  alt={step.alt}
-                  fill
-                  className='object-cover'
-                  sizes='(max-width: 512px) 100vw, 480px'
-                  unoptimized
-                />
-              </div>
+        {steps.map((step, i) => (
+          <div
+            key={step.alt}
+            className='w-full shrink-0 snap-center snap-always px-1'
+            style={{width: width || '100%'}}
+            role='group'
+            aria-roledescription='slide'
+            aria-label={`${i + 1} of ${steps.length}`}
+            aria-hidden={i !== index}
+          >
+            <div className='bg-muted relative aspect-[390/520] max-h-[34dvh] w-full overflow-hidden rounded-2xl sm:max-h-[42dvh]'>
+              <Image
+                src={isDark ? step.srcDark : step.srcLight}
+                alt={step.alt}
+                fill
+                className='object-contain'
+                sizes='(max-width: 512px) 100vw, 480px'
+                unoptimized
+                draggable={false}
+              />
             </div>
-          ))}
-        </m.div>
+          </div>
+        ))}
       </div>
 
       <p
@@ -131,7 +154,7 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
         >
           {steps.map((step, i) => (
             <span
-              key={step.src}
+              key={step.alt}
               className={cn('size-2 rounded-full transition-colors', i === index ? 'bg-primary' : 'bg-border')}
             />
           ))}

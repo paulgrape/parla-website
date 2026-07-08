@@ -1,19 +1,23 @@
 'use client'
 
-import {IOS_INSTALL_DISMISSED_KEY, setIOSInstallDismissed, shouldShowIOSInstallPrompt} from '@/lib/pwa'
+import {
+  IOS_INSTALL_STATE_EVENT,
+  clearIOSInstallDismissed,
+  forceIOSInstallPrompt,
+  setIOSInstallDismissed,
+  shouldShowIOSInstallPrompt
+} from '@/lib/pwa'
 import {useCallback, useSyncExternalStore} from 'react'
 
-const DISMISS_EVENT = 'llp:ios-install-dismissed'
-
-function subscribeDismissed(onStoreChange: () => void) {
+function subscribeIOSInstallState(onStoreChange: () => void) {
   const onStorage = (event: StorageEvent) => {
-    if (event.key === IOS_INSTALL_DISMISSED_KEY) onStoreChange()
+    if (event.key === 'llp:ios-install-dismissed') onStoreChange()
   }
   window.addEventListener('storage', onStorage)
-  window.addEventListener(DISMISS_EVENT, onStoreChange)
+  window.addEventListener(IOS_INSTALL_STATE_EVENT, onStoreChange)
   return () => {
     window.removeEventListener('storage', onStorage)
-    window.removeEventListener(DISMISS_EVENT, onStoreChange)
+    window.removeEventListener(IOS_INSTALL_STATE_EVENT, onStoreChange)
   }
 }
 
@@ -26,12 +30,18 @@ function getServerSnapshot() {
 }
 
 export function useIOSInstallPrompt() {
-  const shouldShow = useSyncExternalStore(subscribeDismissed, getShouldShowSnapshot, getServerSnapshot)
+  const shouldShow = useSyncExternalStore(subscribeIOSInstallState, getShouldShowSnapshot, getServerSnapshot)
 
   const dismiss = useCallback(() => {
     setIOSInstallDismissed()
-    window.dispatchEvent(new Event(DISMISS_EVENT))
   }, [])
 
-  return {shouldShow, dismiss}
+  const showAgain = useCallback(() => {
+    clearIOSInstallDismissed()
+    if (!shouldShowIOSInstallPrompt()) {
+      forceIOSInstallPrompt()
+    }
+  }, [])
+
+  return {shouldShow, dismiss, showAgain}
 }

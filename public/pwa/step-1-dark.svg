@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="390" height="520" viewBox="0 0 390 520"><rect width="390" height="520" rx="24" fill="#0f0f0f"/>
+  <text x="195" y="60" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="600" fill="#b0b0b0" text-anchor="middle">Open the site in your browser</text>
+  <rect x="40" y="120" width="310" height="200" rx="16" fill="#1a1a1a" stroke="#333333" stroke-width="1.5"/>
+  <rect x="64" y="150" width="180" height="12" rx="6" fill="#242424"/>
+  <rect x="64" y="180" width="262" height="40" rx="10" fill="#242424"/>
+  <rect x="64" y="237" width="120" height="14" rx="10" fill="#242424"/>
+  <rect x="64" y="266" width="262" height="36" rx="10" fill="#242424"/>
+  <!-- toolbar -->
+  <circle cx="52" cy="400" r="22" fill="#242424"/>
+  <path d="M58 392l-10 8 10 8" fill="none" stroke="#f5f5f5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="86" y="378" width="196" height="44" rx="22" fill="#242424"/>
+  <text x="182" y="405" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="600" fill="#f5f5f5" text-anchor="middle">parla-it.vercel.app</text>
+  <circle cx="320" cy="400" r="22" fill="#242424"/>
+  <circle cx="311" cy="400" r="2.6" fill="#f5f5f5"/><circle cx="320" cy="400" r="2.6" fill="#f5f5f5"/><circle cx="329" cy="400" r="2.6" fill="#f5f5f5"/>
+  <rect x="292" y="372" width="56" height="56" rx="28" fill="#58cc02" fill-opacity="0.12" stroke="#58cc02" stroke-width="3"/></svg>
