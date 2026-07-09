@@ -1,6 +1,7 @@
 'use client'
 
 import {ProfileStatsHeader} from '@/components/account/ProfileStatsHeader'
+import {AvatarPlaceholder, TextSkeleton} from '@/components/skeletons/UserStatsSkeletons'
 import {cn} from '@/lib/utils'
 import {useClerk, useUser} from '@clerk/nextjs'
 import {Logout01Icon, Settings01Icon} from 'hugeicons-react'
@@ -115,7 +116,7 @@ function getPopoverPosition(trigger: HTMLElement, variant: 'full' | 'compact'): 
 }
 
 export function UserMenu({variant = 'full'}: UserMenuProps) {
-  const {user} = useUser()
+  const {user, isLoaded} = useUser()
   const {signOut} = useClerk()
   const router = useRouter()
   const menuId = useId()
@@ -126,7 +127,8 @@ export function UserMenu({variant = 'full'}: UserMenuProps) {
   const [signingOut, setSigningOut] = useState(false)
   const [position, setPosition] = useState<PopoverPosition | null>(null)
 
-  const displayName = user?.firstName || user?.username || 'Account'
+  const identityPending = !isLoaded
+  const displayName = user?.firstName || user?.username || ''
   const fallback = displayName.charAt(0).toUpperCase()
 
   useEffect(() => {
@@ -278,26 +280,40 @@ export function UserMenu({variant = 'full'}: UserMenuProps) {
       {variant === 'full' ? (
         <button
           {...triggerProps}
+          aria-busy={identityPending}
           className='hover:bg-muted focus-visible:ring-primary flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
-          <UserAvatar
-            imageUrl={user?.imageUrl}
-            fallback={fallback}
-            size={36}
-          />
-          <span className='min-w-0 flex-1 truncate text-sm'>{displayName}</span>
+          {identityPending ? (
+            <AvatarPlaceholder size={36} />
+          ) : (
+            <UserAvatar
+              imageUrl={user?.imageUrl}
+              fallback={fallback}
+              size={36}
+            />
+          )}
+          {identityPending ? (
+            <TextSkeleton className='h-4 w-24' />
+          ) : (
+            <span className='min-w-0 flex-1 truncate text-sm'>{displayName}</span>
+          )}
         </button>
       ) : (
         <button
           {...triggerProps}
           aria-label='Open account menu'
+          aria-busy={identityPending}
           className='focus-visible:ring-primary flex items-center rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
         >
-          <UserAvatar
-            imageUrl={user?.imageUrl}
-            fallback={fallback}
-            size={32}
-          />
+          {identityPending ? (
+            <AvatarPlaceholder size={32} />
+          ) : (
+            <UserAvatar
+              imageUrl={user?.imageUrl}
+              fallback={fallback}
+              size={32}
+            />
+          )}
         </button>
       )}
 

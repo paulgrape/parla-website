@@ -31,7 +31,7 @@ const UNIT_THEMES = [
   {banner: 'bg-pink-500', shadow: '#be185d'}
 ]
 
-export function UnitMap({units, completedLessons, heartsAvailable = true, sectionOrder = 1}: UnitMapProps) {
+export function UnitMap({units, completedLessons, heartsAvailable, sectionOrder = 1}: UnitMapProps) {
   const reducedMotion = useReducedMotion()
   const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
@@ -132,7 +132,7 @@ export function UnitMap({units, completedLessons, heartsAvailable = true, sectio
                 const globalIndex = allLessons.findIndex(l => l.id === lesson.id)
                 const completed = completedLessons.includes(lesson.id)
                 const unlocked = isUnlocked(lesson.id, globalIndex)
-                const canOpen = unlocked && heartsAvailable
+                const canOpen = unlocked && heartsAvailable !== false
                 const isNext = lesson.id === nextLessonId
                 const offset = WAVE_OFFSETS[lessonIndex % WAVE_OFFSETS.length]
                 const lessonLabel = `Level ${lesson.order}: ${lesson.title}${
@@ -140,7 +140,7 @@ export function UnitMap({units, completedLessons, heartsAvailable = true, sectio
                     ? ', completed'
                     : !unlocked
                       ? ', locked'
-                      : !heartsAvailable
+                      : heartsAvailable === false
                         ? ', no hearts'
                         : isNext
                           ? ', current'
@@ -156,7 +156,7 @@ export function UnitMap({units, completedLessons, heartsAvailable = true, sectio
                     : unlocked
                       ? 'border-primary-dark bg-primary text-white shadow-[0_8px_0_0_#46a302] hover:translate-y-1 hover:shadow-[0_4px_0_0_#46a302] active:translate-y-2 active:shadow-none'
                       : 'cursor-not-allowed border-border bg-muted text-muted-foreground shadow-[0_8px_0_0_var(--shadow-raised)]',
-                  unlocked && !heartsAvailable && 'cursor-not-allowed opacity-60'
+                  unlocked && heartsAvailable === false && 'cursor-not-allowed opacity-60'
                 )
 
                 const nodeIcon = completed ? (

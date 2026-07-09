@@ -3,6 +3,7 @@
 import {IOSInstallSettingsAction} from '@/components/settings/IOSInstallSettingsAction'
 import {PreferencesTab} from '@/components/settings/PreferencesTab'
 import {ProfileTab} from '@/components/settings/ProfileTab'
+import {useIsIOS} from '@/hooks/useIsIOS'
 import {cn} from '@/lib/utils'
 import {useRouter, useSearchParams} from 'next/navigation'
 import {useId} from 'react'
@@ -18,6 +19,7 @@ export function SettingsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const baseId = useId()
+  const isIos = useIsIOS()
   const tab: SettingsTab = searchParams.get('tab') === 'profile' ? 'profile' : 'preferences'
 
   function selectTab(next: SettingsTab) {
@@ -63,7 +65,7 @@ export function SettingsContent() {
         {tab === 'preferences' ? <PreferencesTab /> : <ProfileTab />}
       </div>
 
-      <IOSInstallSettingsAction />
+      {isIos ? <IOSInstallSettingsAction /> : null}
     </div>
   )
 }

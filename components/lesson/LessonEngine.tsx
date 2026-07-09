@@ -1,13 +1,14 @@
 'use client'
 
 import {useUserStats} from '@/components/providers/UserStatsProvider'
+import {ValueSkeleton} from '@/components/skeletons/UserStatsSkeletons'
 import {Button} from '@/components/ui/button'
 import {useApi} from '@/lib/api'
 import {vibrate} from '@/lib/haptics'
 import {playSound} from '@/lib/sound'
 import {didLevelUp, xpToLevel} from '@/lib/xp'
 import type {Exercise} from '@llp/types'
-import {Cancel01Icon} from 'hugeicons-react'
+import {Cancel01Icon, FavouriteIcon} from 'hugeicons-react'
 import {useRouter} from 'next/navigation'
 import {useEffect, useMemo, useReducer, useRef, useState} from 'react'
 
@@ -519,7 +520,34 @@ export function LessonEngine({lessonId, exercises}: LessonEngineProps) {
 
   if (state.phase === 'idle') {
     if (loading && !stats) {
-      return <p className='text-muted-foreground py-20 text-center'>Loading your hearts...</p>
+      return (
+        <div
+          className='flex flex-col items-center justify-center gap-6 py-20'
+          role='status'
+          aria-busy='true'
+        >
+          <span className='sr-only'>Loading your hearts</span>
+          <h2 className='text-2xl font-black'>Ready for this level?</h2>
+          <p className='text-muted-foreground flex items-center gap-2'>
+            {levelExercises.length} exercises ·
+            <span
+              className='inline-flex items-center gap-0.5'
+              aria-hidden
+            >
+              {Array.from({length: 5}).map((_, index) => (
+                <FavouriteIcon
+                  key={index}
+                  size={16}
+                  strokeWidth={2}
+                  className='text-destructive animate-pulse'
+                  fill='currentColor'
+                />
+              ))}
+            </span>
+            <ValueSkeleton className='h-4 w-14' />
+          </p>
+        </div>
+      )
     }
 
     if (!loading && hearts <= 0) {
