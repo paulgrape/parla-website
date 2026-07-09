@@ -1,8 +1,8 @@
-<!-- TODO: add logo — e.g. ![Parla logo](docs/logo.png) -->
+![Parla — Learn Italian](docs/header.png)
 
 # Parla — Learn Italian
 
-> **Live demo:** _Deploy and add your URL here_
+> **Live demo:** [parla-it.vercel.app](https://parla-it.vercel.app/)
 
 A Duolingo-style Italian learning Progressive Web App. Work through a CEFR-graded curriculum of translation, matching, fill-in-the-blank, and listening exercises, earn XP and level up, keep a daily streak, and review vocabulary with SM-2 spaced repetition — installable on iOS/Android/desktop, themeable, and built with accessibility as a first-class concern.
 
@@ -14,13 +14,15 @@ A Duolingo-style Italian learning Progressive Web App. Work through a CEFR-grade
 ![Clerk](https://img.shields.io/badge/Clerk-Auth-6c47ff)
 ![PWA](https://img.shields.io/badge/PWA-Serwist-5a0fc8)
 
-<!-- TODO: add screenshots/GIF — e.g.
 ## Screenshots
 
-| Dashboard | Lesson | Review |
-|---|---|---|
-| ![Dashboard](docs/screenshot-dashboard.png) | ![Lesson](docs/screenshot-lesson.png) | ![Review](docs/screenshot-review.png)
--->
+| Dashboard                                                                   | Lesson                                                                         | Sections                                                                       |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| <img src="docs/dashboard-mobile.png" width="280" alt="Dashboard on mobile"> | <img src="docs/lesson-mobile.png" width="280" alt="Lesson exercise on mobile"> | <img src="docs/sections-mobile.png" width="280" alt="Sections list on mobile"> |
+
+<p align="center">
+  <img src="docs/dashboard-desktop.png" width="720" alt="Dashboard on desktop">
+</p>
 
 ## Overview
 
