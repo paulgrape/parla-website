@@ -1,6 +1,12 @@
 'use client'
 
 import {useUserStats} from '@/components/providers/UserStatsProvider'
+import {
+  AvatarPlaceholder,
+  TextSkeleton,
+  ValueSkeleton,
+  useStatsPending
+} from '@/components/skeletons/UserStatsSkeletons'
 import {cn} from '@/lib/utils'
 import {useUser} from '@clerk/nextjs'
 import {BookOpen01Icon, FireIcon, StarIcon} from 'hugeicons-react'
@@ -17,26 +23,31 @@ interface ProfileStatsHeaderProps {
 }
 
 export function ProfileStatsHeader({compact = false}: ProfileStatsHeaderProps) {
-  const {user} = useUser()
-  const {stats, loading} = useUserStats()
+  const {user, isLoaded} = useUser()
+  const {stats} = useUserStats()
+  const statsPending = useStatsPending()
+  const identityPending = !isLoaded
 
   const xp = stats?.xp ?? 0
   const level = Math.floor(xp / 100) + 1
   const streak = stats?.streak ?? 0
   const completedCount = stats?.completedLessons.length ?? 0
-  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Learner'
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || ''
   const memberSince = user?.createdAt ? formatMemberSince(user.createdAt) : null
+  const avatarSize = compact ? 56 : 96
 
   return (
     <div className={cn(compact ? 'space-y-4' : 'space-y-6')}>
-      {/* <Card className={cn(compact ? 'space-y-4 p-4' : 'space-y-6')}> */}
       <div
         className={cn(
           'flex items-center gap-3',
           compact ? 'text-left' : 'flex-col gap-4 text-center sm:flex-row sm:text-left'
         )}
+        aria-busy={identityPending}
       >
-        {user?.imageUrl ? (
+        {identityPending ? (
+          <AvatarPlaceholder size={avatarSize} />
+        ) : user?.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={user.imageUrl}
@@ -59,18 +70,31 @@ export function ProfileStatsHeader({compact = false}: ProfileStatsHeaderProps) {
         )}
 
         <div className='min-w-0 flex-1 space-y-0.5'>
-          <h2 className={cn('font-display text-foreground truncate font-black', compact ? 'text-lg' : 'text-2xl')}>
-            {displayName}
-          </h2>
-          {user?.username ? <p className='text-muted-foreground truncate text-xs font-bold'>@{user.username}</p> : null}
-          {memberSince ? <p className='text-muted-foreground text-xs'>Member since {memberSince}</p> : null}
+          {identityPending ? (
+            <>
+              <TextSkeleton className={cn(compact ? 'h-5 w-32' : 'h-7 w-40')} />
+              <TextSkeleton className='h-3 w-24' />
+            </>
+          ) : (
+            <>
+              <h2 className={cn('font-display text-foreground truncate font-black', compact ? 'text-lg' : 'text-2xl')}>
+                {displayName}
+              </h2>
+              {user?.username ? (
+                <p className='text-muted-foreground truncate text-xs font-bold'>@{user.username}</p>
+              ) : null}
+              {memberSince ? <p className='text-muted-foreground text-xs'>Member since {memberSince}</p> : null}
+            </>
+          )}
         </div>
       </div>
 
       <div
-        className={cn('grid grid-cols-3 gap-2', !compact && 'gap-3', loading && 'opacity-60')}
-        aria-busy={loading}
+        className={cn('grid grid-cols-3 gap-2', !compact && 'gap-3')}
+        aria-busy={statsPending}
+        role={statsPending ? 'status' : undefined}
       >
+        {statsPending ? <span className='sr-only'>Loading stats</span> : null}
         <div
           className={cn(
             'border-border bg-muted/40 rounded-2xl border-2 text-center',
@@ -82,10 +106,15 @@ export function ProfileStatsHeader({compact = false}: ProfileStatsHeaderProps) {
               size={compact ? 14 : 18}
               strokeWidth={2.5}
               aria-hidden
+              className={cn(statsPending && 'animate-pulse')}
             />
             <span className='text-[10px] font-bold uppercase sm:text-xs'>Streak</span>
           </div>
-          <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{streak}</p>
+          {statsPending ? (
+            <ValueSkeleton className={cn('mx-auto', compact ? 'h-6 w-8' : 'h-8 w-10')} />
+          ) : (
+            <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{streak}</p>
+          )}
         </div>
 
         <div
@@ -99,11 +128,21 @@ export function ProfileStatsHeader({compact = false}: ProfileStatsHeaderProps) {
               size={compact ? 14 : 18}
               strokeWidth={2.5}
               aria-hidden
+              className={cn(statsPending && 'animate-pulse')}
             />
             <span className='text-[10px] font-bold uppercase sm:text-xs'>Level</span>
           </div>
-          <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{level}</p>
-          <p className='text-muted-foreground text-[10px] sm:text-xs'>{xp} XP</p>
+          {statsPending ? (
+            <>
+              <ValueSkeleton className={cn('mx-auto', compact ? 'h-6 w-8' : 'h-8 w-10')} />
+              <ValueSkeleton className='mx-auto mt-1 h-3 w-12' />
+            </>
+          ) : (
+            <>
+              <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{level}</p>
+              <p className='text-muted-foreground text-[10px] sm:text-xs'>{xp} XP</p>
+            </>
+          )}
         </div>
 
         <div
@@ -117,14 +156,18 @@ export function ProfileStatsHeader({compact = false}: ProfileStatsHeaderProps) {
               size={compact ? 14 : 18}
               strokeWidth={2.5}
               aria-hidden
+              className={cn(statsPending && 'animate-pulse')}
             />
             <span className='text-[10px] font-bold uppercase sm:text-xs'>Done</span>
           </div>
-          <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{completedCount}</p>
+          {statsPending ? (
+            <ValueSkeleton className={cn('mx-auto', compact ? 'h-6 w-8' : 'h-8 w-10')} />
+          ) : (
+            <p className={cn('text-foreground font-black', compact ? 'text-xl' : 'text-2xl')}>{completedCount}</p>
+          )}
           <p className='text-muted-foreground text-[10px] sm:text-xs'>lessons</p>
         </div>
       </div>
-      {/* </Card> */}
     </div>
   )
 }

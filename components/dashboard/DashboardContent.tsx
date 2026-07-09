@@ -5,6 +5,7 @@ import {StreakAtRiskBanner} from '@/components/dashboard/StreakAtRiskBanner'
 import {UnitMap} from '@/components/dashboard/UnitMap'
 import {useUserStats} from '@/components/providers/UserStatsProvider'
 import {DashboardSkeleton} from '@/components/skeletons/PageSkeletons'
+import {useStatsPending} from '@/components/skeletons/UserStatsSkeletons'
 import {useApi} from '@/lib/api'
 import {resolveActiveSection} from '@/lib/sections'
 import type {Lesson, Section, Unit} from '@llp/types'
@@ -29,6 +30,7 @@ function isEveningLocal(now: number) {
 export function DashboardContent() {
   const {fetchApi} = useApi()
   const {stats} = useUserStats()
+  const statsPending = useStatsPending()
   const searchParams = useSearchParams()
   const sectionIdParam = searchParams.get('sectionId')
 
@@ -79,8 +81,8 @@ export function DashboardContent() {
     )
   }
 
-  const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
-  const heartsAvailable = hearts > 0
+  const hearts = stats?.hearts ?? 0
+  const heartsAvailable = stats ? hearts > 0 : undefined
   const nextHeartAt = stats?.nextHeartAt ?? null
   const regenLabel = nextHeartAt && nextHeartAt > now ? formatCountdown(nextHeartAt - now) : null
 
@@ -89,13 +91,13 @@ export function DashboardContent() {
   const isSectionComplete = allLessonIds.length > 0 && allLessonIds.every(id => completedLessons.includes(id))
   const streak = stats?.streak ?? 0
   const extendedToday = stats?.extendedToday ?? false
-  const showStreakAtRisk = streak > 0 && !extendedToday && isEveningLocal(now)
+  const showStreakAtRisk = !statsPending && streak > 0 && !extendedToday && isEveningLocal(now)
 
   return (
     <div className='space-y-8'>
       {showStreakAtRisk && <StreakAtRiskBanner streak={streak} />}
 
-      {!heartsAvailable && (
+      {heartsAvailable === false && (
         <div className='border-destructive/30 bg-destructive/5 rounded-2xl border-2 p-4 text-center'>
           <p className='text-destructive font-black'>You&apos;re out of hearts</p>
           <p className='text-muted-foreground mt-1 text-sm'>
