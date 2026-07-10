@@ -26,6 +26,7 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
   const viewportRef = useRef<HTMLDivElement>(null)
   const scrollRafRef = useRef<number | null>(null)
   const prevWidthRef = useRef(0)
+  const programmaticTargetRef = useRef<number | null>(null)
   const reducedMotion = useReducedMotion()
   const {resolvedTheme} = useTheme()
   const mounted = useSyncExternalStore(
@@ -53,6 +54,7 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
       if (!node || width <= 0) return
 
       const clamped = Math.max(0, Math.min(steps.length - 1, next))
+      programmaticTargetRef.current = clamped
       setIndex(clamped)
       node.scrollTo({
         left: clamped * width,
@@ -66,18 +68,44 @@ export function InstallCarousel({steps, className}: InstallCarouselProps) {
     const node = viewportRef.current
     if (!node || width <= 0) return
 
+    const syncIndexFromScroll = () => {
+      const nextIndex = Math.round(node.scrollLeft / width)
+      setIndex(Math.max(0, Math.min(steps.length - 1, nextIndex)))
+    }
+
     const onScroll = () => {
       if (scrollRafRef.current !== null) return
       scrollRafRef.current = window.requestAnimationFrame(() => {
         scrollRafRef.current = null
-        const nextIndex = Math.round(node.scrollLeft / width)
-        setIndex(Math.max(0, Math.min(steps.length - 1, nextIndex)))
+
+        const target = programmaticTargetRef.current
+        if (target !== null) {
+          if (Math.abs(node.scrollLeft - target * width) < 1) {
+            programmaticTargetRef.current = null
+          }
+          return
+        }
+
+        syncIndexFromScroll()
       })
     }
 
+    const onPointerDown = () => {
+      programmaticTargetRef.current = null
+    }
+
+    const onScrollEnd = () => {
+      programmaticTargetRef.current = null
+      syncIndexFromScroll()
+    }
+
     node.addEventListener('scroll', onScroll, {passive: true})
+    node.addEventListener('pointerdown', onPointerDown, {passive: true})
+    node.addEventListener('scrollend', onScrollEnd, {passive: true})
     return () => {
       node.removeEventListener('scroll', onScroll)
+      node.removeEventListener('pointerdown', onPointerDown)
+      node.removeEventListener('scrollend', onScrollEnd)
       if (scrollRafRef.current !== null) {
         window.cancelAnimationFrame(scrollRafRef.current)
       }
