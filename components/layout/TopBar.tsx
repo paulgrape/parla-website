@@ -27,47 +27,49 @@ export function TopBar() {
   const hearts = stats?.hearts ?? stats?.maxHearts ?? 5
 
   return (
-    <header className='border-border bg-card sticky top-0 z-30 flex items-center justify-between border-b-2 px-4 py-3 md:hidden'>
+    <header className='border-border bg-card sticky top-0 z-30 flex items-center border-b-2 px-4 py-3 md:hidden'>
       <AppLogo size='sm' />
-      <StatsLoadingStatus
-        label='Loading stats'
-        pending={statsPending}
-        className='flex items-center gap-4'
-      >
-        <div
-          className='flex items-center gap-1'
-          aria-label={statsPending ? undefined : `${hearts} hearts`}
+      <div className='ml-auto flex shrink-0 items-center gap-4'>
+        <StatsLoadingStatus
+          label='Loading stats'
+          pending={statsPending}
+          className='flex items-center gap-4'
         >
-          <FavouriteIcon
-            size={20}
-            strokeWidth={2}
-            className={cn('text-destructive', pendingIconClass(statsPending))}
-            aria-hidden
-          />
-          {statsPending ? (
-            <ValueSkeleton className='h-5 w-5' />
-          ) : (
-            <span className='text-destructive font-bold'>{hearts}</span>
-          )}
-        </div>
-        <div
-          className='flex items-center gap-1'
-          aria-label={statsPending ? undefined : `${streak} day streak${extendedToday ? ', extended today' : ''}`}
-        >
-          <FireIcon
-            size={20}
-            strokeWidth={2}
-            className={cn(streakColor, pendingIconClass(statsPending))}
-            aria-hidden
-          />
-          {statsPending ? (
-            <ValueSkeleton className='h-5 w-5' />
-          ) : (
-            <span className={`font-bold ${streakColor}`}>{streak}</span>
-          )}
-        </div>
-        <UserMenu variant='compact' />
-      </StatsLoadingStatus>
+          <div
+            className='flex items-center gap-1'
+            aria-label={statsPending ? undefined : `${hearts} hearts`}
+          >
+            <FavouriteIcon
+              size={20}
+              strokeWidth={2}
+              className={cn('text-destructive', pendingIconClass(statsPending))}
+              aria-hidden
+            />
+            {statsPending ? (
+              <ValueSkeleton className='h-5 w-5' />
+            ) : (
+              <span className='text-destructive font-bold'>{hearts}</span>
+            )}
+          </div>
+          <div
+            className='flex items-center gap-1'
+            aria-label={statsPending ? undefined : `${streak} day streak${extendedToday ? ', extended today' : ''}`}
+          >
+            <FireIcon
+              size={20}
+              strokeWidth={2}
+              className={cn(streakColor, pendingIconClass(statsPending))}
+              aria-hidden
+            />
+            {statsPending ? (
+              <ValueSkeleton className='h-5 w-5' />
+            ) : (
+              <span className={`font-bold ${streakColor}`}>{streak}</span>
+            )}
+          </div>
+          <UserMenu variant='compact' />
+        </StatsLoadingStatus>
+      </div>
     </header>
   )
 }

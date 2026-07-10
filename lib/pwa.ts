@@ -83,3 +83,7 @@ export function forceIOSInstallPrompt(): void {
 export function shouldShowIOSInstallPrompt(): boolean {
   return isIOSSafari() && !isStandalone() && !isIOSInstallDismissed()
 }
+
+export function canShowIOSInstallSettings(): boolean {
+  return isIOSSafari() && !isStandalone()
+}
